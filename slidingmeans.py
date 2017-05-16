@@ -1,25 +1,23 @@
 #!usr/bin/env python3.5
 
 """
-Takes in an ldhelmet .txt output file as well as
-a window size. Returns means in that windowsize as
-well as the mean of those means. Prints every tenth
-window value to terminal for the sake of progress
-monitoring.
+Takes in an LDHelmet (Chan et al., 2012) .txt output file as well as a window size. Returns mean
+values of r within each window.
 
 usage:
-python3.5 slidingwindowfixed.py [ldhelmet txt infile] [windowsize] > [outfile]
+python3.5 slidingmeans.py [ldhelmet txt infile] [windowsize] > [outfile]
 
-can be done across blocks with a nested for loop:
+can be done across blocks with a nested for loop, if the user is looking to compare the effects of block
+penalty changes at different window sizes:
 
 for w in 500 1000 5000 10000 20000 30000; do
     for b in 10 50 100; do
-        python3.5 slidingwindowfixed.py chromosome_12_$b\.txt $w\ >> slide$w\.txt ;
+        python3.5 slidingmeans.py chromosome_12_$b\.txt $w\ >> chr12slide$w\.txt ;
         done;
     done
 
 
-reference - notebook 7.1
+AH - 03/2017
 """
 
 import pandas as pd
@@ -55,14 +53,12 @@ def slider(df, windowsize, block):
             currentwindowmean = sum(currentwindowmean)/len(currentwindowmean)
             print(winstart, currentwindowmean, block)
             windowmeans.append(currentwindowmean)
-#    return windowmeans
 
 # analysis
 df = pd.read_csv(sys.argv[1], sep = ' ',
                  skiprows = 2, header = 'infer')
 
 colfixer(df)
-# print('fixed columns')
 
 outname = sys.argv[1]
 outname = outname[outname.find('chromosome'):-4]
@@ -70,7 +66,6 @@ block = outname[outname.rfind('_') + 1:]
 
 # creates machine-readable space-separated structure
 slider(df, inputsize, block)
-# print('done sliding')
 
 
 
