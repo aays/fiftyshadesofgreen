@@ -1,11 +1,11 @@
 #!/usr/bin/env Rscript
 
-# plots output from LDHelmet's rjmcmc + post_to_text steps
+# plots output from LDHelmet (Chan et al., 2012) rjmcmc + post_to_text steps
 
 # usage: Rscript chromplot.R [input file (txt)] [outfile name] [outfile wd]
 # e.g. Rscript chromplot.R chromosome_1.txt chromosome_1 analysis/graphs
 
-# reference - notebook 5.3a
+# AH - 02/2017
 
 args <- commandArgs(trailingOnly = TRUE)
 
