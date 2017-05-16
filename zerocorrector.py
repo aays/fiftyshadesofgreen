@@ -17,6 +17,9 @@ usage:
 python3.5 zerocorrector.py <df file> > <outfile name>
 
 eg python3.5 zerocorrector.py chromosome1.ldz > chromosome1r2.txt
+
+AH - 04/2017
+
 '''
 
 import sys
