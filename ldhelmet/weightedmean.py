@@ -1,10 +1,14 @@
 """
 Returns a weighted mean r value for the entirety of a given LDHelmet (Chan et al. 2012) output file.
-Each r value is weighted by the range it was calculated over.
+Each r value is weighted by the range it was calculated over. For instance:
 
-Usage:
+left_snp right_snp mean
+2 5 0.5
 
-python weightedmean.py <infile> >> <outfile>
+would be calculated as 3 * 0.5 = 1.5, and then these weighted values would be used to find the mean.
+
+usage:
+python weightedmean.py <infile> > <outfile>
 
 """
 
