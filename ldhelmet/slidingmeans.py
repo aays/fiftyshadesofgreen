@@ -7,7 +7,7 @@ values of r within each window.
 usage:
 python3.5 slidingmeans.py [ldhelmet txt infile] [windowsize] > [outfile]
 
-can be done across blocks with a nested for loop, if the user is looking to compare the effects of block
+This can be done across blocks with a nested for loop, if the user is looking to compare the effects of block
 penalty changes at different window sizes:
 
 for w in 500 1000 5000 10000 20000 30000; do
@@ -60,7 +60,7 @@ df = pd.read_csv(sys.argv[1], sep = ' ',
 
 colfixer(df)
 
-outname = sys.argv[1]
+outname = str(sys.argv[1])
 outname = outname[outname.find('chromosome'):-4]
 block = outname[outname.rfind('_') + 1:]
 
