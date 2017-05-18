@@ -37,9 +37,8 @@ def meaner(df, i):
 
 def slider(df, windowsize, block):
     dfmeans = []
-    windowmeans = []
     counter = 0
-    windowlist = list(range(int(df.iloc[0,0]), int(df.iloc[-1,1]), windowsize))
+    windowlist = list(range(int(df.iloc[0,0]), int(df.iloc[-1,1]), windowsize + 1))
     for window in windowlist:
         counter = counter + 1
         winstart = window
@@ -50,9 +49,9 @@ def slider(df, windowsize, block):
             print(winstart, 0, block)
             continue
         else:
-            currentwindowmean = sum(currentwindowmean)/len(currentwindowmean)
+            winlength = subdf.iloc[-1,1] - subdf.iloc[0,0]
+            currentwindowmean = sum(currentwindowmean)/winlength
             print(winstart, currentwindowmean, block)
-            windowmeans.append(currentwindowmean)
 
 # analysis
 df = pd.read_csv(sys.argv[1], sep = ' ',
