@@ -2,11 +2,14 @@
 
 '''
 Given a zipped vcf file and a window size, calculates the number of SNPs in each given window.
+Chromosome lengths are currently hardcoded for the Chlamydomonas reinhardtii genome.
 
 usage:
 python3.5 snpsampler.py [vcf (.gz)] [windowsize] > [outfile]
 
 reference - notebook 8.6
+
+AH - 04/2017
 '''
 
 import sys
