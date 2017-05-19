@@ -1,22 +1,26 @@
 #!/usr/bin/python3.5
 
 '''
-
-
 usage:
 python3.5 snpsample2vcf.py [vcf (.gz)] [windowsize] [outfile]
 
 e.g.
 python3.5 snpsample2vcf.py chromosome10.vcf.gz 100000 chromosome10
-
 will create a vcf called chromosome10sampled.vcf.
 
 Number of SNPs picked out from each window are hardcoded in the snpcounts dictionary,
-based on calculations from snpsampler.py.
+based on calculations from snpcounter.py. These were calculated such that an equivalent
+amount of SNPs are obtained from each chromosome so as not to bias downstream inter-chromosome 
+r2 comparisons, and correspond to a window size of 100kb.
+
+In order to reuse this script for a different window size/genome, one would have to
+run snpcounter.py for the desired window size and with the chromosome lengths modified as
+necessary, after inputting the respective SNP counts (as well as chromosome lengths) into this script.
 
 reference - notebook 8.6c
-'''
 
+AH - 04/2017
+'''
 
 import sys
 import vcf
@@ -61,7 +65,7 @@ lengths = {'chromosome_1': 8033585,
 'chromosome_17': 7188315} 
 
 def chromgetter(vcfinput):
-    '''Fetches chrom name from vcf. Helper function for variantgetter.'''
+    '''Fetches chrom name from vcf. Helper function for randvariantgetter.'''
     thisvcf = vcf.Reader(filename = vcfinput, compressed = True)
     chromname = next(thisvcf).CHROM
     return chromname
