@@ -5,15 +5,12 @@ Given a tabix-indexed vcf, start/end coordinates, and an outfile name, writes a 
 containing that snippet.
 
 usage:
-python3.5 vcf_genfetch.py <input vcf> <chromosome> <start> <end> <outname>
+python3.5 vcf_genfetch.py -v <input vcf> -c <chromosome> -p <start-end> -o <outname>
 
 e.g.
-python3.5 vcf_genfetch.py genome.vcf chromosome_6 280000 290000 snippet.vcf
+python3.5 vcf_genfetch.py -v genome.vcf -c chromosome_6 -p 280000-290000 snippet.vcf
 
 will write records from position 280000 to 290000 to a new file called snippet.vcf.
-
-I might eventually update this with a failsafe that uses subprocess to create a tabix file
-should there not be one.
 
 AH - 05/2017
 
@@ -21,15 +18,35 @@ AH - 05/2017
 
 import vcf
 import sys
+import argparse
 
-vcfin = str(sys.argv[1])
-chrom = str(sys.argv[2])
-start = int(sys.argv[3])
-end = int(sys.argv[4])
-outfile = str(sys.argv[5]) 
+parser = argparse.ArgumentParser(description = 'Subset a vcf file.', 
+                                usage = 'vcf_genfetch.py [options]')
 
+parser.add_argument('-v', '--vcfinput', required = True,
+                   type = str, help = 'Input VCF')
+parser.add_argument('-c', '--chrom', required = True,
+                   type = str, help = 'Chromosome name (as it appears in the vcf)')
+parser.add_argument('-p', '--positions', required = False,
+                   type = str, help = 'Positions, in the format "start-end" (ie 100-200)')
+parser.add_argument('-o', '--out', required = True,
+                   type = str, help = 'Name of desired output file')
+
+args = parser.parse_args()
+vcfin = args.vcfinput
+chrom = args.chrom
+pos = args.positions
+outfile = args.out
+    
 file = vcf.Reader(filename = vcfin, compressed = True)
-snippet = file.fetch(chrom = chrom, start = start, end = end) 
+
+if pos:
+    pos = pos.split('-')
+    start = int(pos[0])
+    end = int(pos[1])
+    snippet = file.fetch(chrom = chrom, start = start, end = end) 
+else:
+    snippet = file.fetch(chrom = chrom) 
 
 with open(outfile, 'w') as out:
     writer = vcf.Writer(out, snippet)
