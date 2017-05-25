@@ -5,10 +5,10 @@ Given a tabix-indexed vcf, start/end coordinates, and an outfile name, writes a 
 containing that snippet.
 
 usage:
-python3.5 vcf_genfetch.py -v <input vcf> -c <chromosome> -p <start-end> -o <outname>
+python3.5 vcf_chop.py -v <input vcf> -c <chromosome> -p <start-end> -o <outname>
 
 e.g.
-python3.5 vcf_genfetch.py -v genome.vcf -c chromosome_6 -p 280000-290000 snippet.vcf
+python3.5 vcf_chop.py -v genome.vcf -c chromosome_6 -p 280000-290000 -o snippet.vcf
 
 will write records from position 280000 to 290000 to a new file called snippet.vcf.
 
