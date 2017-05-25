@@ -21,7 +21,7 @@ import sys
 import argparse
 
 parser = argparse.ArgumentParser(description = 'Subset a vcf file.', 
-                                usage = 'vcf_genfetch.py [options]')
+                                usage = 'vcf_chop.py [options]')
 
 parser.add_argument('-v', '--vcfinput', required = True,
                    type = str, help = 'Input VCF')
