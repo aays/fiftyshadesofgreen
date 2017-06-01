@@ -164,11 +164,12 @@ def reclist(vcf_file, chrom = None, pos = None):
         try:
             assert isinstance(pos, str) 
             pos = pos.split('-')
+            assert len(pos) == 2
             start = int(pos[0]) - 1
             end = int(pos[1])
             snippet = vcfin.fetch(chrom = chrom, start = start, end = end) 
             reclist = [record for record in snippet]
-        except AssertionError:
+        except:
             print('Error in pos parameter.')
             print('Please enter positions in a start-end format with no spaces.')
     elif chrom is not None and pos is None:
