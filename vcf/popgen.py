@@ -1,5 +1,5 @@
 '''
-popgenvcf v0.1
+popgen v0.1
 
 A suite of functions that calculate useful population genetics statistics
 between a pair of VCF records - ideally SNPs with single ALTs. Deviations from this
