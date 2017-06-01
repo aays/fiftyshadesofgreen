@@ -114,12 +114,18 @@ def dprimecalc(record1, record2, snpcheck = True):
     d = dcalc(record1, record2)
     if d >= 0:
         dmax = min(p * q2, p2 * q)
-        out = d/dmax
+        if dmax == 0:
+            out = 0
+        else:
+            out = d/dmax
     elif d < 0:
         dmin = max(-1 * p * q, -1 * p2 * q2)
-        out = d/dmin
-    elif d == 0:
-        print("Error - SNPs in linkage equilibrium")
+        if dmin == 0:
+            out = 0
+        else:
+            out = d/dmin
+    elif round(d, 6) == 0:
+        out = 0
     out = round(out, 4)
     return out
 
@@ -134,9 +140,12 @@ def r2calc(record1, record2, snpcheck = True):
     q = 1 - record2.aaf[0]
     p2 = record1.aaf[0]
     q2 = record2.aaf[0]
-    dsquared = dcalc(record1, record2)**2
-    out = dsquared/(p * q * p2 * q2)
-    out = round(out, 4)
+    if p == 0 or q == 0 or p2 == 0 or q2 == 0:
+        out = 0
+    else:
+        dsquared = dcalc(record1, record2)**2
+        out = dsquared/(p * q * p2 * q2)
+        out = round(out, 4)
     return out
 
 def ldstats(record1, record2, snpcheck = True, freqs = False):
@@ -199,5 +208,3 @@ def reclook(pos, reclist):
             return record
         else:
             pass
-
-
