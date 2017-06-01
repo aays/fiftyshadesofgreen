@@ -63,7 +63,9 @@ def singlevcfcalc(vcf_file, ref, target, stat):
     For intrachromosomal stats, simply input the same region twice:
     singlevcfcalc('myfile.vcf.gz', 'chromosome_6', 'chromosome_6', 'd/dprime')
     '''
-    
+    def metadata(record1, record2):
+        out = record1.CHROM + ' ' + str(record1.POS) + ' ' + record2.CHROM + ' ' + str(record2.POS)
+        return out
     reflocus = reclist(vcf_file, chrom = ref, snpsonly = True)
     stat = stat.split('/')
     header(stat)
@@ -76,17 +78,17 @@ def singlevcfcalc(vcf_file, ref, target, stat):
                 continue
             if len(stat) == 1:
                 if 'd' in stat:
-                    print(record1.CHROM, record1.POS, record2.CHROM, record2.POS, dcalc(record1, record2))
+                    print(metadata(record1, record2), dcalc(record1, record2))
                 elif 'dprime' in stat:
-                    print(record1.CHROM, record1.POS, record2.CHROM, record2.POS, dprimecalc(record1, record2))
+                    print(metadata(record1, record2), dprimecalc(record1, record2))
                 elif 'r2' in stat:
-                    print(record1.CHROM, record1.POS, record2.CHROM, record2.POS, r2calc(record1, record2))
+                    print(metadata(record1, record2), r2calc(record1, record2))
             elif len(stat) == 2:
                 if 'd' in stat and 'dprime' in stat:
-                    print(record1.CHROM, record1.POS, record2.CHROM, record2.POS, dcalc(record1, record2), dprimecalc(record1, record2))
+                    print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2))
                 elif 'd' in stat and 'r2' in stat:
-                    print(record1.CHROM, record1.POS, record2.CHROM, record2.POS, dcalc(record1, record2), r2calc(record1, record2))
+                    print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
                 elif 'dprime' in stat and 'r2' in stat:
-                    print(record1.CHROM, record1.POS, record2.CHROM, record2.POS, dcalc(record1, record2), r2calc(record1, record2))
+                    print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
             elif len(stat) == 3:
-                print(record1.CHROM, record1.POS, record2.CHROM, record2.POS, dcalc(record1, record2), dprimecalc(record1, record2), r2calc(record1, record2))
+                print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), r2calc(record1, record2))
