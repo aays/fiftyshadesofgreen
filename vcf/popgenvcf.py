@@ -18,6 +18,8 @@ Python library down the line.
 AH - 05/2017
 '''
 
+import vcf
+
 def snpchecker(record1, record2):
     '''Given two VCF records, checks whether they are SNPs with single ALTs each.
     Helper function that just throws warning messages if necessary.'''
@@ -99,7 +101,7 @@ def dcalc(record1, record2, snpcheck = True):
     return d      
 
 def dprimecalc(record1, record2, snpcheck = True):
-    """Calculates Lewontin's D' statistic between two VCF records.
+    """Calculates Lewontin's D' statistic (D/Dmax) between two VCF records.
     Will check that records are single-ALT SNPs unless snpcheck = False."""
     if snpcheck == True:
         snpchecker(record1, record2)
