@@ -66,7 +66,7 @@ def singlevcfcalc(vcf_file, ref, target, stat):
     def metadata(record1, record2):
         out = record1.CHROM + ' ' + str(record1.POS) + ' ' + record2.CHROM + ' ' + str(record2.POS)
         return out
-    reflocus = reclist(vcf_file, chrom = ref, snpsonly = True)
+    reflocus = snppuller(vcf_file, chrom = ref)
     stat = stat.split('/')
     header(stat)
     for record1 in reflocus:
