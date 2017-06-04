@@ -1,5 +1,5 @@
 '''
-ldcalc.py - functions to calculate linkage disequlibrium stats from vcf files
+ldcalc.py - functions to calculate linkage disequilibrium stats from vcf files
 
 Uses LD functions defined in popgen.py.
 
