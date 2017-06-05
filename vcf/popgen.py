@@ -126,7 +126,7 @@ def dprimecalc(record1, record2, snpcheck = True):
             out = d/dmin
     elif round(d, 6) == 0:
         out = 0
-    out = round(out, 4)
+    out = round(out, 6)
     return out
 
 def r2calc(record1, record2, snpcheck = True):
