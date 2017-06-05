@@ -97,7 +97,7 @@ def dcalc(record1, record2, snpcheck = True):
             altcount = altcount + 1
     ABfreq = refcount/(refcount + altcount)
     d = ABfreq - (p * q)
-    d = round(d, 5)
+    # d = round(d, 5)
     return d      
 
 def dprimecalc(record1, record2, snpcheck = True):
@@ -144,7 +144,7 @@ def r2calc(record1, record2, snpcheck = True):
     else:
         dsquared = dcalc(record1, record2)**2
         out = dsquared/(p * q * p2 * q2)
-        out = round(out, 4)
+        # out = round(out, 4)
     return out
 
 def ldstats(record1, record2, snpcheck = True, freqs = False):
