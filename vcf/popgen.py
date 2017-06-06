@@ -73,8 +73,7 @@ def freqscalc(record1, record2, snpcheck = True):
         haplist.append(outgt) # create list of observed genotypes
     uniques = set(haplist)
     for hap in uniques:
-        print(hap, round(haplist.count(hap)/len(haplist), 5))   
-        
+        print(hap, round(haplist.count(hap)/len(haplist), 5))    
     
 def freqsgetter(record1, record2, snpcheck = True):
     '''Helper function for LD statistic calculations. Returns, in order: 1. a dict containing
@@ -117,8 +116,6 @@ def freqsgetter(record1, record2, snpcheck = True):
         uniques[hap] = haplist.count(hap)/len(haplist)
     homref = record1.REF + record2.REF
     return uniques, values, homref
-
-
 
 def dcalc(record1, record2, snpcheck = True):
     '''Calculates D statistic between two VCF records.
