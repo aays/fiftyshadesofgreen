@@ -1,5 +1,5 @@
 '''
-popgen v0.1
+popgen v0.2
 
 A suite of functions that calculate useful population genetics statistics
 between a pair of VCF records - ideally SNPs with single ALTs. Deviations from this
@@ -15,7 +15,7 @@ their genomic positions and can be entered as input to the pop gen functions.
 This is an extremely early draft of what might be put together into a full
 Python library down the line.
 
-AH - 05/2017
+AH - 06/2017
 '''
 
 import vcf
@@ -31,10 +31,15 @@ def snpchecker(record1, record2):
         print('caution: multiple alts in record 1 - ', record1.ALT)
     if len(record2.ALT) > 1:
         print('caution: multiple alts in record 2 - ', record2.ALT)
+    if len(record1.alleles) != 2:
+        print('caution: record 1 does not have two alleles - ', record1.alleles)
+    if len(record2.alleles) != 2:
+        print('caution: record 2 does not have two alleles - ', record2.alleles)
 
 def freqscalc(record1, record2, snpcheck = True):
     '''Given two VCF records, returns observed haplotype frequencies.
-    Will check that records are single-ALT SNPs unless snpcheck = False.'''
+    Will check that records are single-ALT SNPs unless snpcheck = False.
+    Function for exploratory use.'''
     if snpcheck == True:
         snpchecker(record1, record2)
     elif snpcheck == False:
@@ -70,7 +75,51 @@ def freqscalc(record1, record2, snpcheck = True):
     for hap in uniques:
         print(hap, round(haplist.count(hap)/len(haplist), 5))   
         
-        
+    
+def freqsgetter(record1, record2, snpcheck = True):
+    '''Helper function for LD statistic calculations. Returns, in order: 1. a dict containing
+    haplotype frequences; 2. a dict containing allele frequency values (p1, p2, q1, q2), and
+    3. the AB haplotype (for D calculations).'''
+    if snpcheck == True:
+        snpchecker(record1, record2)
+    elif snpcheck == False:
+        pass
+    strainlist = [record1.samples[i].sample for i in range(len(record1.samples))] 
+    assert strainlist == [record2.samples[i].sample for i in range(len(record2.samples))]
+    haplist = []
+    pcount = 0
+    qcount = 0
+    for strain in strainlist:
+        gt1 = record1.genotype(strain)['GT']
+        gt2 = record2.genotype(strain)['GT']
+        if gt1 == '.' or gt2 == '.':
+            continue
+        if gt1 == '1' and gt2 == '1':
+            outgt = str(record1.ALT[0]) + str(record2.ALT[0]) 
+        elif gt1 == '1' and gt2 == '0':
+            qcount = qcount + 1
+            outgt = str(record1.ALT[0]) + record2.REF
+        elif gt1 == '0' and gt2 == '1':
+            pcount = pcount + 1
+            outgt = record1.REF + str(record2.ALT[0])
+        elif gt1 == '0' and gt2 == '0':
+            pcount = pcount + 1
+            qcount = qcount + 1
+            outgt = record1.REF + record2.REF
+        haplist.append(outgt) # create list of observed genotypes
+    values = {}
+    values['p1'] = pcount/record1.num_called
+    values['q1'] = qcount/record2.num_called
+    values['p2'] = 1 - values['p1']
+    values['q2'] = 1 - values['q1']
+    uniques = dict.fromkeys(set(haplist))
+    for hap in uniques:
+        uniques[hap] = haplist.count(hap)/len(haplist)
+    homref = record1.REF + record2.REF
+    return uniques, values, homref
+
+
+
 def dcalc(record1, record2, snpcheck = True):
     '''Calculates D statistic between two VCF records.
     Will check that records are single-ALT SNPs unless snpcheck = False.'''
@@ -78,27 +127,12 @@ def dcalc(record1, record2, snpcheck = True):
         snpchecker(record1, record2)
     elif snpcheck == False:
         pass
-    p = 1 - record1.aaf[0]
-    q = 1 - record2.aaf[0]
-    p2 = record1.aaf[0]
-    q2 = record2.aaf[0]
-    refcount = 0
-    altcount = 0
     strainlist = [record1.samples[i].sample for i in range(len(record1.samples))] 
-    assert strainlist == [record2.samples[i].sample for i in range(len(record2.samples))]    
-    for strain in strainlist:
-        gt1 = record1.genotype(strain)['GT']
-        gt2 = record2.genotype(strain)['GT']
-        if gt1 == '.' or gt2 == '.':
-            continue
-        elif gt1 == '0' and gt2 == '0':
-            refcount = refcount + 1
-        else:
-            altcount = altcount + 1
-    ABfreq = refcount/(refcount + altcount)
-    d = ABfreq - (p * q)
+    assert strainlist == [record2.samples[i].sample for i in range(len(record2.samples))]
+    uniques, values, homref = freqsgetter(record1, record2)
+    d = uniques[homref] - (values['p1'] * values['p2'])
     # d = round(d, 5)
-    return d      
+    return d     
 
 def dprimecalc(record1, record2, snpcheck = True):
     """Calculates Lewontin's D' statistic (D/Dmax) between two VCF records.
@@ -107,19 +141,16 @@ def dprimecalc(record1, record2, snpcheck = True):
         snpchecker(record1, record2)
     elif snpcheck == False:
         pass
-    p = 1 - record1.aaf[0]
-    q = 1 - record2.aaf[0]
-    p2 = record1.aaf[0]
-    q2 = record2.aaf[0]
+    values = freqsgetter(record1, record2)[1] # get allele frequencies
     d = dcalc(record1, record2)
     if d >= 0:
-        dmax = min(p * q2, p2 * q)
+        dmax = min(values['p1'] * values['q2'], values['p2'] * values['q1'])
         if dmax == 0:
             out = 0
         else:
             out = d/dmax
     elif d < 0:
-        dmin = max(-1 * p * q, -1 * p2 * q2)
+        dmin = max(-1 * values['p1'] * values['q1'], -1 * values['p2'] * values['q2'])
         if dmin == 0:
             out = 0
         else:
@@ -135,15 +166,12 @@ def r2calc(record1, record2, snpcheck = True):
         snpchecker(record1, record2)
     elif snpcheck == False:
         pass
-    p = 1 - record1.aaf[0]
-    q = 1 - record2.aaf[0]
-    p2 = record1.aaf[0]
-    q2 = record2.aaf[0]
-    if p == 0 or q == 0 or p2 == 0 or q2 == 0:
+    values = freqsgetter(record1, record2)[1]
+    if values['p1'] == 0 or values['q1'] == 0 or values['p2'] == 0 or values['q2'] == 0:
         out = 0
     else:
         dsquared = dcalc(record1, record2)**2
-        out = dsquared/(p * q * p2 * q2)
+        out = dsquared/(values['p1'] * values['q1'] * values['p2'] * values['q2'])
         # out = round(out, 4)
     return out
 
