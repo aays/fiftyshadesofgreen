@@ -127,7 +127,10 @@ def dcalc(record1, record2, snpcheck = True):
     strainlist = [record1.samples[i].sample for i in range(len(record1.samples))] 
     assert strainlist == [record2.samples[i].sample for i in range(len(record2.samples))]
     uniques, values, homref = freqsgetter(record1, record2)
-    d = uniques[homref] - (values['p1'] * values['p2'])
+    try:
+        d = uniques[homref] - (values['p1'] * values['p2'])
+    except KeyError: # no AB
+        d = 0 - (values['p1'] * values['p2'])
     # d = round(d, 5)
     return d     
 
