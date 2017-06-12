@@ -88,27 +88,32 @@ def freqsgetter(record1, record2, snpcheck = True):
     haplist = []
     pcount = 0
     qcount = 0
+    totcalls = 0
     for strain in strainlist:
         gt1 = record1.genotype(strain)['GT']
         gt2 = record2.genotype(strain)['GT']
         if gt1 == '.' or gt2 == '.':
             continue
         elif gt1 == '1' and gt2 == '1':
-            outgt = str(record1.ALT[0]) + str(record2.ALT[0]) 
+            outgt = str(record1.ALT[0]) + str(record2.ALT[0])
+            totcalls = totcalls + 1
         elif gt1 == '1' and gt2 == '0':
             qcount = qcount + 1
             outgt = str(record1.ALT[0]) + record2.REF
+            totcalls = totcalls + 1
         elif gt1 == '0' and gt2 == '1':
             pcount = pcount + 1
             outgt = record1.REF + str(record2.ALT[0])
+            totcalls = totcalls + 1
         elif gt1 == '0' and gt2 == '0':
             pcount = pcount + 1
             qcount = qcount + 1
             outgt = record1.REF + record2.REF
+            totcalls = totcalls + 1
         haplist.append(outgt) # create list of observed genotypes
     values = {}
-    values['p1'] = pcount/record1.num_called
-    values['q1'] = qcount/record2.num_called
+    values['p1'] = pcount/totcalls
+    values['q1'] = qcount/totcalls
     values['p2'] = 1 - values['p1']
     values['q2'] = 1 - values['q1']
     uniques = dict.fromkeys(set(haplist))
