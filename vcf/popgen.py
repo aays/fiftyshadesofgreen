@@ -112,8 +112,14 @@ def freqsgetter(record1, record2, snpcheck = True):
             totcalls = totcalls + 1
         haplist.append(outgt) # create list of observed genotypes
     values = {}
-    values['p1'] = pcount/totcalls
-    values['q1'] = qcount/totcalls
+    try:
+        values['p1'] = pcount/totcalls
+    except ZeroDivisionError:
+        values['p1'] = 0
+    try:
+        values['q1'] = qcount/totcalls
+    except ZeroDivisionError:
+        values['q1'] = 0
     values['p2'] = 1 - values['p1']
     values['q2'] = 1 - values['q1']
     uniques = dict.fromkeys(set(haplist))
