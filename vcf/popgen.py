@@ -1,5 +1,5 @@
 '''
-popgen v0.2
+popgen v0.3
 
 A suite of functions that calculate useful population genetics statistics
 between a pair of VCF records - ideally SNPs with single ALTs. Deviations from this
@@ -78,7 +78,7 @@ def freqscalc(record1, record2, snpcheck = True):
 def freqsgetter(record1, record2, snpcheck = True):
     '''Helper function for LD statistic calculations. Returns, in order: 1. a dict containing
     haplotype frequences; 2. a dict containing allele frequency values (p1, p2, q1, q2), and
-    3. the AB haplotype (for D calculations).'''
+    3. a dict containing haplotype frequencies with A/B notation.'''
     if snpcheck == True:
         snpchecker(record1, record2)
     elif snpcheck == False:
@@ -93,7 +93,7 @@ def freqsgetter(record1, record2, snpcheck = True):
         gt2 = record2.genotype(strain)['GT']
         if gt1 == '.' or gt2 == '.':
             continue
-        if gt1 == '1' and gt2 == '1':
+        elif gt1 == '1' and gt2 == '1':
             outgt = str(record1.ALT[0]) + str(record2.ALT[0]) 
         elif gt1 == '1' and gt2 == '0':
             qcount = qcount + 1
@@ -115,7 +115,27 @@ def freqsgetter(record1, record2, snpcheck = True):
     for hap in uniques:
         uniques[hap] = haplist.count(hap)/len(haplist)
     homref = record1.REF + record2.REF
-    return uniques, values, homref
+    homalt = str(record1.ALT[0]) + str(record2.ALT[0])
+    het1 = record1.REF + str(record2.ALT[0])
+    het2 = str(record1.ALT[0]) + record2.REF
+    haps = {}
+    if homref in uniques.keys():
+        haps['AB'] = uniques[homref]
+    else:
+        haps['AB'] = 0
+    if homalt in uniques.keys():
+        haps['ab'] = uniques[homalt]
+    else:
+        haps['ab'] = 0
+    if het1 in uniques.keys():
+        haps['Ab'] = uniques[het1]
+    else:
+        haps['Ab'] = 0
+    if het2 in uniques.keys():
+        haps['aB'] = uniques[het2]
+    else:
+        haps['aB'] = 0
+    return uniques, values, haps
 
 def dcalc(record1, record2, snpcheck = True):
     '''Calculates D statistic between two VCF records.
@@ -126,13 +146,18 @@ def dcalc(record1, record2, snpcheck = True):
         pass
     strainlist = [record1.samples[i].sample for i in range(len(record1.samples))] 
     assert strainlist == [record2.samples[i].sample for i in range(len(record2.samples))]
-    uniques, values, homref = freqsgetter(record1, record2)
+    uniques, values, haps = freqsgetter(record1, record2)
     try:
-        d = uniques[homref] - (values['p1'] * values['q1'])
-    except KeyError: # no AB
-        d = 0 - (values['p1'] * values['q1'])
+        LHS = haps['AB'] * haps['ab']
+    except KeyError:
+        LHS = 0
+    try:
+        RHS = haps['Ab'] * haps['aB']
+    except KeyError:
+        RHS = 0
+    d = LHS - RHS
     # d = round(d, 5)
-    return d     
+    return d 
 
 def dprimecalc(record1, record2, snpcheck = True):
     """Calculates Lewontin's D' statistic (D/Dmax) between two VCF records.
@@ -150,7 +175,7 @@ def dprimecalc(record1, record2, snpcheck = True):
         else:
             out = d/dmax
     elif d < 0:
-        dmin = max(-1 * values['p1'] * values['q1'], -1 * values['p2'] * values['q2'])
+        dmin = min(-1 * values['p1'] * values['q1'], -1 * values['p2'] * values['q2'])
         if dmin == 0:
             out = 0
         else:
