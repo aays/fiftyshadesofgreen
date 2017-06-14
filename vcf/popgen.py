@@ -39,7 +39,8 @@ def snpchecker(record1, record2):
 def freqscalc(record1, record2, snpcheck = True):
     '''Given two VCF records, returns observed haplotype frequencies.
     Will check that records are single-ALT SNPs unless snpcheck = False.
-    Function for exploratory use.'''
+    Bit of an inexact function, and mostly for exploratory use.
+    (See freqsgetter for more exact allele freq values).'''
     if snpcheck == True:
         snpchecker(record1, record2)
     elif snpcheck == False:
@@ -112,14 +113,12 @@ def freqsgetter(record1, record2, snpcheck = True):
             totcalls = totcalls + 1
         haplist.append(outgt) # create list of observed genotypes
     values = {}
-    try:
-        values['p1'] = pcount/totcalls
-    except ZeroDivisionError:
+    if totcalls == 0:
         values['p1'] = 0
-    try:
-        values['q1'] = qcount/totcalls
-    except ZeroDivisionError:
         values['q1'] = 0
+    else:
+        values['p1'] = pcount/totcalls
+        values['q1'] = qcount/totcalls
     values['p2'] = 1 - values['p1']
     values['q2'] = 1 - values['q1']
     uniques = dict.fromkeys(set(haplist))
