@@ -1,5 +1,5 @@
 '''
-popgen v0.3
+popgen v0.4
 
 A suite of functions that calculate useful population genetics statistics
 between a pair of VCF records - ideally SNPs with single ALTs. Deviations from this
@@ -84,8 +84,10 @@ def freqsgetter(record1, record2, snpcheck = True):
         snpchecker(record1, record2)
     elif snpcheck == False:
         pass
+    # check strains b/w compared records are identical
     strainlist = [record1.samples[i].sample for i in range(len(record1.samples))] 
     assert strainlist == [record2.samples[i].sample for i in range(len(record2.samples))]
+    # parse through VCF calls
     haplist = []
     pcount = 0
     qcount = 0
@@ -112,6 +114,7 @@ def freqsgetter(record1, record2, snpcheck = True):
             outgt = record1.REF + record2.REF
             totcalls = totcalls + 1
         haplist.append(outgt) # create list of observed genotypes
+    # assign allele freq values
     values = {}
     if totcalls == 0:
         values['p1'] = 0
@@ -121,14 +124,17 @@ def freqsgetter(record1, record2, snpcheck = True):
         values['q1'] = qcount/totcalls
     values['p2'] = 1 - values['p1']
     values['q2'] = 1 - values['q1']
+    # haplotype frequencies
     uniques = dict.fromkeys(set(haplist))
     for hap in uniques:
         uniques[hap] = haplist.count(hap)/len(haplist)
+    # create tuples w/ actual haps and corresponding AB notation
     homref = record1.REF + record2.REF, 'AB'
     homalt = str(record1.ALT[0]) + str(record2.ALT[0]), 'ab'
     het1 = record1.REF + str(record2.ALT[0]), 'Ab'
     het2 = str(record1.ALT[0]) + record2.REF, 'aB'
     haps = {}
+    # use tuples to assign hap freqs to AB notation for downstream use
     genotypes = [homref, homalt, het1, het2]
     for genotype in genotypes:
         if genotype[0] in uniques.keys():
@@ -143,13 +149,11 @@ def dcalc(record1, record2, snpcheck = True):
     if snpcheck == True:
         snpchecker(record1, record2)
     elif snpcheck == False:
-        pass
-    strainlist = [record1.samples[i].sample for i in range(len(record1.samples))] 
-    assert strainlist == [record2.samples[i].sample for i in range(len(record2.samples))]
+        pass    
     uniques, values, haps = freqsgetter(record1, record2)
     try:
         LHS = haps['AB'] * haps['ab']
-    except KeyError:
+    except KeyError: # either hap missing
         LHS = 0
     try:
         RHS = haps['Ab'] * haps['aB']
@@ -216,7 +220,7 @@ def ldstats(record1, record2, snpcheck = True, freqs = False):
         freqscalc(record1, record2, snpcheck = False) 
     
 def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
-    '''Returns records in given gzipped VCF file as a list.
+    '''Returns records in given bgzipped VCF file as a list.
     If given chrom, will fetch just chrom; if given both chrom 
     and pos (in the format 'start-end') will fetch just that 
     subset of the VCF.'''
@@ -243,7 +247,7 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
         elif snpsonly == False:
             reclist = [record for record in snippet]
     elif chrom is None and pos is not None:
-        print('Error - pos supplied without chrom specification.')
+        print('Error - positions supplied without chromosome specification.')
     else:
         if snpsonly == True:
             reclist = [record for record in vcfin if record.is_snp == True]
@@ -253,8 +257,8 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
 
 def reclook(reclist, pos):
     '''Convenience function. If VCF records are saved to a list 
-    (ie via reclist()), will return the record at an input 
-    position value. Can be used as input to pop gen functions.'''
+    via reclist(), will return the record at an input 
+    position value. Can be used as input to pop gen functions or ldstats().'''
     for record in reclist:
         if record.POS == pos:
             return record
