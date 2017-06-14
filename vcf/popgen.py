@@ -124,27 +124,17 @@ def freqsgetter(record1, record2, snpcheck = True):
     uniques = dict.fromkeys(set(haplist))
     for hap in uniques:
         uniques[hap] = haplist.count(hap)/len(haplist)
-    homref = record1.REF + record2.REF
-    homalt = str(record1.ALT[0]) + str(record2.ALT[0])
-    het1 = record1.REF + str(record2.ALT[0])
-    het2 = str(record1.ALT[0]) + record2.REF
+    homref = record1.REF + record2.REF, 'AB'
+    homalt = str(record1.ALT[0]) + str(record2.ALT[0]), 'ab'
+    het1 = record1.REF + str(record2.ALT[0]), 'Ab'
+    het2 = str(record1.ALT[0]) + record2.REF, 'aB'
     haps = {}
-    if homref in uniques.keys():
-        haps['AB'] = uniques[homref]
-    else:
-        haps['AB'] = 0
-    if homalt in uniques.keys():
-        haps['ab'] = uniques[homalt]
-    else:
-        haps['ab'] = 0
-    if het1 in uniques.keys():
-        haps['Ab'] = uniques[het1]
-    else:
-        haps['Ab'] = 0
-    if het2 in uniques.keys():
-        haps['aB'] = uniques[het2]
-    else:
-        haps['aB'] = 0
+    genotypes = [homref, homalt, het1, het2]
+    for genotype in genotypes:
+        if genotype[0] in uniques.keys():
+            haps[genotype[1]] = uniques[genotype[0]]
+        else:
+            haps[genotype[1]] = 0
     return uniques, values, haps
 
 def dcalc(record1, record2, snpcheck = True):
