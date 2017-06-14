@@ -262,7 +262,7 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
             reclist = [record for record in vcfin]
     return reclist
 
-def reclook(pos, reclist):
+def reclook(reclist, pos):
     '''Convenience function. If VCF records are saved to a list 
     (ie via reclist()), will return the record at an input 
     position value. Can be used as input to pop gen functions.'''
