@@ -79,7 +79,9 @@ def freqscalc(record1, record2, snpcheck = True):
 def freqsgetter(record1, record2, snpcheck = True):
     '''Helper function for LD statistic calculations. Returns, in order: 1. a dict containing
     haplotype frequences; 2. a dict containing allele frequency values (p1, p2, q1, q2), and
-    3. a dict containing haplotype frequencies with A/B notation.'''
+    3. a dict containing haplotype frequencies with A/B notation. Has more accurate allele
+    freq calculations than freqscalc - handles missing data better (i.e. when biallelic genotype
+    not present).'''
     if snpcheck == True:
         snpchecker(record1, record2)
     elif snpcheck == False:
