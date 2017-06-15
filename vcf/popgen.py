@@ -22,7 +22,8 @@ import vcf
 
 def snpchecker(record1, record2):
     '''Given two VCF records, checks whether they are SNPs with single ALTs each.
-    Helper function that just throws warning messages if necessary.'''
+    Helper function that just throws warning messages if necessary.
+    '''
     if record1.is_snp == False:
         print('caution: first record is not a SNP')
     elif record2.is_snp == False:
@@ -40,7 +41,8 @@ def freqscalc(record1, record2, snpcheck = True):
     '''Given two VCF records, returns observed haplotype frequencies.
     Will check that records are single-ALT SNPs unless snpcheck = False.
     Bit of an inexact function, and mostly for exploratory use.
-    (See freqsgetter for more exact allele freq values).'''
+    (See freqsgetter for more exact allele freq values).
+    '''
     if snpcheck == True:
         snpchecker(record1, record2)
     elif snpcheck == False:
@@ -81,7 +83,8 @@ def freqsgetter(record1, record2, snpcheck = True):
     haplotype frequences; 2. a dict containing allele frequency values (p1, p2, q1, q2), and
     3. a dict containing haplotype frequencies with A/B notation. Has more accurate allele
     freq calculations than freqscalc - handles missing data better (i.e. when biallelic genotype
-    not present).'''
+    not present).
+    '''
     if snpcheck == True:
         snpchecker(record1, record2)
     elif snpcheck == False:
@@ -147,12 +150,13 @@ def freqsgetter(record1, record2, snpcheck = True):
 
 def dcalc(record1, record2, snpcheck = True):
     '''Calculates D statistic between two VCF records.
-    Will check that records are single-ALT SNPs unless snpcheck = False.'''
+    Will check that records are single-ALT SNPs unless snpcheck = False.
+    '''
     if snpcheck == True:
         snpchecker(record1, record2)
     elif snpcheck == False:
         pass    
-    uniques, values, haps = freqsgetter(record1, record2)
+    haps = freqsgetter(record1, record2)[2]
     try:
         LHS = haps['AB'] * haps['ab']
     except KeyError: # either hap missing
@@ -166,8 +170,9 @@ def dcalc(record1, record2, snpcheck = True):
     return d 
 
 def dprimecalc(record1, record2, snpcheck = True):
-    """Calculates Lewontin's D' statistic (D/Dmax) between two VCF records.
-    Will check that records are single-ALT SNPs unless snpcheck = False."""
+    '''Calculates Lewontin's D' statistic (D/Dmax) between two VCF records.
+    Will check that records are single-ALT SNPs unless snpcheck = False.
+    '''
     if snpcheck == True:
         snpchecker(record1, record2)
     elif snpcheck == False:
@@ -192,7 +197,8 @@ def dprimecalc(record1, record2, snpcheck = True):
 
 def r2calc(record1, record2, snpcheck = True):
     '''Calculates r^2 (correlation) between two VCF records.
-    Will check that records are single-ALT SNPs unless snpcheck = False.'''
+    Will check that records are single-ALT SNPs unless snpcheck = False.
+    '''
     if snpcheck == True:
         snpchecker(record1, record2)
     elif snpcheck == False:
@@ -209,7 +215,8 @@ def r2calc(record1, record2, snpcheck = True):
 def ldstats(record1, record2, snpcheck = True, freqs = False):
     '''Convenience function - returns D, D prime, and r2.
     If freqs = True, will also return an allele frequency report.
-    Will check that records are single-ALT SNPs unless snpcheck = False.'''
+    Will check that records are single-ALT SNPs unless snpcheck = False.
+    '''
     if snpcheck == True:
         snpchecker(record1, record2)
     elif snpcheck == False:
@@ -225,7 +232,8 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
     '''Returns records in given bgzipped VCF file as a list.
     If given chrom, will fetch just chrom; if given both chrom 
     and pos (in the format 'start-end') will fetch just that 
-    subset of the VCF.'''
+    subset of the VCF.
+    '''
     vcfin = vcf.Reader(filename = vcf_file, compressed = True)
     if chrom is not None and pos is not None:
         try:
@@ -260,7 +268,8 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
 def reclook(reclist, pos):
     '''Convenience function. If VCF records are saved to a list 
     via reclist(), will return the record at an input 
-    position value. Can be used as input to pop gen functions or ldstats().'''
+    position value. Can be used as input to pop gen functions or ldstats().
+    '''
     for record in reclist:
         if record.POS == pos:
             return record
