@@ -1,11 +1,13 @@
 '''
-singlevcfcalc.py - calculate ld stats between two regions
-within a single vcf
+singlevcfcalc.py - calculate ld stats between two regions within a single vcf file.
 
 usage: python singlevcfcalc.py [vcf (.gz)] [region 1] [region 2] [ld stats] > [outfile]
 
-ld stats can be any combination of d, dprime, or r2 -
-separate by a slash (i.e. r2/dprime) for more than one
+LD stats can be any combination of d, dprime, or r2 -
+separate by a slash (i.e. r2/dprime) for more than one.
+
+if looking to do an intra-region comparison, simply enter the same region name
+for both region 1 and region 2 (i.e. myvcf.gz chromosome_2 chromosome_2 r2/dprime > chr2.ld)
 
 AH - 06/2017
 '''
