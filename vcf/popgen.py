@@ -295,7 +295,7 @@ def singlegtcounts(record):
     print('ref:', gtlist.count('0'))
     print('alt:', gtlist.count('1'))
     print('missing:', gtlist.count('.'))
-    print('total:', samplelen))
+    print('total:', samplelen)
     
 def doublegtcounts(record1, record2, freqs = True):
     '''Exploratory convenience function. For a given pair of records,
