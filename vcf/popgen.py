@@ -1,5 +1,5 @@
 '''
-popgen v0.4
+popgen v0.5
 
 A suite of functions that calculate useful population genetics statistics
 between a pair of VCF records - ideally SNPs with single ALTs. Deviations from this
@@ -37,20 +37,29 @@ def snpchecker(record1, record2):
     if len(record2.alleles) != 2:
         print('caution: record 2 does not have two alleles - ', record2.alleles)
 
-def freqscalc(record1, record2, snpcheck = True):
-    '''Given two VCF records, returns observed haplotype frequencies.
-    Will check that records are single-ALT SNPs unless snpcheck = False.
-    Bit of an inexact function, and mostly for exploratory use.
-    (See freqsgetter for more exact allele freq values).
+def freqscalc(record1, record2, snpcheck = True, aaf = False):
+    '''Exploratory convenience function. Given two VCF records, returns 
+    observed haplotype frequencies. Will check that records are single-ALT SNPs 
+    unless snpcheck = False. aaf will return AF values hardcoded in the VCF
+    itself, while aaf = False (default) will make freqscalc calculate them instead
+    (more accurate option).
     '''
     if snpcheck == True:
         snpchecker(record1, record2)
     elif snpcheck == False:
         pass
-    p = 1 - record1.aaf[0]
-    q = 1 - record2.aaf[0]
-    p2 = record1.aaf[0]
-    q2 = record2.aaf[0]
+    # get allele frequencies
+    if aaf = True:
+        p = 1 - record1.aaf[0]
+        q = 1 - record2.aaf[0]
+        p2 = record1.aaf[0]
+        q2 = record2.aaf[0]
+    elif aaf = False:
+        values = freqsgetter(record1, record2)[1]
+        p = values['p1']
+        q = values['q1']
+        p2 = values['p2']
+        q2 = values['q2']
     print(record1.CHROM, record1.POS, '- ref', record1.REF, 'alt', record1.ALT[0])
     print(record2.CHROM, record2.POS, '- ref', record2.REF, 'alt', record2.ALT[0])
     print('p1 ', p, 'p2 ', p2)
@@ -276,14 +285,53 @@ def reclook(reclist, pos):
         else:
             pass
         
-def gtcounts(reclist, pos):
+def singlegtcounts(record):
     '''Exploratory convenience function. For a given record, returns
-    counts of refs, alts, and missing calls in the population.
+    counts of refs, alts, and missing calls in the population. Can take
+    a reclook function as input.
     '''
-    samplelen = len(reclook(reclist, pos).samples)
-    gtlist = [reclook(reclist, pos).samples[i]['GT'] for i in range(samplelen)]
+    samplelen = len(record.samples)
+    gtlist = [record.samples[i]['GT'] for i in range(samplelen)]
     print('ref:', gtlist.count('0'))
     print('alt:', gtlist.count('1'))
     print('missing:', gtlist.count('.'))
     print('total:', samplelen))
     
+def doublegtcounts(record1, record2, freqs = True):
+    '''Exploratory convenience function. For a given pair of records,
+    prints all observed haplotypes in the population.
+    '''
+    # check strains b/w compared records are identical
+    strainlist = [record1.samples[i].sample for i in range(len(record1.samples))] 
+    assert strainlist == [record2.samples[i].sample for i in range(len(record2.samples))]
+    if freqs == True:
+        freqscalc(record1, record2)
+    elif freqs == False:
+        pass
+    # parse through VCF calls
+    for strain in strainlist:
+        gt1 = record1.genotype(strain)['GT']
+        gt2 = record2.genotype(strain)['GT']
+        if gt1 == '.' and gt2 == '.':
+            print('--')
+            continue
+        elif gt1 == '.':
+            if gt2 == '0':
+                print('-B', '-' + record2.REF)
+            elif gt2 == '1':
+                print('-b', '-' + str(record2.ALT[0]))
+        elif gt1 == '0':
+            if gt2 == '.':
+                print('A-', record1.REF + '-')
+            elif gt2 == '0':
+                print('AB', record1.REF + str(record2.REF))
+            elif gt2 == '1':
+                print('Ab', record1.REF + str(record2.ALT[0]))
+        elif gt1 == '1':
+            if gt2 == '.':
+                print('a-', str(record1.ALT[0]) + '-')
+            elif gt2 == '0':
+                print('aB', str(record1.ALT[0]) + record2.REF)
+            elif gt2 == '1':
+                print('ab', str(record1.ALT[0]) + str(record2.ALT[0]))
+        
