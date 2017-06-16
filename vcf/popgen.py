@@ -275,3 +275,15 @@ def reclook(reclist, pos):
             return record
         else:
             pass
+        
+def gtcounts(reclist, pos):
+    '''Exploratory convenience function. For a given record, returns
+    counts of refs, alts, and missing calls in the population.
+    '''
+    samplelen = len(reclook(reclist, pos).samples)
+    gtlist = [reclook(reclist, pos).samples[i]['GT'] for i in range(samplelen)]
+    print('ref:', gtlist.count('0'))
+    print('alt:', gtlist.count('1'))
+    print('missing:', gtlist.count('.'))
+    print('total:', samplelen))
+    
