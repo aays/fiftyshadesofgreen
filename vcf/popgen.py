@@ -285,7 +285,7 @@ def reclook(reclist, pos):
         else:
             pass
         
-def singlegtcounts(record):
+def singlegtcounts(record, showlist = False):
     '''Exploratory convenience function. For a given record, returns
     counts of refs, alts, and missing calls in the population. Can take
     a reclook function as input.
@@ -296,8 +296,10 @@ def singlegtcounts(record):
     print('alt:', gtlist.count('1'))
     print('missing:', gtlist.count('.'))
     print('total:', samplelen)
+    if showlist == True:
+        print(gtlist)
     
-def doublegtcounts(record1, record2, freqs = True):
+def doublegtcounts(record1, record2, freqs = True, missing = True):
     '''Exploratory convenience function. For a given pair of records,
     prints all observed haplotypes in the population.
     '''
@@ -312,23 +314,25 @@ def doublegtcounts(record1, record2, freqs = True):
     for strain in strainlist:
         gt1 = record1.genotype(strain)['GT']
         gt2 = record2.genotype(strain)['GT']
-        if gt1 == '.' and gt2 == '.':
+        if gt1 == '.' and gt2 == '.' and missing == True:
             print('--')
             continue
-        elif gt1 == '.':
+        elif gt1 == '.' and missing == True:
             if gt2 == '0':
                 print('-B', '-' + record2.REF)
             elif gt2 == '1':
                 print('-b', '-' + str(record2.ALT[0]))
+            else:
+                continue
         elif gt1 == '0':
-            if gt2 == '.':
+            if gt2 == '.' and missing == True:
                 print('A-', record1.REF + '-')
             elif gt2 == '0':
                 print('AB', record1.REF + str(record2.REF))
             elif gt2 == '1':
                 print('Ab', record1.REF + str(record2.ALT[0]))
         elif gt1 == '1':
-            if gt2 == '.':
+            if gt2 == '.' and missing == True:
                 print('a-', str(record1.ALT[0]) + '-')
             elif gt2 == '0':
                 print('aB', str(record1.ALT[0]) + record2.REF)
