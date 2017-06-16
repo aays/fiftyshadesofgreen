@@ -195,7 +195,7 @@ def dprimecalc(record1, record2, snpcheck = True):
         else:
             out = d/dmax
     elif d < 0:
-        dmin = min(-1 * values['p1'] * values['q1'], -1 * values['p2'] * values['q2'])
+        dmin = max(-1 * values['p1'] * values['q1'], -1 * values['p2'] * values['q2'])
         if dmin == 0:
             out = 0
         else:
