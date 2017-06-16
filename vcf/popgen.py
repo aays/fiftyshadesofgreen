@@ -49,12 +49,12 @@ def freqscalc(record1, record2, snpcheck = True, aaf = False):
     elif snpcheck == False:
         pass
     # get allele frequencies
-    if aaf = True:
+    if aaf == True:
         p = 1 - record1.aaf[0]
         q = 1 - record2.aaf[0]
         p2 = record1.aaf[0]
         q2 = record2.aaf[0]
-    elif aaf = False:
+    elif aaf == False:
         values = freqsgetter(record1, record2)[1]
         p = values['p1']
         q = values['q1']
