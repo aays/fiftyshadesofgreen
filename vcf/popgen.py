@@ -165,7 +165,7 @@ def dcalc(record1, record2, snpcheck = True):
         snpchecker(record1, record2)
     elif snpcheck == False:
         pass    
-    haps = freqsgetter(record1, record2)[2]
+    haps = freqsgetter(record1, record2, snpcheck = False)[2]
     try:
         LHS = haps['AB'] * haps['ab']
     except KeyError: # either hap missing
@@ -186,8 +186,8 @@ def dprimecalc(record1, record2, snpcheck = True):
         snpchecker(record1, record2)
     elif snpcheck == False:
         pass
-    values = freqsgetter(record1, record2)[1] # get allele frequencies
-    d = dcalc(record1, record2)
+    values = freqsgetter(record1, record2, snpcheck = False)[1] # get allele frequencies
+    d = dcalc(record1, record2, snpcheck = False)
     if d >= 0:
         dmax = min(values['p1'] * values['q2'], values['p2'] * values['q1'])
         if dmax == 0:
@@ -212,11 +212,11 @@ def r2calc(record1, record2, snpcheck = True):
         snpchecker(record1, record2)
     elif snpcheck == False:
         pass
-    values = freqsgetter(record1, record2)[1]
+    values = freqsgetter(record1, record2, snpcheck = False)[1]
     if values['p1'] == 0 or values['q1'] == 0 or values['p2'] == 0 or values['q2'] == 0:
         out = 0
     else:
-        dsquared = dcalc(record1, record2)**2
+        dsquared = dcalc(record1, record2, snpcheck = False)**2
         out = dsquared/(values['p1'] * values['q1'] * values['p2'] * values['q2'])
         # out = round(out, 4)
     return out
