@@ -11,22 +11,37 @@ from popgen import *
 
 def snppuller(vcf_file, chrom = None, pos = None):
     vcfin = vcf.Reader(filename = vcf_file, compressed = True)
+    # filters
+    def hardsnpcheck(record): # ensure biallelic SNP
+        if len(record.REF) == 1 and len(record.ALT) == 1 and len(record.ALT[0]) == 1 and len(record.alleles) == 2:
+            return True
+        elif len(record.REF) != 1 or len(record.ALT) != 1 or len(record.ALT[0]) != 1 or len(record.alleles) != 2:
+            return False
+    def notsingleton(record): # ensure not singleton
+        count = record.INFO['AN'] - record.INFO['AC'][0]
+        if count == 1:
+            return False
+        if record.INFO['AC'][0] == 1:
+            return False
+        else:
+            return True
+    # fetch
     if chrom is not None and pos is not None:
         pos = pos.split('-')
         for record in vcfin.fetch(chrom = chrom, start = pos[0], end = pos[1]):
-            if record.is_snp == True:
+            if hardsnpcheck(record) == True and notsingleton(record) == True:
                 yield record
             else:
                 pass
     elif chrom is not None and pos is None:
         for record in vcfin.fetch(chrom = chrom):
-            if record.is_snp == True:
+            if hardsnpcheck(record) == True and notsingleton(record) == True:
                 yield record
             else:
                 pass
     else:
         for record in vcfin:
-            if record.is_snp == True:
+            if hardsnpcheck(record) == True and notsingleton(record) == True:
                 yield record
             else:
                 pass
