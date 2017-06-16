@@ -1,5 +1,5 @@
 '''
-popgen v0.5
+popgen v0.6
 
 A suite of functions that calculate useful population genetics statistics
 between a pair of VCF records - ideally SNPs with single ALTs. Deviations from this
@@ -24,69 +24,26 @@ def snpchecker(record1, record2):
     '''Given two VCF records, checks whether they are SNPs with single ALTs each.
     Helper function that just throws warning messages if necessary.
     '''
-    if record1.is_snp == False:
-        print('caution: first record is not a SNP')
-    elif record2.is_snp == False:
-        print('caution: second record is not a SNP')
-    if len(record1.ALT) > 1:
-        print('caution: multiple alts in record 1 - ', record1.ALT)
-    if len(record2.ALT) > 1:
-        print('caution: multiple alts in record 2 - ', record2.ALT)
-    if len(record1.alleles) != 2:
-        print('caution: record 1 does not have two alleles - ', record1.alleles)
-    if len(record2.alleles) != 2:
-        print('caution: record 2 does not have two alleles - ', record2.alleles)
-
-def freqscalc(record1, record2, snpcheck = True, aaf = False):
-    '''Exploratory convenience function. Given two VCF records, returns 
-    observed haplotype frequencies. Will check that records are single-ALT SNPs 
-    unless snpcheck = False. aaf will return AF values hardcoded in the VCF
-    itself, while aaf = False (default) will make freqscalc calculate them instead
-    (more accurate option).
-    '''
-    if snpcheck == True:
-        snpchecker(record1, record2)
-    elif snpcheck == False:
+    if len(record1.REF) == 1 and len(record1.ALT) == 1 and len(record1.ALT[0]) == 1 and len(record1.alleles) == 2:
         pass
-    # get allele frequencies
-    if aaf == True:
-        p = 1 - record1.aaf[0]
-        q = 1 - record2.aaf[0]
-        p2 = record1.aaf[0]
-        q2 = record2.aaf[0]
-    elif aaf == False:
-        values = freqsgetter(record1, record2)[1]
-        p = values['p1']
-        q = values['q1']
-        p2 = values['p2']
-        q2 = values['q2']
-    print(record1.CHROM, record1.POS, '- ref', record1.REF, 'alt', record1.ALT[0])
-    print(record2.CHROM, record2.POS, '- ref', record2.REF, 'alt', record2.ALT[0])
-    print('p1 ', p, 'p2 ', p2)
-    print('q1 ', q, 'q2 ', q2)
-    # get samples + check for same samples b/w both records
-    strainlist = [record1.samples[i].sample for i in range(len(record1.samples))] 
-    assert strainlist == [record2.samples[i].sample for i in range(len(record2.samples))]    
-    # score haplotypes
-    haplist = []
-    for strain in strainlist:
-        gt1 = record1.genotype(strain)['GT']
-        gt2 = record2.genotype(strain)['GT']
-        if gt1 == '.' or gt2 == '.':
-            continue
-        if gt1 == '1' and gt2 == '1':
-            outgt = str(record1.ALT[0]) + str(record2.ALT[0]) 
-        elif gt1 == '1' and gt2 == '0':
-            outgt = str(record1.ALT[0]) + record2.REF
-        elif gt1 == '0' and gt2 == '1':
-            outgt = record1.REF + str(record2.ALT[0])
-        elif gt1 == '0' and gt2 == '0':
-            outgt = record1.REF + record2.REF
-        haplist.append(outgt) # create list of observed genotypes
-    uniques = set(haplist)
-    for hap in uniques:
-        print(hap, round(haplist.count(hap)/len(haplist), 5))    
-    
+    elif len(record1.REF) != 1 or len(record1.ALT) != 1 or len(record1.ALT[0]) != 1 or len(record1.alleles) != 2:
+        print('caution: first record is not a biallelic SNP')
+        print(record1.REF, record1.ALT, record1.alleles)
+    if len(record2.REF) == 1 and len(record2.ALT) == 1 and len(record2.ALT[0]) == 1 and len(record2.alleles) == 2:
+        pass
+    elif len(record2.REF) != 1 or len(record2.ALT) != 1 or len(record2.ALT[0]) != 1 or len(record2.alleles) == 2:
+        print('caution: second record is not a biallelic SNP')
+        print(record2.REF, record2.ALT, record2.alleles)
+
+def straingetter(record1, record2):
+    '''Given two VCF records, returns a list of individuals in the population that
+    contain calls at both sites. Helper function for LD calculations.
+    '''
+    rec1set = set([record1.samples[i].sample for i in range(len(record1.samples)) if record1.samples[i]['GT'] != '.'])
+    rec2set = set([record2.samples[i].sample for i in range(len(record2.samples)) if record2.samples[i]['GT'] != '.'])
+    strainlist = list(rec1set.intersect(rec2set))
+    return strainlist
+
 def freqsgetter(record1, record2, snpcheck = True):
     '''Helper function for LD statistic calculations. Returns, in order: 1. a dict containing
     haplotype frequences; 2. a dict containing allele frequency values (p1, p2, q1, q2), and
@@ -99,8 +56,7 @@ def freqsgetter(record1, record2, snpcheck = True):
     elif snpcheck == False:
         pass
     # check strains b/w compared records are identical
-    strainlist = [record1.samples[i].sample for i in range(len(record1.samples))] 
-    assert strainlist == [record2.samples[i].sample for i in range(len(record2.samples))]
+    strainlist = straingetter(record1, record2)
     # parse through VCF calls
     haplist = []
     pcount = 0
@@ -236,7 +192,9 @@ def ldstats(record1, record2, snpcheck = True, freqs = False):
     if freqs == True:
         print('\nFrequencies report:')
         freqscalc(record1, record2, snpcheck = False) 
-    
+
+### exploratory functions        
+        
 def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
     '''Returns records in given bgzipped VCF file as a list.
     If given chrom, will fetch just chrom; if given both chrom 
@@ -244,6 +202,11 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
     subset of the VCF.
     '''
     vcfin = vcf.Reader(filename = vcf_file, compressed = True)
+    def hardsnpcheck(record):
+        if len(record.REF) == 1 and len(record.ALT) == 1 and len(record.ALT[0]) == 1 and len(record.alleles) == 2:
+            return True
+        elif len(record.REF) != 1 or len(record.ALT) != 1 or len(record.ALT[0]) != 1 or len(record.alleles) != 2:
+            return False
     if chrom is not None and pos is not None:
         try:
             assert isinstance(pos, str) 
@@ -253,7 +216,7 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
             end = int(pos[1])
             snippet = vcfin.fetch(chrom = chrom, start = start, end = end) 
             if snpsonly == True:
-                reclist = [record for record in snippet if record.is_snp == True]
+                reclist = [record for record in snippet if hardsnpcheck(record) == True]
             elif snpsonly == False:
                 reclist = [record for record in snippet]
         except:
@@ -262,14 +225,14 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
     elif chrom is not None and pos is None:
         snippet = vcfin.fetch(chrom = chrom)
         if snpsonly == True:
-            reclist = [record for record in snippet if record.is_snp == True]
+            reclist = [record for record in snippet if hardsnpcheck(record) == True]
         elif snpsonly == False:
             reclist = [record for record in snippet]
     elif chrom is None and pos is not None:
         print('Error - positions supplied without chromosome specification.')
     else:
         if snpsonly == True:
-            reclist = [record for record in vcfin if record.is_snp == True]
+            reclist = [record for record in vcfin if hardsnpcheck(record) == True]
         elif snpsonly == False:
             reclist = [record for record in vcfin]
     return reclist
@@ -284,6 +247,55 @@ def reclook(reclist, pos):
             return record
         else:
             pass
+
+def freqscalc(record1, record2, snpcheck = True, aaf = False):
+    '''Exploratory convenience function. Given two VCF records, returns 
+    observed haplotype frequencies. Will check that records are single-ALT SNPs 
+    unless snpcheck = False. aaf will return AF values hardcoded in the VCF
+    itself, while aaf = False (default) will make freqscalc calculate them instead
+    (more accurate option).
+    '''
+    if snpcheck == True:
+        snpchecker(record1, record2)
+    elif snpcheck == False:
+        pass
+    # get allele frequencies
+    if aaf == True:
+        p = 1 - record1.aaf[0]
+        q = 1 - record2.aaf[0]
+        p2 = record1.aaf[0]
+        q2 = record2.aaf[0]
+    elif aaf == False:
+        values = freqsgetter(record1, record2)[1]
+        p = values['p1']
+        q = values['q1']
+        p2 = values['p2']
+        q2 = values['q2']
+    print(record1.CHROM, record1.POS, '- ref', record1.REF, 'alt', record1.ALT[0])
+    print(record2.CHROM, record2.POS, '- ref', record2.REF, 'alt', record2.ALT[0])
+    print('p1 ', p, 'p2 ', p2)
+    print('q1 ', q, 'q2 ', q2)
+    # get samples + check for same samples b/w both records
+    strainlist = straingetter(record1, record2)   
+    # score haplotypes
+    haplist = []
+    for strain in strainlist:
+        gt1 = record1.genotype(strain)['GT']
+        gt2 = record2.genotype(strain)['GT']
+        if gt1 == '.' or gt2 == '.':
+            continue
+        if gt1 == '1' and gt2 == '1':
+            outgt = str(record1.ALT[0]) + str(record2.ALT[0]) 
+        elif gt1 == '1' and gt2 == '0':
+            outgt = str(record1.ALT[0]) + record2.REF
+        elif gt1 == '0' and gt2 == '1':
+            outgt = record1.REF + str(record2.ALT[0])
+        elif gt1 == '0' and gt2 == '0':
+            outgt = record1.REF + record2.REF
+        haplist.append(outgt) # create list of observed genotypes
+    uniques = set(haplist)
+    for hap in uniques:
+        print(hap, round(haplist.count(hap)/len(haplist), 5))            
         
 def singlegtcounts(record, showlist = False):
     '''Exploratory convenience function. For a given record, returns
@@ -338,4 +350,13 @@ def doublegtcounts(record1, record2, freqs = True, missing = True):
                 print('aB', str(record1.ALT[0]) + record2.REF)
             elif gt2 == '1':
                 print('ab', str(record1.ALT[0]) + str(record2.ALT[0]))
+                
+def notsingleton(record):
+    '''Checks whether a record is a singleton.
+    '''
+    count = record.INFO['AN'] - record.INFO['AC'][0]
+    if count == 1:
+        return False
+    if record.INFO['AC'][0] == 1:
+        return False                
         
