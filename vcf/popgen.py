@@ -12,8 +12,11 @@ using reclist() and running functions on records out of those lists.
 If working with known sites, reclook() allows for easy access of records based on 
 their genomic positions and can be entered as input to the pop gen functions. 
 
+These functions are only compatible with haploid genomes (for now). 
+Use with higher ploidies (is that a word?) at your own risk.
+
 This is an extremely early draft of what might be put together into a full
-Python library down the line.
+Python library down the line. 
 
 AH - 06/2017
 '''
