@@ -353,13 +353,5 @@ def doublegtcounts(record1, record2, freqs = True, missing = True):
                 print('aB', str(record1.ALT[0]) + record2.REF)
             elif gt2 == '1':
                 print('ab', str(record1.ALT[0]) + str(record2.ALT[0]))
-                
-def notsingleton(record):
-    '''Checks whether a record is a singleton.
-    '''
-    count = record.INFO['AN'] - record.INFO['AC'][0]
-    if count == 1:
-        return False
-    if record.INFO['AC'][0] == 1:
-        return False                
+                          
         
