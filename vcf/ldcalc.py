@@ -17,31 +17,31 @@ def snppuller(vcf_file, chrom = None, pos = None):
             return True
         elif len(record.REF) != 1 or len(record.ALT) != 1 or len(record.ALT[0]) != 1 or len(record.alleles) != 2:
             return False
-    def notsingleton(record): # ensure not singleton
+    def issingleton(record): # ensure not singleton
         count = record.INFO['AN'] - record.INFO['AC'][0]
         if count == 1:
-            return False
-        if record.INFO['AC'][0] == 1:
-            return False
-        else:
             return True
+        if record.INFO['AC'][0] == 1:
+            return True
+        else:
+            return False
     # fetch
     if chrom is not None and pos is not None:
         pos = pos.split('-')
         for record in vcfin.fetch(chrom = chrom, start = pos[0], end = pos[1]):
-            if hardsnpcheck(record) == True and notsingleton(record) == True:
+            if hardsnpcheck(record) == True and issingleton(record) == False:
                 yield record
             else:
                 pass
     elif chrom is not None and pos is None:
         for record in vcfin.fetch(chrom = chrom):
-            if hardsnpcheck(record) == True and notsingleton(record) == True:
+            if hardsnpcheck(record) == True and issingleton(record) == False:
                 yield record
             else:
                 pass
     else:
         for record in vcfin:
-            if hardsnpcheck(record) == True and notsingleton(record) == True:
+            if hardsnpcheck(record) == True and issingleton(record) == False:
                 yield record
             else:
                 pass
