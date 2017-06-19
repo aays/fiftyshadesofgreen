@@ -17,7 +17,6 @@ AH - 05/2017
 '''
 
 import vcf
-import sys
 import argparse
 
 parser = argparse.ArgumentParser(description = 'Subset a vcf file.', 
