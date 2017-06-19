@@ -44,7 +44,7 @@ def straingetter(record1, record2):
     '''
     rec1set = set([record1.samples[i].sample for i in range(len(record1.samples)) if record1.samples[i]['GT'] != '.'])
     rec2set = set([record2.samples[i].sample for i in range(len(record2.samples)) if record2.samples[i]['GT'] != '.'])
-    strainlist = list(rec1set.intersect(rec2set))
+    strainlist = list(rec1set.intersection(rec2set))
     return strainlist
 
 def freqsgetter(record1, record2, snpcheck = True):
