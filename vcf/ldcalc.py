@@ -25,8 +25,10 @@ def snppuller(vcf_file, chrom = None, pos = None):
             return True
         else:
             return False
-    def emptyalt(record): # ensure AC != 0
+    def isinvariant(record):
         if record.INFO['AC'][0] == 0:
+            return True
+        if record.INFO['AF'][0] == 1.0:
             return True
         else:
             return False
@@ -34,19 +36,19 @@ def snppuller(vcf_file, chrom = None, pos = None):
     if chrom is not None and pos is not None:
         pos = pos.split('-')
         for record in vcfin.fetch(chrom = chrom, start = pos[0], end = pos[1]):
-            if hardsnpcheck(record) == True and issingleton(record) == False and emptyalt(record) == False:
+            if hardsnpcheck(record) == True and issingleton(record) == False and isinvariant(record) == False:
                 yield record
             else:
                 pass
     elif chrom is not None and pos is None:
         for record in vcfin.fetch(chrom = chrom):
-            if hardsnpcheck(record) == True and issingleton(record) == False and emptyalt(record) == False:
+            if hardsnpcheck(record) == True and issingleton(record) == False and isinvariant(record) == False:
                 yield record
             else:
                 pass
     else:
         for record in vcfin:
-            if hardsnpcheck(record) == True and issingleton(record) == False and emptyalt(record) == False:
+            if hardsnpcheck(record) == True and issingleton(record) == False and isinvariant(record) == False:
                 yield record
             else:
                 pass
