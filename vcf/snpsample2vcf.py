@@ -92,7 +92,7 @@ def randvariantgetter(vcfinput, chrom, windowmin, windowmax, snplist):
     except IndexError:
         pass
     try:
-        snpsample = sorted(random.sample(snppositions, snpcounts[chromname]))
+        snpsample = sorted(random.sample(snppositions, snpcounts[chrom]))
     except ValueError:
         snpsample = snppositions
     snpsample = snplist + snpsample
