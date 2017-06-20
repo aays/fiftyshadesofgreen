@@ -2,11 +2,11 @@
 
 '''
 usage:
-python3.5 snpsample2vcf.py [vcf (.gz)] [windowsize] [outfile]
+python3.5 snpsample2vcf.py [vcf (.gz)] [windowsize] [chrom] [outfile]
 
 e.g.
-python3.5 snpsample2vcf.py chromosome10.vcf.gz 100000 chromosome10
-will create a vcf called chromosome10sampled.vcf.
+python3.5 snpsample2vcf.py chromosome10.vcf.gz 100000 chromosome_10 out
+will create a vcf called outsampled.vcf.
 
 Number of SNPs picked out from each window are hardcoded in the snpcounts dictionary,
 based on calculations from snpcounter.py. These were calculated such that an equivalent
@@ -80,14 +80,13 @@ def windowranger(windowsize, totalsize):
     windowmins = [num + 1 for num in windowmins]
     return windowmins, windowmaxes
 
-def randvariantgetter(vcfinput, windowmin, windowmax, snplist):
+def randvariantgetter(vcfinput, chrom, windowmin, windowmax, snplist):
     '''Returns randomly selected SNP positions within current window.
     Number of SNPs picked out for given chrom is determined from snpcounts 
     dict. Feed empty list if first iteration.'''
     vcfin = vcf.Reader(filename = vcfinput, compressed = True) 
-    chromname = chromgetter(vcfinput)
     snppositions = [] # reset list
-    snippet = vcfin.fetch(chrom = chromname, start = windowmin, end = windowmax - 1)
+    snippet = vcfin.fetch(chrom = chrom, start = windowmin, end = windowmax - 1)
     try:
         snppositions = [record.POS for record in snippet]
     except IndexError:
@@ -99,36 +98,36 @@ def randvariantgetter(vcfinput, windowmin, windowmax, snplist):
     snpsample = snplist + snpsample
     return snpsample
 
-def variantwriter(vcfinput, outfile, snplist):
+def variantwriter(vcfinput, inchrom, outfile, snplist):
     '''Given a list of a SNPs and an input, writes a vcf file
     that only contains those records.'''
     vcfin = vcf.Reader(filename = vcfinput, compressed = True) 
-    chromname = chromgetter(vcfinput)
+    snippet = vcf.fetch(chrom = inchrom)
     with open(outfile, 'w') as outvcf:
-        writer = vcf.Writer(outvcf, vcfin)
+        writer = vcf.Writer(outvcf, snippet)
         try:
-            for record in vcfin:
+            for record in snippet:
                 if record.POS in snplist:
                     writer.write_record(record)
                 else:
                     pass
         except IndexError:
             pass 
-# analysis
 
+# analysis
 vcfin = str(sys.argv[1])
 windowsize = int(sys.argv[2])
-outfilename = str(sys.argv[3])
+chrom = str(sys.argv[3])
+outfilename = str(sys.argv[4])
 
-chromname = chromgetter(vcfin)
-ranges = windowranger(windowsize, lengths[chromname])
+ranges = windowranger(windowsize, lengths[chrom])
 
 snplist = []
 
 for start, end in zip(ranges[0], ranges[1]):
-    snplist = randvariantgetter(vcfin, start, end, snplist)
+    snplist = randvariantgetter(vcfin, chrom, start, end, snplist)
     
 outname = outfilename + 'sampled.vcf'
     
-variantwriter(vcfin, outname, snplist)    
+variantwriter(vcfin, chrom, outname, snplist)    
 
