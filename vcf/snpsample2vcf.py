@@ -102,7 +102,7 @@ def variantwriter(vcfinput, inchrom, outfile, snplist):
     '''Given a list of a SNPs and an input, writes a vcf file
     that only contains those records.'''
     vcfin = vcf.Reader(filename = vcfinput, compressed = True) 
-    snippet = vcf.fetch(chrom = inchrom)
+    snippet = vcfin.fetch(chrom = inchrom)
     with open(outfile, 'w') as outvcf:
         writer = vcf.Writer(outvcf, snippet)
         try:
