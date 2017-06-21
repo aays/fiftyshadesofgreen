@@ -96,9 +96,6 @@ def singlevcfcalc(vcf_file, ref, target, stat):
         if len(record1.ALT) > 1:
             continue
         for record2 in targetlocus:
-            # haps = freqsgetter(record1, record2)[2]
-            # if 0 in haps.values(): # ensure four haps present
-            #     continue
             if len(record2.ALT) > 1:
                 continue
             elif len(stat) == 1:
