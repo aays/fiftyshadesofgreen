@@ -1,3 +1,5 @@
+#!usr/bin/python3.5
+
 '''
 singlevcfcalc.py - calculate ld stats between two regions within a single vcf file.
 
