@@ -7,7 +7,7 @@ AH - 06/2017
 '''
 
 import vcf
-import tqdm
+from tqdm import tqdm
 from popgen import *
 
 def snppuller(vcf_file, chrom = None, pos = None):
