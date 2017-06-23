@@ -7,6 +7,7 @@ AH - 06/2017
 '''
 
 import vcf
+import tqdm
 from popgen import *
 
 def snppuller(vcf_file, chrom = None, pos = None):
@@ -91,7 +92,7 @@ def singlevcfcalc(vcf_file, ref, target, stat):
     reflocus = snppuller(vcf_file, chrom = ref)
     stat = stat.split('/')
     header(stat)
-    for record1 in reflocus:
+    for record1 in tqdm(reflocus):
         targetlocus = snppuller(vcf_file, chrom = target)
         if len(record1.ALT) > 1:
             continue
