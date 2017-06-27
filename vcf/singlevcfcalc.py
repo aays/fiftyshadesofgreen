@@ -3,25 +3,35 @@
 '''
 singlevcfcalc.py - calculate ld stats between two regions within a single vcf file.
 
-usage: python singlevcfcalc.py [vcf (.gz)] [region 1] [region 2] [ld stats] > [outfile]
+usage: python singlevcfcalc.py -v [vcf (.gz)] -r [region 1] [region 2] -l [ld stats] > [outfile]
 
 LD stats can be any combination of d, dprime, or r2 -
 separate by a slash (i.e. r2/dprime) for more than one.
 
 if looking to do an intra-region comparison, simply enter the same region name
-for both region 1 and region 2 (i.e. myvcf.gz chromosome_2 chromosome_2 r2/dprime > chr2.ld)
+for both region 1 and region 2 (i.e. -v myvcf.gz -r chromosome_2 chromosome_2 -l r2/dprime > chr2.ld)
 
 AH - 06/2017
 '''
 
-import sys
 import vcf
+import argparse
 from ldcalc import *
 from popgen import *
 
-vcfin = sys.argv[1]
-region1 = sys.argv[2]
-region2 = sys.argv[3]
-ldstats = sys.argv[4]
+parser = argparse.ArgumentParser(description = 'Calculate LD stats between two regions in a VCF file.', 
+                                usage = 'singlevcfcalc.py [options]')
 
-singlevcfcalc(vcfin, ref = region1, target = region2, stat = ldstats)
+parser.add_argument('-v', '--vcfinput', required = True,
+                   type = str, help = 'Input VCF')
+parser.add_argument('-r', '--regions', required = True,
+                   type = str, nargs = '+', help = 'Two regions to compare (as they appear in the vcf)')
+parser.add_argument('-l', '--ldstats', required = True,
+                   type = str, help = 'LD stats to calculate, separated by forward slashes (i.e. d/dprime)')
+
+args = parser.parse_args()
+vcfin = args.vcfinput
+regions = args.regions
+ldstats = args.ldstats
+
+singlevcfcalc(vcfin, ref = regions[0], target = regions[1], stat = ldstats)
