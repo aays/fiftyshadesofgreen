@@ -7,6 +7,7 @@ AH - 06/2017
 '''
 
 import vcf
+import random
 from tqdm import tqdm
 from popgen import *
 
@@ -77,9 +78,9 @@ def header(stat):
     elif len(stat) == 3:
         print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'dprime', 'r2')
 
-def singlevcfcalc(vcf_file, ref, target, stat):
+def singlevcfcalc(vcf_file, ref, target, stat, filter = None):
     '''
-    In a single VCF, calculates linkage stats between two entire regions. (Positional options coming soon)
+    In a single VCF, calculates linkage stats between two entire regions.
     The stat parameter can take any of 'd', 'dprime', or 'r2' as input. 
     Multiple parameters can be provided if separated by a forward slash (ie 'd/dprime' or 'r2/d').
     Output is printed in a space separated format.
@@ -89,6 +90,9 @@ def singlevcfcalc(vcf_file, ref, target, stat):
     
     For intrachromosomal stats, simply input the same region twice:
     singlevcfcalc('myfile.vcf.gz', 'chromosome_6', 'chromosome_6', 'd/dprime')
+    
+    A filter can also be provided - setting filter = 0.8 will drop records in both
+    ref and target roughly 20% of the time.
     '''
     def metadata(record1, record2):
         out = record1.CHROM + ' ' + str(record1.POS) + ' ' + record2.CHROM + ' ' + str(record2.POS)
@@ -115,9 +119,23 @@ def singlevcfcalc(vcf_file, ref, target, stat):
     reflocus = snppuller(vcf_file, chrom = ref)
     stat = stat.split('/')
     header(stat) # print header
-    for record1 in tqdm(reflocus):
-        targetlocus = snppuller(vcf_file, chrom = target)
-        if len(record1.ALT) > 1:
-            continue
-        for record2 in targetlocus:
-            ldgetter(record1, record2)
+    if not filter:
+        for record1 in tqdm(reflocus):
+            targetlocus = snppuller(vcf_file, chrom = target)
+            if len(record1.ALT) > 1:
+                continue
+            for record2 in targetlocus:
+                ldgetter(record1, record2)
+    elif filter:
+        for record1 in tqdm(reflocus):
+            if random.random() <= filter:
+                targetlocus = snppuller(vcf_file, chrom = target)
+                if len(record1.ALT) > 1:
+                    for record2 in targetlocus:
+                        if random.random() <= filter:
+                            ldgetter(record1, record2)
+                        elif random.random() > filter:
+                            continue
+            elif random.random() > filter:
+                continue
+
