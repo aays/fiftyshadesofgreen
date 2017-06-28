@@ -11,6 +11,9 @@ from tqdm import tqdm
 from popgen import *
 
 def snppuller(vcf_file, chrom = None, pos = None):
+    '''Returns a generator object for a specified VCF snippet that returns only
+    SNPs, while filtering out singletons.
+    '''
     vcfin = vcf.Reader(filename = vcf_file, compressed = True)
     # filters
     def hardsnpcheck(record): # ensure biallelic SNP
@@ -55,7 +58,8 @@ def snppuller(vcf_file, chrom = None, pos = None):
                 pass
         
 def header(stat):
-    '''Helper function that determines output headers in singlevcfcalc.'''
+    '''Helper function that determines output headers in singlevcfcalc.
+    '''
     if len(stat) == 1:
         if 'd' in stat:
             print('chrom1', 'pos1', 'chrom2', 'pos2', 'd')
@@ -89,29 +93,31 @@ def singlevcfcalc(vcf_file, ref, target, stat):
     def metadata(record1, record2):
         out = record1.CHROM + ' ' + str(record1.POS) + ' ' + record2.CHROM + ' ' + str(record2.POS)
         return out
+    def ldgetter(record1, record2):
+        if len(record2.ALT) > 1:
+            continue
+        elif len(stat) == 1:
+            if 'd' in stat:
+                print(metadata(record1, record2), dcalc(record1, record2))
+            elif 'dprime' in stat:
+                print(metadata(record1, record2), dprimecalc(record1, record2))
+            elif 'r2' in stat:
+                print(metadata(record1, record2), r2calc(record1, record2))
+        elif len(stat) == 2:
+            if 'd' in stat and 'dprime' in stat:
+                print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2))
+            elif 'd' in stat and 'r2' in stat:
+                print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
+            elif 'dprime' in stat and 'r2' in stat:
+                print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
+        elif len(stat) == 3:
+            print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), r2calc(record1, record2))
     reflocus = snppuller(vcf_file, chrom = ref)
     stat = stat.split('/')
-    header(stat)
+    header(stat) # print header
     for record1 in tqdm(reflocus):
         targetlocus = snppuller(vcf_file, chrom = target)
         if len(record1.ALT) > 1:
             continue
         for record2 in targetlocus:
-            if len(record2.ALT) > 1:
-                continue
-            elif len(stat) == 1:
-                if 'd' in stat:
-                    print(metadata(record1, record2), dcalc(record1, record2))
-                elif 'dprime' in stat:
-                    print(metadata(record1, record2), dprimecalc(record1, record2))
-                elif 'r2' in stat:
-                    print(metadata(record1, record2), r2calc(record1, record2))
-            elif len(stat) == 2:
-                if 'd' in stat and 'dprime' in stat:
-                    print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2))
-                elif 'd' in stat and 'r2' in stat:
-                    print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
-                elif 'dprime' in stat and 'r2' in stat:
-                    print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
-            elif len(stat) == 3:
-                print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), r2calc(record1, record2))
+            ldgetter(record1, record2)
