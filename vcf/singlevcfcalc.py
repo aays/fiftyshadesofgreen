@@ -30,7 +30,7 @@ parser.add_argument('-r', '--regions', required = True,
 parser.add_argument('-l', '--ldstats', required = True,
                    type = str, help = 'LD stats to calculate, separated by forward slashes (i.e. d/dprime)')
 parser.add_argument('-f', '--filter', required = False,
-                   type = int, help = 'Proportion of records to perform calculations on. Optional.')
+                   type = float, help = 'Proportion of records to perform calculations on. Optional.')
 
 args = parser.parse_args()
 vcfin = args.vcfinput
