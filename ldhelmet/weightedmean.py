@@ -7,6 +7,8 @@ left_snp right_snp mean
 
 would be calculated as 3 * 0.5 = 1.5, and then these weighted values would be used to find the mean.
 
+nts (28/06/2017) - you do know you could do all of this in R with a single instance of mutate(), right?
+
 usage:
 python weightedmean.py <infile> > <outfile>
 
