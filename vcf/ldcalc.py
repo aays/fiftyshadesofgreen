@@ -126,15 +126,11 @@ def singlevcfcalc(vcf_file, ref, target, stat, filter = None):
                 ldgetter(record1, record2)
     elif filter:
         for record1 in tqdm(reflocus):
-            if random.random() <= filter:
-                targetlocus = snppuller(vcf_file, chrom = target)
-                if len(record1.ALT) > 1:
-                    continue
-                for record2 in targetlocus:
-                    if random.random() <= filter:
-                        ldgetter(record1, record2)
-                    elif random.random() > filter:
-                        continue
-            elif random.random() > filter:
+            targetlocus = snppuller(vcf_file, chrom = target)
+            if len(record1.ALT) > 1:
                 continue
-
+            for record2 in targetlocus:
+                if random.random() <= filter:
+                    ldgetter(record1, record2)
+                elif random.random() > filter:
+                    continue
