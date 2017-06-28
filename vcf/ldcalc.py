@@ -98,9 +98,7 @@ def singlevcfcalc(vcf_file, ref, target, stat, filter = None):
         out = record1.CHROM + ' ' + str(record1.POS) + ' ' + record2.CHROM + ' ' + str(record2.POS)
         return out
     def ldgetter(record1, record2):
-        if len(record2.ALT) > 1:
-            continue
-        elif len(stat) == 1:
+        if len(stat) == 1:
             if 'd' in stat:
                 print(metadata(record1, record2), dcalc(record1, record2))
             elif 'dprime' in stat:
