@@ -21,7 +21,7 @@ region2 = sys.argv[3]
 stats = sys.argv[4]
 processes = sys.argv[5]
 
-def ldgetter(record1, record2):
+def ldgetter(record1, record2, stat):
     '''Helper function for parallelvcfcalc.
     '''
     if len(stat) == 1:
@@ -69,7 +69,7 @@ def parallelvcfcalc(vcf_file, ref, target, stat, num_processes = 1):
         targetlocus = snppuller(vcf_file, chrom = target)
         chunk = [i for i in itertools.islice(targetlocus, num_processes * 6)]
         while True:
-            pool.starmap(ldgetter, zip(itertools.repeat(record1), chunk))
+            pool.starmap(ldgetter, zip(itertools.repeat(record1), chunk, itertools.repeat(stat)))
             chunk = [i for i in itertools.islice(targetlocus, num_processes * 6)] # get next chunk
             if len(chunk) == 0:
                 break
