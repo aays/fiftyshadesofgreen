@@ -65,12 +65,14 @@ def parallelvcfcalc(vcf_file, ref, target, stat, num_processes = 1):
     stat = stat.split('/')
     header(stat) # print header
     # parallel process begins here
-    pool = Pool(processes = num_processes)
     for record1 in reflocus:
         targetlocus = snppuller(vcf_file, chrom = target)
         chunk = [i for i in itertools.islice(targetlocus, num_processes)]
         while True:
+            pool = Pool(processes = num_processes)
             pool.starmap(ldgetter, zip(itertools.repeat(record1), chunk, itertools.repeat(stat)))
+            pool.close()
+            pool.join()
             chunk = [i for i in itertools.islice(targetlocus, num_processes)] # get next chunk
             if len(chunk) == 0:
                 break
