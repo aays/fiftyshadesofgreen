@@ -86,9 +86,9 @@ def freqsgetter(record1, record2, snpcheck = True):
             qcount = qcount + 1
             outgt = record1.REF + record2.REF
             totcalls = totcalls + 1
-        if outgt:
+        try:
             haplist.append(outgt) # create list of observed genotypes
-        else:
+        except UnboundLocalError:
             continue
     # assign allele freq values
     values = {}
