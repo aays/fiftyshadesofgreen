@@ -66,6 +66,7 @@ def freqsgetter(record1, record2, snpcheck = True):
     qcount = 0
     totcalls = 0
     for strain in strainlist:
+        outgt = ''
         gt1 = record1.genotype(strain)['GT']
         gt2 = record2.genotype(strain)['GT']
         if gt1 == '.' or gt2 == '.':
@@ -86,10 +87,8 @@ def freqsgetter(record1, record2, snpcheck = True):
             qcount = qcount + 1
             outgt = record1.REF + record2.REF
             totcalls = totcalls + 1
-        try:
-            haplist.append(outgt) # create list of observed genotypes
-        except UnboundLocalError:
-            continue
+        haplist.append(outgt) # create list of observed genotypes
+
     # assign allele freq values
     values = {}
     if totcalls == 0:
