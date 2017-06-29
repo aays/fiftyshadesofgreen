@@ -9,10 +9,8 @@ AH - 06/2017
 '''
 
 import vcf
-import random
 import itertools
 import sys
-from tqdm import tqdm
 from functools import partial
 from multiprocessing import Pool
 from popgen import *
@@ -68,7 +66,7 @@ def parallelvcfcalc(vcf_file, ref, target, stat, num_processes = 1):
     header(stat) # print header
     # parallel process begins here
     pool = Pool(processes = num_processes)
-    for record1 in tqdm(reflocus):
+    for record1 in reflocus:
         targetlocus = snppuller(vcf_file, chrom = target)
         chunk = [i for i in itertools.islice(targetlocus, num_processes * 6)]
         while True:
