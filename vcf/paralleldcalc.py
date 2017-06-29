@@ -68,10 +68,10 @@ def parallelvcfcalc(vcf_file, ref, target, stat, num_processes = 1):
     pool = Pool(processes = num_processes)
     for record1 in reflocus:
         targetlocus = snppuller(vcf_file, chrom = target)
-        chunk = [i for i in itertools.islice(targetlocus, num_processes * 6)]
+        chunk = [i for i in itertools.islice(targetlocus, num_processes)]
         while True:
             pool.starmap(ldgetter, zip(itertools.repeat(record1), chunk, itertools.repeat(stat)))
-            chunk = [i for i in itertools.islice(targetlocus, num_processes * 6)] # get next chunk
+            chunk = [i for i in itertools.islice(targetlocus, num_processes)] # get next chunk
             if len(chunk) == 0:
                 break
 
