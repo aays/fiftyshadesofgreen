@@ -3,6 +3,8 @@ parallelldcalc.py - an attempt to parallelize ldcalc's operations
 
 Uses LD functions defined in popgen.py and ldcalc.py
 
+probably doesn't work yet so be wary
+
 AH - 06/2017
 '''
 
