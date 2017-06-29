@@ -67,10 +67,10 @@ def parallelvcfcalc(vcf_file, ref, target, stat, num_processes = 1):
     pool = Pool(processes = num_processes)
     for record1 in tqdm(reflocus):
         targetlocus = snppuller(vcf_file, chrom = target)
-        chunk = itertools.islice(targetlocus, num_processes * 6)
-        while len(chunk) > 0:
+        chunk = [i for i in itertools.islice(targetlocus, num_processes * 6)]
+        while True:
             pool.map(partial(ldgetter, record1 = record1), chunk)
-            chunk = itertools.islice(targetlocus, num_processes * 6) # get next chunk
+            chunk = [i for i in itertools.islice(targetlocus, num_processes * 6)] # get next chunk
             if len(chunk) == 0:
                 break
     
