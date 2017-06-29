@@ -11,7 +11,6 @@ AH - 06/2017
 import vcf
 import itertools
 import sys
-from functools import partial
 from multiprocessing import Pool
 from popgen import *
 from ldcalc import *
@@ -70,11 +69,11 @@ def parallelvcfcalc(vcf_file, ref, target, stat, num_processes = 1):
         targetlocus = snppuller(vcf_file, chrom = target)
         chunk = [i for i in itertools.islice(targetlocus, num_processes * 6)]
         while True:
-            pool.map(partial(ldgetter, record1 = record1), chunk)
+            pool.starmap(ldgetter, zip(itertools.repeat(record1), chunk))
             chunk = [i for i in itertools.islice(targetlocus, num_processes * 6)] # get next chunk
             if len(chunk) == 0:
                 break
-    
+
 parallelvcfcalc(vcfin, region1, region2, stat = stats, num_processes = processes)
 
 
