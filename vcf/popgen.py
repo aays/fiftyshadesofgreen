@@ -69,7 +69,7 @@ def freqsgetter(record1, record2, snpcheck = True):
         gt1 = record1.genotype(strain)['GT']
         gt2 = record2.genotype(strain)['GT']
         if gt1 == '.' or gt2 == '.':
-            continue
+            return
         elif gt1 == '1' and gt2 == '1':
             outgt = str(record1.ALT[0]) + str(record2.ALT[0])
             totcalls = totcalls + 1
