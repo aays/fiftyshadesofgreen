@@ -21,6 +21,10 @@ region2 = sys.argv[3]
 stats = sys.argv[4]
 processes = sys.argv[5]
 
+def metadata(record1, record2):
+        out = record1.CHROM + ' ' + str(record1.POS) + ' ' + record2.CHROM + ' ' + str(record2.POS)
+        return out
+
 def ldgetter(record1, record2, stat):
     '''Helper function for parallelvcfcalc.
     '''
@@ -57,9 +61,6 @@ def parallelvcfcalc(vcf_file, ref, target, stat, num_processes = 1):
     num_processes will set how many processes Python will use in completing
     the operation.
     '''
-    def metadata(record1, record2):
-        out = record1.CHROM + ' ' + str(record1.POS) + ' ' + record2.CHROM + ' ' + str(record2.POS)
-        return out
     reflocus = snppuller(vcf_file, chrom = ref)
     stat = stat.split('/')
     header(stat) # print header
