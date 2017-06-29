@@ -24,6 +24,26 @@ region2 = sys.argv[3]
 stats = sys.argv[4]
 processes = sys.argv[5]
 
+def ldgetter(record1, record2):
+    '''Helper function for parallelvcfcalc.
+    '''
+    if len(stat) == 1:
+        if 'd' in stat:
+            print(metadata(record1, record2), dcalc(record1, record2))
+        elif 'dprime' in stat:
+            print(metadata(record1, record2), dprimecalc(record1, record2))
+        elif 'r2' in stat:
+            print(metadata(record1, record2), r2calc(record1, record2))
+    elif len(stat) == 2:
+        if 'd' in stat and 'dprime' in stat:
+            print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2))
+        elif 'd' in stat and 'r2' in stat:
+            print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
+        elif 'dprime' in stat and 'r2' in stat:
+            print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
+    elif len(stat) == 3:
+        print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), r2calc(record1, record2))
+
 def parallelvcfcalc(vcf_file, ref, target, stat, num_processes = 1):
     '''
     In a single VCF, calculates linkage stats between two entire regions.
@@ -43,23 +63,6 @@ def parallelvcfcalc(vcf_file, ref, target, stat, num_processes = 1):
     def metadata(record1, record2):
         out = record1.CHROM + ' ' + str(record1.POS) + ' ' + record2.CHROM + ' ' + str(record2.POS)
         return out
-    def ldgetter(record1, record2):
-        if len(stat) == 1:
-            if 'd' in stat:
-                print(metadata(record1, record2), dcalc(record1, record2))
-            elif 'dprime' in stat:
-                print(metadata(record1, record2), dprimecalc(record1, record2))
-            elif 'r2' in stat:
-                print(metadata(record1, record2), r2calc(record1, record2))
-        elif len(stat) == 2:
-            if 'd' in stat and 'dprime' in stat:
-                print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2))
-            elif 'd' in stat and 'r2' in stat:
-                print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
-            elif 'dprime' in stat and 'r2' in stat:
-                print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
-        elif len(stat) == 3:
-            print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), r2calc(record1, record2))
     reflocus = snppuller(vcf_file, chrom = ref)
     stat = stat.split('/')
     header(stat) # print header
