@@ -86,7 +86,10 @@ def freqsgetter(record1, record2, snpcheck = True):
             qcount = qcount + 1
             outgt = record1.REF + record2.REF
             totcalls = totcalls + 1
-        haplist.append(outgt) # create list of observed genotypes
+        if outgt:
+            haplist.append(outgt) # create list of observed genotypes
+        else:
+            continue
     # assign allele freq values
     values = {}
     if totcalls == 0:
