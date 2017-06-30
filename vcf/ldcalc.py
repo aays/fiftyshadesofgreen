@@ -92,7 +92,7 @@ def singlevcfcalc(vcf_file, ref, target, stat, filter = None):
     singlevcfcalc('myfile.vcf.gz', 'chromosome_6', 'chromosome_6', 'd/dprime')
     
     A filter can also be provided - setting filter = 0.8 will drop records in both
-    ref and target roughly 20% of the time.
+    *just target* roughly 20% of the time.
     '''
     def metadata(record1, record2):
         out = record1.CHROM + ' ' + str(record1.POS) + ' ' + record2.CHROM + ' ' + str(record2.POS)
@@ -114,8 +114,8 @@ def singlevcfcalc(vcf_file, ref, target, stat, filter = None):
                 print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
         elif len(stat) == 3:
             print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), r2calc(record1, record2))
-    reflocus = snppuller(vcf_file, chrom = ref)
-    stat = stat.split('/')
+    reflocus = snppuller(vcf_file, chrom = ref) # create ref vcf record generator
+    stat = stat.split('/') # get stat
     header(stat) # print header
     if not filter:
         for record1 in tqdm(reflocus):
