@@ -3,7 +3,7 @@
 '''
 singlevcfcalc.py - calculate ld stats between two regions within a single vcf file.
 
-usage: python singlevcfcalc.py -v [vcf (.gz)] -r [region 1] [region 2] -l [ld stats] -f [filter] > [outfile]
+usage: python singlevcfcalc.py -v [vcf (.gz)] -r [region 1] [region 2] -l [ld stats] -f [filter] -w [windowsize] > [outfile]
 
 LD stats can be any combination of d, dprime, or r2 -
 separate by a slash (i.e. r2/dprime) for more than one.
@@ -31,11 +31,15 @@ parser.add_argument('-l', '--ldstats', required = True,
                    type = str, help = 'LD stats to calculate, separated by forward slashes (i.e. d/dprime)')
 parser.add_argument('-f', '--filter', required = False,
                    type = float, help = 'Proportion of records to perform calculations on. Optional.')
+parser.add_argument('-w', '--windowsize', required = False,
+                   type = int, help = 'Window size to calculate LD between. Only use for intra-region calculations. Optional.')
+
 
 args = parser.parse_args()
 vcfin = args.vcfinput
 regions = args.regions
 ldstats = args.ldstats
 filter = args.filter
+windowsize = args.windowsize
 
-singlevcfcalc(vcfin, ref = regions[0], target = regions[1], stat = ldstats, filter = filter)
+singlevcfcalc(vcfin, ref = regions[0], target = regions[1], stat = ldstats, filter = filter, windowsize = windowsize)
