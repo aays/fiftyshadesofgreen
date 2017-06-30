@@ -78,7 +78,7 @@ def header(stat):
     elif len(stat) == 3:
         print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'dprime', 'r2')
 
-def singlevcfcalc(vcf_file, ref, target, stat, filter = None):
+def singlevcfcalc(vcf_file, ref, target, stat, filter = None, windowsize = None):
     '''
     In a single VCF, calculates linkage stats between two entire regions.
     The stat parameter can take any of 'd', 'dprime', or 'r2' as input. 
@@ -123,7 +123,13 @@ def singlevcfcalc(vcf_file, ref, target, stat, filter = None):
             if len(record1.ALT) > 1:
                 continue
             for record2 in targetlocus:
-                ldgetter(record1, record2)
+                if not windowsize:
+                    ldgetter(record1, record2)
+                elif windowsize:
+                    if abs(record2.POS - record1.POS) <= windowsize:
+                        ldgetter(record1, record2)
+                    elif abs(record2.POS - record1.POS) > windowsize:
+                        continue
     elif filter:
         for record1 in tqdm(reflocus):
             targetlocus = snppuller(vcf_file, chrom = target)
@@ -131,6 +137,12 @@ def singlevcfcalc(vcf_file, ref, target, stat, filter = None):
                 continue
             for record2 in targetlocus:
                 if random.random() <= filter:
-                    ldgetter(record1, record2)
+                    if not windowsize:
+                        ldgetter(record1, record2)
+                    elif windowsize:
+                        if abs(record2.POS - record1.POS) <= windowsize:
+                            ldgetter(record1, record2)
+                        elif abs(record2.POS - record1.POS) > windowsize:
+                            continue
                 elif random.random() > filter:
                     continue
