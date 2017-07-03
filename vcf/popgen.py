@@ -51,7 +51,7 @@ def freqsgetter(record1, record2, snpcheck = True):
     '''Helper function for LD statistic calculations. Returns, in order: 1. a dict containing
     haplotype frequences; 2. a dict containing allele frequency values (p1, p2, q1, q2), and
     3. a dict containing haplotype frequencies with A/B notation. Has more accurate allele
-    freq calculations than freqscalc - handles missing data better (i.e. when biallelic genotype
+    freq calculations than freqscalc() - handles missing data better (i.e. when biallelic genotype
     not present).
     '''
     if snpcheck == True:
@@ -71,18 +71,18 @@ def freqsgetter(record1, record2, snpcheck = True):
         gt2 = record2.genotype(strain)['GT']
         if gt1 == '.' or gt2 == '.':
             return
-        elif gt1 == '1' and gt2 == '1':
+        elif gt1 == '1' and gt2 == '1': # ab
             outgt = str(record1.ALT[0]) + str(record2.ALT[0])
             totcalls = totcalls + 1
-        elif gt1 == '1' and gt2 == '0':
+        elif gt1 == '1' and gt2 == '0': # aB
             qcount = qcount + 1
             outgt = str(record1.ALT[0]) + record2.REF
             totcalls = totcalls + 1
-        elif gt1 == '0' and gt2 == '1':
+        elif gt1 == '0' and gt2 == '1': # Ab
             pcount = pcount + 1
             outgt = record1.REF + str(record2.ALT[0])
             totcalls = totcalls + 1
-        elif gt1 == '0' and gt2 == '0':
+        elif gt1 == '0' and gt2 == '0': # AB
             pcount = pcount + 1
             qcount = qcount + 1
             outgt = record1.REF + record2.REF
@@ -119,7 +119,7 @@ def freqsgetter(record1, record2, snpcheck = True):
 
 def dcalc(record1, record2, snpcheck = True):
     '''Calculates D statistic between two VCF records.
-    Will check that records are single-ALT SNPs unless snpcheck = False.
+    Will check that records are biallelic (single-ALT) SNPs unless snpcheck = False.
     '''
     if snpcheck == True:
         snpchecker(record1, record2)
@@ -140,7 +140,7 @@ def dcalc(record1, record2, snpcheck = True):
 
 def dprimecalc(record1, record2, snpcheck = True):
     '''Calculates Lewontin's D' statistic (D/Dmax) between two VCF records.
-    Will check that records are single-ALT SNPs unless snpcheck = False.
+    Will check that records are biallelic (single-ALT) SNPs unless snpcheck = False.
     '''
     if snpcheck == True:
         snpchecker(record1, record2)
@@ -166,7 +166,7 @@ def dprimecalc(record1, record2, snpcheck = True):
 
 def r2calc(record1, record2, snpcheck = True):
     '''Calculates r^2 (correlation) between two VCF records.
-    Will check that records are single-ALT SNPs unless snpcheck = False.
+    Will check that records are biallelic (single-ALT) SNPs unless snpcheck = False.
     '''
     if snpcheck == True:
         snpchecker(record1, record2)
@@ -184,7 +184,7 @@ def r2calc(record1, record2, snpcheck = True):
 def ldstats(record1, record2, snpcheck = True, freqs = False):
     '''Convenience function - returns D, D prime, and r2.
     If freqs = True, will also return an allele frequency report.
-    Will check that records are single-ALT SNPs unless snpcheck = False.
+    Will check that records are biallelic (single-ALT) SNPs unless snpcheck = False.
     '''
     if snpcheck == True:
         snpchecker(record1, record2)
@@ -254,7 +254,7 @@ def reclook(reclist, pos):
 
 def freqscalc(record1, record2, snpcheck = True, aaf = False):
     '''Exploratory convenience function. Given two VCF records, returns 
-    observed haplotype frequencies. Will check that records are single-ALT SNPs 
+    observed haplotype frequencies. Will check that records are biallelic (single-ALT) SNPs 
     unless snpcheck = False. aaf will return AF values hardcoded in the VCF
     itself, while aaf = False (default) will make freqscalc calculate them instead
     (more accurate option).
