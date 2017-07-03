@@ -6,6 +6,8 @@
 # usage - Rscript lddecaywh_gen.R [input file] [outfile name] [plot wd]
 # eg Rscript lddecaywh_gen.R chrom1.txt chrom1 /analysis/graphs creates chrom1.png in /analysis/graphs
 
+# modified from plink/lddecaywh.R
+
 # AH - 06/2017
 
 library(ggplot2)
