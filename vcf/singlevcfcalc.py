@@ -39,7 +39,7 @@ args = parser.parse_args()
 vcfin = args.vcfinput
 regions = args.regions
 ldstats = args.ldstats
-filter = args.filter
+filt = args.filter
 windowsize = args.windowsize
 
-singlevcfcalc(vcfin, ref = regions[0], target = regions[1], stat = ldstats, filter = filter, windowsize = windowsize)
+singlevcfcalc(vcfin, ref = regions[0], target = regions[1], stat = ldstats, filter = filt, windowsize = windowsize)
