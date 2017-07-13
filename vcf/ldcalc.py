@@ -16,12 +16,14 @@ def snppuller(vcf_file, chrom = None, pos = None):
     SNPs, while filtering out singletons.
     '''
     vcfin = vcf.Reader(filename = vcf_file, compressed = True)
+    
     # filters
     def hardsnpcheck(record): # ensure biallelic SNP
         if len(record.REF) == 1 and len(record.ALT) == 1 and len(record.ALT[0]) == 1 and len(record.alleles) == 2:
             return True
         elif len(record.REF) != 1 or len(record.ALT) != 1 or len(record.ALT[0]) != 1 or len(record.alleles) != 2:
             return False
+        
     def issingleton(record): # ensure not singleton
         count = record.INFO['AN'] - record.INFO['AC'][0]
         if count == 1:
@@ -30,6 +32,7 @@ def snppuller(vcf_file, chrom = None, pos = None):
             return True
         else:
             return False
+        
     def isinvariant(record):
         if record.INFO['AC'][0] == 0:
             return True
@@ -37,6 +40,7 @@ def snppuller(vcf_file, chrom = None, pos = None):
             return True
         else:
             return False
+        
     # fetch
     if chrom is not None and pos is not None:
         pos = pos.split('-')
@@ -94,9 +98,11 @@ def singlevcfcalc(vcf_file, ref, target, stat, filter = None, windowsize = None)
     A filter can also be provided - setting filter = 0.8 will drop records in both
     *just target* roughly 20% of the time.
     '''
+    
     def metadata(record1, record2):
         out = record1.CHROM + ' ' + str(record1.POS) + ' ' + record2.CHROM + ' ' + str(record2.POS)
         return out
+    
     def ldgetter(record1, record2):
         if len(stat) == 1:
             if 'd' in stat:
@@ -114,9 +120,11 @@ def singlevcfcalc(vcf_file, ref, target, stat, filter = None, windowsize = None)
                 print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
         elif len(stat) == 3:
             print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), r2calc(record1, record2))
+            
     reflocus = snppuller(vcf_file, chrom = ref) # create ref vcf record generator
     stat = stat.split('/') # get stat
     header(stat) # print header
+    
     if not filter:
         for record1 in tqdm(reflocus):
             targetlocus = snppuller(vcf_file, chrom = target)
