@@ -3,6 +3,10 @@
 # takes in table-formatted output from plink's --r2 function and generates plots
 # that fit an equation modelling LD decay over distance (Weir & Hill 1986, Cutter et al. 2006)
 
+# assumes n = 24
+
+# 20/07/2017 - corrected typo in equation (Weir & Hill 1988)
+
 # usage - Rscript lddecaywh.R [input file] [outfile name] [plot wd]
 # eg Rscript lddecaywh.R chrom1.txt chrom1 /analysis/graphs creates chrom1.png in /analysis/graphs
 
@@ -34,7 +38,7 @@ diffgetter <- function(df) {
 
 plotter <- function(df, outfile, graphwd) {
     df <- as.data.frame(df)
-    weirhilleq <- '((10 + p*d)/(22 + (13*p*d) + (p*d)^2))*(1 + (((3 + (p*d))/(24*(22 + (13*p*d) + (p*d)^2)^2)) * (12 + (12*p*d) + (p*d)^2)))'
+    weirhilleq <- '((10 + p*d)/(22 + (13*p*d) + (p*d)^2))*(1 + (((3 + (p*d))/(24*(22 + (13*p*d) + (p*d)^2))) * (12 + (12*p*d) + (p*d)^2)))'
 
     subdf <- df %>%
         select(one_of(c('d', 'r2'))) %>%
@@ -46,6 +50,8 @@ plotter <- function(df, outfile, graphwd) {
               predict() %>%
               as.data.frame()
   
+  
+    message('Model fit complete.')
     tempdf$d <- df$d
     colnames(tempdf)[1] <- 'rho'
     tempdf <- apply(tempdf, 2, as.numeric)
@@ -59,15 +65,21 @@ plotter <- function(df, outfile, graphwd) {
            plot = r2plot, path = graphwd,
            width = par("din")[2], height = par("din")[2],
            units = "in", dpi = 750)
-
+    
+    message(paste('Saving plot to ', graphwd, '...', sep = ''))
+  
     paste(outfile, summary(nls(paste('r2', '~', weirhilleq),
                       data = subdf, control = list(maxiter = 500),
                       start = list(p = 0.5)))$p)
 }
 
+message('Loading in file...')
+
 data <- read.csv(infile, header = TRUE)
 
 colnames(data) <- 'column'
+
+message('Complete.')
 
 data <- mutate(data, column = gsub(pattern = "[ ]{1,}", replacement = ",", x = column)) %>%
 separate(col = "column", into = c('pos1', 'pos2', 'r2'), sep = ",")
