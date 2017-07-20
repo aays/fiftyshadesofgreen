@@ -14,7 +14,7 @@
 
 library(ggplot2)
 library(tidyr)
-library(dplyr)
+library(dplyr, warn.conflicts = FALSE)
 
 args <- commandArgs(trailingOnly = TRUE)
 
@@ -50,24 +50,28 @@ plotter <- function(df, outfile, graphwd) {
               predict() %>%
               as.data.frame()
   
-  
     message('Model fit complete.')
+    
     tempdf$d <- df$d
     colnames(tempdf)[1] <- 'rho'
     tempdf <- apply(tempdf, 2, as.numeric)
-
+    
+    message('Creating plot...')
+    
     r2plot <- ggplot(subdf, aes(x = d, y = r2)) +
         geom_point() +
         geom_line(data = as.data.frame(tempdf), aes(x = d, y = rho), col = 'red') +
         geom_smooth()
 
+    message(paste('Saving plot to ', graphwd, outfile, '...', sep = ''))
+  
     ggsave(filename = paste(outfile, '.png', sep = ''),
            plot = r2plot, path = graphwd,
            width = par("din")[2], height = par("din")[2],
            units = "in", dpi = 750)
     
-    message(paste('Saving plot to ', graphwd, '...', sep = ''))
-  
+    message('Complete.)
+    
     paste(outfile, summary(nls(paste('r2', '~', weirhilleq),
                       data = subdf, control = list(maxiter = 500),
                       start = list(p = 0.5)))$p)
