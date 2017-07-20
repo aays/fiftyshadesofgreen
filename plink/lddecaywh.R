@@ -5,8 +5,6 @@
 
 # assumes n = 24
 
-# 20/07/2017 - corrected typo in equation (Weir & Hill 1988)
-
 # usage - Rscript lddecaywh.R [input file] [outfile name] [plot wd]
 # eg Rscript lddecaywh.R chrom1.txt chrom1 /analysis/graphs creates chrom1.png in /analysis/graphs
 
@@ -38,7 +36,7 @@ diffgetter <- function(df) {
 
 plotter <- function(df, outfile, graphwd) {
     df <- as.data.frame(df)
-    weirhilleq <- '((10 + p*d)/(22 + (13*p*d) + (p*d)^2))*(1 + (((3 + (p*d))/(24*(22 + (13*p*d) + (p*d)^2))) * (12 + (12*p*d) + (p*d)^2)))'
+    weirhilleq <- '((10 + p*d)/(22 + (13*p*d) + (p*d)^2))*(1 + (((3 + (p*d))/(24*(22 + (13*p*d) + (p*d)^2)^2)) * (12 + (12*p*d) + (p*d)^2)))'
 
     subdf <- df %>%
         select(one_of(c('d', 'r2'))) %>%
@@ -60,8 +58,7 @@ plotter <- function(df, outfile, graphwd) {
     
     r2plot <- ggplot(subdf, aes(x = d, y = r2)) +
         geom_point() +
-        geom_line(data = as.data.frame(tempdf), aes(x = d, y = rho), col = 'red') +
-        geom_smooth()
+        geom_line(data = as.data.frame(tempdf), aes(x = d, y = rho), col = 'red')
 
     message(paste('Saving plot to ', graphwd, outfile, '...', sep = ''))
   
