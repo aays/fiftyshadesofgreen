@@ -70,7 +70,7 @@ plotter <- function(df, outfile, graphwd) {
            width = par("din")[2], height = par("din")[2],
            units = "in", dpi = 750)
     
-    message('Complete.)
+    message('Complete.')
     
     paste(outfile, summary(nls(paste('r2', '~', weirhilleq),
                       data = subdf, control = list(maxiter = 500),
