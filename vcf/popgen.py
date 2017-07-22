@@ -1,19 +1,20 @@
 '''
 popgen v0.6
+(requires pyVCF)
 
-A suite of functions that calculate useful population genetics statistics
+Functions that calculate useful population genetics statistics
 between a pair of VCF records - ideally SNPs with single ALTs. Deviations from this
-won't break the script, but will throw up (overrideable) warning messages and 
+won't break anything, but will throw up (overrideable) warning messages and 
 should probably be done with caution.
 
 If doing some exploratory work, it may be worthwhile to load in subsets of records
-using reclist() and running functions on records out of those lists. 
+using reclist() and run functions on records out of the resultant list objects. 
 
 If working with known sites, reclook() allows for easy access of records based on 
 their genomic positions and can be entered as input to the pop gen functions. 
 
 These functions are only compatible with haploid genomes (for now). 
-Use with higher ploidies (is that a word?) at your own risk.
+Use with higher ploidies at your own risk.
 
 This is an extremely early draft of what might be put together into a full
 Python library down the line. 
