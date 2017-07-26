@@ -35,7 +35,7 @@ def meaner(df, i):
     value = value * df['mean'][i]
     return value
 
-def slider(df, windowsize, block):
+def slider(df, windowsize, block, chrname):
     dfmeans = []
     counter = 0
     windowlist = list(range(int(df.iloc[0,0]), int(df.iloc[-1,1]), windowsize + 1))
@@ -46,12 +46,12 @@ def slider(df, windowsize, block):
         subdf = df[(df['left_snp'] >= winstart) & (df['right_snp'] <= winend)].reset_index()
         currentwindowmean = [meaner(df, i) for i in range(subdf.shape[0])]
         if sum(currentwindowmean) == 0:
-            print(winstart, 0, block)
+            print(winstart, 0, block, chrname)
             continue
         else:
             winlength = subdf.iloc[-1,1] - subdf.iloc[0,0]
             currentwindowmean = sum(currentwindowmean)/winlength
-            print(winstart, currentwindowmean, block)
+            print(winstart, currentwindowmean, block, chrname)
 
 # analysis
 df = pd.read_csv(sys.argv[1], sep = ' ',
