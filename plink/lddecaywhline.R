@@ -41,7 +41,7 @@ linemaker <- function(df) {
     
     linedf$d <- df$d
     colnames(linedf)[1] <- 'rho'
-    linedf <- apply(tempdf, 2, as.numeric)
+    linedf <- apply(linedf, 2, as.numeric)
     
     paste(outfile, summary(nls(paste('r2', '~', weirhilleq),
                       data = subdf, control = list(maxiter = 500),
