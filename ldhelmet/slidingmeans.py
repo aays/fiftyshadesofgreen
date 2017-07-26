@@ -64,7 +64,7 @@ outname = outname[outname.find('chromosome'):-4]
 block = outname[outname.rfind('_') + 1:]
 
 # creates machine-readable space-separated structure
-slider(df, inputsize, block)
+slider(df, inputsize, block, outname)
 
 
 
