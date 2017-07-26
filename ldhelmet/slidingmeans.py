@@ -22,6 +22,7 @@ AH - 03/2017
 
 import pandas as pd
 import sys
+from tqdm import tqdm
 
 inputsize = int(sys.argv[2])
 
@@ -39,7 +40,7 @@ def slider(df, windowsize, block, chrname):
     dfmeans = []
     counter = 0
     windowlist = list(range(int(df.iloc[0,0]), int(df.iloc[-1,1]), windowsize + 1))
-    for window in windowlist:
+    for window in tqdm(windowlist):
         counter = counter + 1
         winstart = window
         winend = window + windowsize
