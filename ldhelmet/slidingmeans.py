@@ -61,10 +61,11 @@ colfixer(df)
 
 outname = str(sys.argv[1])
 outname = outname[outname.find('chromosome'):-4]
-block = outname[outname.rfind('_') + 1:]
+block = outname[outname.rfind('_') + 1:] # get block penalty
+chromosome = outname[0:outname.rfind('_')] # get chrom name
 
 # creates machine-readable space-separated structure
-slider(df, inputsize, block, outname)
+slider(df, inputsize, block, chromosome)
 
 
 
