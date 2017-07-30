@@ -50,8 +50,7 @@ def slider(df, windowsize, block, chrname):
             print(winstart, 0, block, chrname)
             continue
         else:
-            winlength = subdf.iloc[-1,1] - subdf.iloc[0,0]
-            currentwindowmean = sum(currentwindowmean)/winlength
+            currentwindowmean = sum(currentwindowmean)/windowsize
             print(winstart, currentwindowmean, block, chrname)
 
 # analysis
