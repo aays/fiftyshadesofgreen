@@ -1,3 +1,8 @@
+# Primes LDhelmet output for use with scaledmeans.py
+# takes in an LDhelmet outfile and scales each rho value to the distance between SNPs
+
+# AH - 07/2017
+
 library(dplyr, warn.conflicts = FALSE)
 library(magrittr, warn.conflicts = FALSE)
 
@@ -11,6 +16,6 @@ df %<>%
     select(left_snp = V1, right_snp = V2, mean = V3) %>% 
     mutate(diff = right_snp - left_snp) %>% 
     mutate(scaledmean = diff * mean) %>%
-        select(-mean)
+    select(-mean)
 
 write.table(df, file = paste('scaled', infile, sep =''), sep = ' ')
