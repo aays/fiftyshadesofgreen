@@ -10,8 +10,8 @@ library(magrittr, warn.conflicts = FALSE)
 
 args <- commandArgs(trailingOnly = TRUE)
 
-file <- args[1]
-windowsize <- args[2]
+filename <- as.character(args[1])
+window <- as.integer(args[2])
 
 windowcalc <- function(df, windowsize) {
     df %<>% select(left_snp = V1, right_snp = V2, rho = V3) %>% # get cols
@@ -23,7 +23,7 @@ windowcalc <- function(df, windowsize) {
     return(df)
 }
 
-df <- read.csv(file, sep = ' ', skip = 3, header = FALSE) %>%
-  windowcalc(windowsize)
+df <- read.csv(filename, sep = ' ', skip = 3, header = FALSE)
+df %<>% windowcalc(window)
 
 write.table(df, file = paste('means_', infile, sep = ''), sep = ' ')  
