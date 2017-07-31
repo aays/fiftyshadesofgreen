@@ -1,6 +1,6 @@
 # does what slidingmeans.py does, but in R.
 # takes in LDhelmet output and a windowsize
-# ie. Rscript slidingmeans.R [ldhelmet file] [windowsize] > [outfile]
+# ie. Rscript slidingmeans.R [ldhelmet file] [windowsize] [chromosome name] > [outfile]
 # saves to same directory (for now)
 
 # AH - 07/2017
@@ -12,6 +12,7 @@ args <- commandArgs(trailingOnly = TRUE)
 
 filename <- as.character(args[1])
 window <- as.integer(args[2])
+chrname <- as.character(args[3])
 
 windowcalc <- function(df, windowsize) {
     df %<>% select(left_snp = V1, right_snp = V2, rho = V3) %>% # get cols
@@ -19,7 +20,8 @@ windowcalc <- function(df, windowsize) {
         mutate(scaledrho = rho * diff) %>% # use diff for scaled rho
         mutate(window = ceiling(left_snp/windowsize)) %>% # compute windows
         group_by(window) %>% # group by windows
-        summarise(rho = mean(scaledrho)) # get means
+        summarise(rho = mean(scaledrho)) %>% # get means
+        mutate(chr = chrname)
     return(df)
 }
 
