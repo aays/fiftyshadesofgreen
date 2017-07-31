@@ -28,5 +28,7 @@ windowcalc <- function(df, windowsize) {
 df <- read.csv(filename, sep = ' ', skip = 3, header = FALSE)
 df %<>% windowcalc(window)
 
+df <- df[,c(3,2,1)] # reorder
+
 names(df) <- NULL # suppress colnames in printing
 print.data.frame(df, row.names = FALSE, quote = FALSE)
