@@ -1,6 +1,6 @@
 # does what slidingmeans.py does, but in R.
 # takes in LDhelmet output and a windowsize
-# ie. Rscript slidingmeans.R [ldhelmet file] [windowsize]
+# ie. Rscript slidingmeans.R [ldhelmet file] [windowsize] > [outfile]
 # saves to same directory (for now)
 
 # AH - 07/2017
@@ -26,4 +26,6 @@ windowcalc <- function(df, windowsize) {
 df <- read.csv(filename, sep = ' ', skip = 3, header = FALSE)
 df %<>% windowcalc(window)
 
-write.table(df, file = paste(filename, 'means', sep = ''), sep = ' ')  
+# write.table(df, file = paste(filename, 'means', sep = ''), sep = ' ')  
+names(df) <- NULL
+print.data.frame(df, row.names = FALSE, quote = FALSE)
