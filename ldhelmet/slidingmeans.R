@@ -1,6 +1,6 @@
 # does what slidingmeans.py does, but in R.
 # takes in LDhelmet output and a windowsize
-# ie. Rscript slidingmeans.R [ldhelmet file] [windowsize] [chromosome name] > [outfile]
+# ie. Rscript slidingmeans.R [ldhelmet file] [windowsize] [chromosome name]
 # saves to same directory (for now)
 
 # AH - 07/2017
@@ -32,4 +32,5 @@ df %<>% windowcalc(window)
 df <- df[,c(2,1)] # reorder
 
 names(df) <- NULL # suppress colnames in printing
-print.data.frame(df, row.names = FALSE, quote = FALSE, right = FALSE)
+write.table(df, file = 'genomedist.txt', sep = ' ', 
+            col.names = FALSE, quote = FALSE, append = TRUE)
