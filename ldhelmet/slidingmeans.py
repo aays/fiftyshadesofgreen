@@ -37,11 +37,8 @@ def meaner(df, i):
     return value
 
 def slider(df, windowsize, block, chrname):
-    dfmeans = []
-    counter = 0
     windowlist = list(range(int(df.iloc[0,0]), int(df.iloc[-1,1]), windowsize + 1))
     for window in tqdm(windowlist):
-        counter = counter + 1
         winstart = window
         winend = window + windowsize
         subdf = df[(df['left_snp'] >= winstart) & (df['right_snp'] <= winend)].reset_index()
@@ -50,6 +47,7 @@ def slider(df, windowsize, block, chrname):
             print(winstart, 0, block, chrname)
             continue
         else:
+            # print(subdf['left_snp'][0], subdf['right_snp'].iloc[-2]) - can check windows
             currentwindowmean = sum(currentwindowmean)/windowsize
             print(winstart, currentwindowmean, block, chrname)
 
