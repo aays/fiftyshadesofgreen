@@ -1,7 +1,8 @@
 # does what slidingmeans.py does, but in R.
 # takes in LDhelmet output and a windowsize
 # ie. Rscript slidingmeans.R [ldhelmet file] [windowsize] [chromosome name]
-# saves to same directory (for now)
+# saves to 'genomedist.txt' in same directory (for now)
+# for multiple chromosomes - for i in {1..n}; do Rscript slidingmeans.R chromosome_$i.txt 200000 chromosome_$i; done
 
 # AH - 07/2017
 
