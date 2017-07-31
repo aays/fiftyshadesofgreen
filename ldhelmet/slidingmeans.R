@@ -21,15 +21,14 @@ windowcalc <- function(df, windowsize) {
         mutate(window = ceiling(left_snp/windowsize)) %>% # compute windows
         group_by(window) %>% # group by windows
         summarise(rho = mean(scaledrho)) %>% # get means
-        mutate(chr = chrname) %>%
-        select(-window)
+        mutate(chr = chrname)
     return(df)
 }
 
 df <- read.csv(filename, sep = ' ', skip = 3, header = FALSE)
 df %<>% windowcalc(window)
 
-df <- df[,c(2,1)] # reorder
+df <- df[,c(3,2,1)] # reorder
 
 names(df) <- NULL # suppress colnames in printing
-print.data.frame(df, row.names = FALSE, quote = FALSE)
+print.data.frame(df, row.names = FALSE, quote = FALSE, right = FALSE)
