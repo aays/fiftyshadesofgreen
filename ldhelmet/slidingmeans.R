@@ -26,4 +26,4 @@ windowcalc <- function(df, windowsize) {
 df <- read.csv(filename, sep = ' ', skip = 3, header = FALSE)
 df %<>% windowcalc(window)
 
-write.table(df, file = paste('means_', filename, sep = ''), sep = ' ')  
+write.table(df, file = paste(filename, 'means', sep = ''), sep = ' ')  
