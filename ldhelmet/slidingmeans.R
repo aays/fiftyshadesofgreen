@@ -26,6 +26,5 @@ windowcalc <- function(df, windowsize) {
 df <- read.csv(filename, sep = ' ', skip = 3, header = FALSE)
 df %<>% windowcalc(window)
 
-# write.table(df, file = paste(filename, 'means', sep = ''), sep = ' ')  
-names(df) <- NULL
+names(df) <- NULL # suppress colnames in printing
 print.data.frame(df, row.names = FALSE, quote = FALSE)
