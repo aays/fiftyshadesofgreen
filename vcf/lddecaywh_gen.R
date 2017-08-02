@@ -11,7 +11,7 @@
 # AH - 06/2017
 
 library(ggplot2)
-library(tidyr)
+library(tidyr, warn.conflicts = FALSE)
 library(dplyr, warn.conflicts = FALSE)
 
 args <- commandArgs(trailingOnly = TRUE)
