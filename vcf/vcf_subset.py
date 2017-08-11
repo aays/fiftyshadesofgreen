@@ -22,9 +22,10 @@ import sys
 import vcf
 import random
 import argparse
+import tqdm
 
-parser = argparse.ArgumentParser(description = 'Subset a vcf file.', 
-                                usage = 'vcf_chop.py [options]')
+parser = argparse.ArgumentParser(description = 'Subset and/or filter a vcf file.', 
+                                usage = 'vcf_subset.py [options]')
 
 parser.add_argument('-v', '--vcfinput', required = True,
                    type = str, help = 'Input VCF')
@@ -66,12 +67,12 @@ if pos:
 elif chrom and not pos:
     snippet = file.fetch(chrom = chrom) 
 
-# filter
+# filter and write
 if filt_frac: # given fraction between 0 and 1
     assert not filt_num
     with open(outfile, 'w') as out:
         writer = vcf.Writer(out, snippet)
-        for record in snippet:
+        for record in tqdm(snippet):
             if random.random() <= filt_frac: # filtering
                 writer.write_record(record)
                 
@@ -84,14 +85,15 @@ elif filt_num: # given number of sites to keep
     frac_from_num = filt_num/totalrecs # get filter fraction
     with open(outfile, 'w') as out:
         writer = vcf.Writer(out, snippet)
-        for record in snippet:
+        for record in tqdm(snippet):
             if random.random() <= frac_from_num:
                 writer.write_record(record)
-                
+
+# no filtering - just write                
 elif not filt_frac and not filt_num:    
     with open(outfile, 'w') as out:
         writer = vcf.Writer(out, snippet)
-        for record in snippet:
+        for record in tqdm(snippet):
             writer.write_record(record) 
 
 print('VCF written to', outfile)         
