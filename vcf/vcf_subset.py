@@ -22,7 +22,7 @@ import sys
 import vcf
 import random
 import argparse
-import tqdm
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser(description = 'Subset and/or filter a vcf file.', 
                                 usage = 'vcf_subset.py [options]')
