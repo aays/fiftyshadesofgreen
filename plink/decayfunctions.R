@@ -125,10 +125,11 @@ decaypoint.to.df <- function(linedf, frac, chrname) {
 flatline.point <- function(linedf, chrname) {
     # uses rates of change to approximately determine when decay 'flatlines'
     linedf %<>%
+        distinct() %>%
         group_by(d) %>%
         summarise(mean.rho = mean(rho)) %>%
         mutate(d2 = lead(d), mean.rho2 = lead(mean.rho)) %>%
-        mutate(ddx = abs(round((mean.rho2 - mean.rho)/(d2 - d), digits = 3))) # approx rate of change
+        mutate(ddx = abs(round((mean.rho2 - mean.rho)/(d2 - d), digits = 4))) # approx rate of change
     
     start.rho <- linedf$mean.rho[1]
     start.d <- linedf$d[1]
