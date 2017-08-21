@@ -13,6 +13,7 @@
 library(ggplot2)
 library(tidyr, warn.conflicts = FALSE)
 library(dplyr, warn.conflicts = FALSE)
+library(magrittr, warn.conflicts = FALSE)
 
 args <- commandArgs(trailingOnly = TRUE)
 
@@ -26,9 +27,9 @@ outfile <- args[2]
 graphwd <- args[3]
 
 diffgetter <- function(df) {
-    df <- df %>%
+    df %<>%
       mutate(d = abs(as.numeric(pos2) - as.numeric(pos1))) %>%
-      select(one_of(c('d', 'r2'))) %>%
+      select(d, r2) %>%
       apply(2, as.numeric)
     df[,c(1,2)] <- sapply(df[,c(1,2)], as.numeric)
     return(as.data.frame(df))
@@ -39,7 +40,7 @@ plotter <- function(df, outfile, graphwd) {
     weirhilleq <- '((10 + p*d)/(22 + (13*p*d) + (p*d)^2))*(1 + (((3 + (p*d))/(24*(22 + (13*p*d) + (p*d)^2)^2)) * (12 + (12*p*d) + (p*d)^2)))'
 
     subdf <- df %>%
-        select(one_of(c('d', 'r2'))) %>%
+        select(d, r2) %>%
         apply(2, as.numeric) %>%
         as.data.frame()
 
