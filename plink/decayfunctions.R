@@ -1,6 +1,9 @@
-# useful functions for working with LD decay data
+# useful functions for working with LD decay data from plink's --r2 fxn
 
 # AH - 08/2017
+
+library(dplyr, warn.conflicts = FALSE)
+library(magrittr, warn.conflicts = FALSE)
 
 decaypoint <- function(df, frac, verbose = FALSE) {
     weirhilleq <- '((10 + p*d)/(22 + (13*p*d) + (p*d)^2))*(1 + (((3 + (p*d))/(24*(22 + (13*p*d) + (p*d)^2))) * (12 + (12*p*d) + (p*d)^2)))'
