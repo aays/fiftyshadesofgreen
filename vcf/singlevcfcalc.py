@@ -33,7 +33,7 @@ parser.add_argument('-f', '--filter', required = False,
                    type = float, help = 'Proportion of records to perform calculations on. Optional.')
 parser.add_argument('-w', '--windowsize', required = False,
                    type = int, help = 'Window size to calculate LD between. Only use for intra-region calculations. Optional.')
-parser.add_argument('-h', '--haps', required = False,
+parser.add_argument('-p', '--haps', required = False,
                    action = 'store_true', help = 'Whether to output the number of observed haplotypes for each comparison. Optional.')
 
 
