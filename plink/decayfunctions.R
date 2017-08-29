@@ -36,7 +36,7 @@ decaypoint <- function(df, frac, verbose = FALSE) {
     if (verbose == FALSE) {
         out <- c(start.rho, end.rho, start.d, end.d, end.d - start.d)
     } else if (verbose == TRUE) {
-        out <- paste('start rho = ', start.rho,
+        out <- paste('start.rho = ', start.rho,
                     '\nend.rho = ', end.rho,
                     '\nstart.d = ', start.d,
                     '\nend.d = ', end.d,
@@ -84,7 +84,7 @@ decaypoint.line <- function(linedf, frac, verbose = FALSE) {
     if (verbose == FALSE) {
         out <- c(start.rho, end.rho, start.d, end.d, end.d - start.d)
     } else if (verbose == TRUE) {
-        out <- paste('start rho = ', start.rho,
+        out <- paste('start.rho = ', start.rho,
                     '\nend.rho = ', end.rho,
                     '\nstart.d = ', start.d,
                     '\nend.d = ', end.d,
