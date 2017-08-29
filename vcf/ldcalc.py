@@ -15,6 +15,7 @@ def snppuller(vcf_file, chrom = None, pos = None):
     '''Returns a generator object for a specified VCF snippet that returns only
     SNPs, while filtering out singletons.
     '''
+    
     vcfin = vcf.Reader(filename = vcf_file, compressed = True)
     
     # filters
@@ -65,6 +66,7 @@ def snppuller(vcf_file, chrom = None, pos = None):
 def header(stat, haps = False):
     '''Helper function that determines output headers in singlevcfcalc.
     '''
+    
     if haps == False:
         if len(stat) == 1:
             if 'd' in stat:
@@ -126,8 +128,7 @@ def singlevcfcalc(vcf_file, ref, target, stat, filter = None, windowsize = None,
         return out
     
     def ldgetter(record1, record2):
-        
-        if haps == False:
+        if haps == False: # proceed w/o haps
             if len(stat) == 1:
                 if 'd' in stat:
                     print(metadata(record1, record2), dcalc(record1, record2))
@@ -177,11 +178,12 @@ def singlevcfcalc(vcf_file, ref, target, stat, filter = None, windowsize = None,
             for record2 in targetlocus:
                 if not windowsize:
                     ldgetter(record1, record2)
-                elif windowsize:
+                elif windowsize: # if a windowsize is provided
                     if abs(record2.POS - record1.POS) <= windowsize:
                         ldgetter(record1, record2)
                     elif abs(record2.POS - record1.POS) > windowsize:
                         continue
+                        
     elif filter:
         for record1 in tqdm(reflocus):
             targetlocus = snppuller(vcf_file, chrom = target)
