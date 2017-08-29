@@ -167,7 +167,7 @@ def singlevcfcalc(vcf_file, ref, target, stat, filter = None, windowsize = None,
             
     reflocus = snppuller(vcf_file, chrom = ref) # create ref vcf record generator
     stat = stat.split('/') # get stat
-    header(stat) # print header
+    header(stat, haps) # print header
     
     if not filter:
         for record1 in tqdm(reflocus):
