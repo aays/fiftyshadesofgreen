@@ -62,27 +62,46 @@ def snppuller(vcf_file, chrom = None, pos = None):
             else:
                 pass
         
-def header(stat):
+def header(stat, haps = False):
     '''Helper function that determines output headers in singlevcfcalc.
     '''
-    if len(stat) == 1:
-        if 'd' in stat:
-            print('chrom1', 'pos1', 'chrom2', 'pos2', 'd')
-        elif 'dprime' in stat:
-            print('chrom1', 'pos1', 'chrom2', 'pos2', 'dprime')
-        elif 'r2' in stat:
-            print('chrom1', 'pos1', 'chrom2', 'pos2', 'r2')
-    elif len(stat) == 2:
-        if 'd' in stat and 'dprime' in stat:
-            print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'dprime')
-        elif 'd' in stat and 'r2' in stat:
-            print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'r2')        
-        elif 'dprime' in stat and 'r2' in stat:
-            print('chrom1', 'pos1', 'chrom2', 'pos2', 'dprime', 'r2')
-    elif len(stat) == 3:
-        print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'dprime', 'r2')
-
-def singlevcfcalc(vcf_file, ref, target, stat, filter = None, windowsize = None):
+    if haps == False:
+        if len(stat) == 1:
+            if 'd' in stat:
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'd')
+            elif 'dprime' in stat:
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'dprime')
+            elif 'r2' in stat:
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'r2')
+        elif len(stat) == 2:
+            if 'd' in stat and 'dprime' in stat:
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'dprime')
+            elif 'd' in stat and 'r2' in stat:
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'r2')        
+            elif 'dprime' in stat and 'r2' in stat:
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'dprime', 'r2')
+        elif len(stat) == 3:
+            print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'dprime', 'r2')
+    elif haps == True:
+        if len(stat) == 1:
+            if 'd' in stat:
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'hapcount')
+            elif 'dprime' in stat:
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'dprime', 'hapcount')
+            elif 'r2' in stat:
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'r2', 'hapcount')
+        elif len(stat) == 2:
+            if 'd' in stat and 'dprime' in stat:
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'dprime', 'hapcount')
+            elif 'd' in stat and 'r2' in stat:
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'r2', 'hapcount')
+            elif 'dprime' in stat and 'r2' in stat:
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'dprime', 'r2', 'hapcount')
+        elif len(stat) == 3:
+            print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'dprime', 'r2', 'hapcount')
+        
+        
+def singlevcfcalc(vcf_file, ref, target, stat, filter = None, windowsize = None, haps = False):
     '''
     In a single VCF, calculates linkage stats between two entire regions.
     The stat parameter can take any of 'd', 'dprime', or 'r2' as input. 
@@ -97,6 +116,9 @@ def singlevcfcalc(vcf_file, ref, target, stat, filter = None, windowsize = None)
     
     A filter can also be provided - setting filter = 0.8 will drop records in both
     *just target* roughly 20% of the time.
+    
+    Setting haps to True will also print out how many of the four possible haplotypes
+    were actually present in the final comparison.
     '''
     
     def metadata(record1, record2):
@@ -104,22 +126,44 @@ def singlevcfcalc(vcf_file, ref, target, stat, filter = None, windowsize = None)
         return out
     
     def ldgetter(record1, record2):
-        if len(stat) == 1:
-            if 'd' in stat:
-                print(metadata(record1, record2), dcalc(record1, record2))
-            elif 'dprime' in stat:
-                print(metadata(record1, record2), dprimecalc(record1, record2))
-            elif 'r2' in stat:
-                print(metadata(record1, record2), r2calc(record1, record2))
-        elif len(stat) == 2:
-            if 'd' in stat and 'dprime' in stat:
-                print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2))
-            elif 'd' in stat and 'r2' in stat:
-                print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
-            elif 'dprime' in stat and 'r2' in stat:
-                print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
-        elif len(stat) == 3:
-            print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), r2calc(record1, record2))
+        
+        if haps == False:
+            if len(stat) == 1:
+                if 'd' in stat:
+                    print(metadata(record1, record2), dcalc(record1, record2))
+                elif 'dprime' in stat:
+                    print(metadata(record1, record2), dprimecalc(record1, record2))
+                elif 'r2' in stat:
+                    print(metadata(record1, record2), r2calc(record1, record2))
+            elif len(stat) == 2:
+                if 'd' in stat and 'dprime' in stat:
+                    print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2))
+                elif 'd' in stat and 'r2' in stat:
+                    print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
+                elif 'dprime' in stat and 'r2' in stat:
+                    print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
+            elif len(stat) == 3:
+                print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), r2calc(record1, record2))
+        
+        elif haps == True: # show haps/4 for each comparison
+            observed_haps = list(freqsgetter(record1, record2)[2].values()) # get hap frequencies
+            hapcount = 4 - observed_haps.count(0)
+            if len(stat) == 1:
+                if 'd' in stat:
+                    print(metadata(record1, record2), dcalc(record1, record2), hapcount)
+                elif 'dprime' in stat:
+                    print(metadata(record1, record2), dprimecalc(record1, record2), hapcount)
+                elif 'r2' in stat:
+                    print(metadata(record1, record2), r2calc(record1, record2), hapcount)
+            elif len(stat) == 2:
+                if 'd' in stat and 'dprime' in stat:
+                    print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), hapcount)
+                elif 'd' in stat and 'r2' in stat:
+                    print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2), hapcount)
+                elif 'dprime' in stat and 'r2' in stat:
+                    print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2), hapcount)
+            elif len(stat) == 3:
+                print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), r2calc(record1, record2), hapcount)
             
     reflocus = snppuller(vcf_file, chrom = ref) # create ref vcf record generator
     stat = stat.split('/') # get stat
