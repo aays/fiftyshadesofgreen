@@ -33,6 +33,8 @@ parser.add_argument('-f', '--filter', required = False,
                    type = float, help = 'Proportion of records to perform calculations on. Optional.')
 parser.add_argument('-w', '--windowsize', required = False,
                    type = int, help = 'Window size to calculate LD between. Only use for intra-region calculations. Optional.')
+parser.add_argument('-h', '--haps', required = False,
+                   action = 'store_true', help = 'Whether to output the number of observed haplotypes for each comparison. Optional.')
 
 
 args = parser.parse_args()
@@ -40,6 +42,8 @@ vcfin = args.vcfinput
 regions = args.regions
 ldstats = args.ldstats
 filt = args.filter
+haps = args.haps
 windowsize = args.windowsize
 
-singlevcfcalc(vcfin, ref = regions[0], target = regions[1], stat = ldstats, filter = filt, windowsize = windowsize)
+
+singlevcfcalc(vcfin, ref = regions[0], target = regions[1], stat = ldstats, filter = filt, windowsize = windowsize, haps = haps)
