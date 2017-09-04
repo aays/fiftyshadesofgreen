@@ -28,7 +28,7 @@ vcfin = args.vcfinput
 ldstats = args.ldstats
 haps = args.haps
 
-def ldgetter(record1, record2):
+def ldgetter(record1, record2, stat):
     '''Helper fxn for allpairscalc
     '''
     
@@ -96,7 +96,7 @@ def allpairscalc(vcf_file, stat, haps = False):
             if record1.CHROM == record2.CHROM and record1.POS == record2.POS:
                 continue
             else:
-                ldgetter(record1, record2)
+                ldgetter(record1, record2, stat)
 
 allpairscalc(vcf_file = vcfin, stat = ldstats, haps = haps)
 
