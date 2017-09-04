@@ -136,4 +136,3 @@ def allpairscalc(vcf_file, stat, haps = False):
                 ldgetter(record1, record2)
 
 allpairscalc(vcf_file = vcfin, stat = ldstats, haps = haps)
-
