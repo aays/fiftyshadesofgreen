@@ -28,46 +28,6 @@ vcfin = args.vcfinput
 ldstats = args.ldstats
 haps = args.haps
 
-  def ldgetter(record1, record2, stat):
-
-      if haps == False: # proceed w/o haps
-          if len(stat) == 1:
-              if 'd' in stat:
-                  print(metadata(record1, record2), dcalc(record1, record2))
-              elif 'dprime' in stat:
-                  print(metadata(record1, record2), dprimecalc(record1, record2))
-              elif 'r2' in stat:
-                  print(metadata(record1, record2), r2calc(record1, record2))
-          elif len(stat) == 2:
-              if 'd' in stat and 'dprime' in stat:
-                  print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2))
-              elif 'd' in stat and 'r2' in stat:
-                  print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
-              elif 'dprime' in stat and 'r2' in stat:
-                  print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
-          elif len(stat) == 3:
-              print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), r2calc(record1, record2))
-
-      elif haps == True: # show haps/4 for each comparison
-          observed_haps = list(freqsgetter(record1, record2)[2].values()) # get hap frequencies
-          hapcount = 4 - observed_haps.count(0)
-          if len(stat) == 1:
-              if 'd' in stat:
-                  print(metadata(record1, record2), dcalc(record1, record2), hapcount)
-              elif 'dprime' in stat:
-                  print(metadata(record1, record2), dprimecalc(record1, record2), hapcount)
-              elif 'r2' in stat:
-                  print(metadata(record1, record2), r2calc(record1, record2), hapcount)
-          elif len(stat) == 2:
-              if 'd' in stat and 'dprime' in stat:
-                  print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), hapcount)
-              elif 'd' in stat and 'r2' in stat:
-                  print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2), hapcount)
-              elif 'dprime' in stat and 'r2' in stat:
-                  print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2), hapcount)
-          elif len(stat) == 3:
-              print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), r2calc(record1, record2), hapcount)
-
 def allpairscalc(vcf_file, stat, haps = False):
     '''In a single VCF, calculates linkage stats between all possible pairs, regardless of region.
     The stat parameter can take any of 'd', 'dprime', or 'r2' as input. 
