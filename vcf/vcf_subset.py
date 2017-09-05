@@ -65,7 +65,7 @@ if pos:
     end = int(pos[1])
     snippet = file.fetch(chrom = chrom, start = start, end = end) 
 elif chrom and not pos and len(chrom) == 1: # single chrom provided
-    snippet = file.fetch(chrom = chrom)
+    snippet = file.fetch(chrom = chrom[0])
 elif chrom and not pos and len(chrom) > 1: # multiple chroms provided
     snippet = []
     for c in chrom:
