@@ -67,7 +67,10 @@ if pos:
 elif chrom and not pos and len(chrom) == 1: # single chrom provided
     snippet = file.fetch(chrom = chrom)
 elif chrom and not pos and len(chrom) > 1: # multiple chroms provided
-    snippet = [file.fetch(chrom = c) for c in chrom]
+    snippet = []
+    for c in chrom:
+        file = vcf.Reader(filename = vcfin, compressed = True) # since the generator resets each time
+        snippet.append(file.fetch(chrom = c))
 elif not chrom and not pos: # no chrom or pos provided - just filtering
     snippet = file
 
