@@ -29,7 +29,14 @@ mv -v allvariants.vcf* data/vcfs/organellesredux/no_clones
 date
 echo 'called initial vcf'
 
-python3.5 analysis/fiftyshadesofgreen/vcf/vcf_subset.py -v data/vcfs/organellesredux/no_clones/allvariants.vcf.gz -c chromosome_1 chromosome_2 chromosome_3 chromosome_4 chromosome_5 chromosome_6 chromosome_7 chromosome_8 chromosome_9 chromosome_10 chromosome_11 chromosome_12 chromosome_13 chromosome_14 chromosome_15 chromosome_16 chromosome_17 -f 0.0002 -o data/vcfs/organellesredux/no_clones/allvariantsfiltered.vcf
+python3.5 analysis/fiftyshadesofgreen/vcf/vcf_subset.py \
+-v data/vcfs/organellesredux/no_clones/allvariants.vcf.gz \
+-c chromosome_1 chromosome_2 chromosome_3 chromosome_4 chromosome_5 \
+chromosome_6 chromosome_7 chromosome_8 chromosome_9 chromosome_10 \
+chromosome_11 chromosome_12 chromosome_13 chromosome_14 chromosome_15 \
+chromosome_16 chromosome_17 \
+-f 0.0002 \
+-o data/vcfs/organellesredux/no_clones/allvariantsfiltered.vcf
 
 date
 echo 'subset complete'
@@ -47,4 +54,6 @@ tabix data/vcfs/organellesredux/no_clones/allvariantsfiltered.vcf.gz
 
 date
 
-time python3.5 analysis/fiftyshadesofgreen/vcf/allpairscalc.py -v data/vcfs/organellesredux/no_clones/allvariantsfiltered.vcf.gz -l d/dprime/r2 --haps > data/organellelinkage/no_clones/allpairs.txt
+time python3.5 analysis/fiftyshadesofgreen/vcf/allpairscalc.py \
+-v data/vcfs/organellesredux/no_clones/allvariantsfiltered.vcf.gz \
+-l d/dprime/r2 --haps > data/organellelinkage/no_clones/allpairs.txt
