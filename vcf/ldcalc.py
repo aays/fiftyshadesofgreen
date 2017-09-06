@@ -26,7 +26,7 @@ def snppuller(vcf_file, chrom = None, pos = None):
             return False
         
     def issingleton(record): # ensure not singleton
-        count = record.INFO['AN'] - record.INFO['AC'][0]
+        count = record.INFO['AN'][0] - record.INFO['AC'][0]
         if count == 1:
             return True
         if record.INFO['AC'][0] == 1:
