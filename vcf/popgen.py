@@ -208,6 +208,7 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
     '''
     vcfin = vcf.Reader(filename = vcf_file, compressed = True)
     
+    # filters
     def hardsnpcheck(record):
         if len(record.REF) == 1 and len(record.ALT) == 1 and len(record.ALT[0]) == 1 and len(record.alleles) == 2:
             return True
@@ -233,7 +234,8 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
             return True
         else:
             return False
-        
+    
+    # make list
     if chrom is not None and pos is not None:
         try:
             assert isinstance(pos, str) 
@@ -255,6 +257,8 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
         snippet = vcfin.fetch(chrom = chrom)
         if snpsonly == True:
             reclist = [record for record in snippet if hardsnpcheck(record) == True]
+            reclist = [record for record in reclist if issingleton(record) == False]
+            reclist = [record for record in reclist if isinvariant(record) == False]
         elif snpsonly == False:
             reclist = [record for record in snippet]
     elif chrom is None and pos is not None:
