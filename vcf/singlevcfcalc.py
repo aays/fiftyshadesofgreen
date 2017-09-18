@@ -35,6 +35,8 @@ parser.add_argument('-w', '--windowsize', required = False,
                    type = int, help = 'Window size to calculate LD between. Only use for intra-region calculations. Optional.')
 parser.add_argument('-p', '--haps', required = False,
                    action = 'store_true', help = 'Whether to output the number of observed haplotypes for each comparison. Optional.')
+parser.add_argument('-q', '--sequential', required = False,
+                   action = 'store_true', help = 'Calculate in sequential pairs instead of all pairs (Lewontin 1995). Optional.')
 
 
 args = parser.parse_args()
@@ -43,7 +45,10 @@ regions = args.regions
 ldstats = args.ldstats
 filt = args.filter
 haps = args.haps
+sequential = args.sequential
 windowsize = args.windowsize
 
-
-singlevcfcalc(vcfin, ref = regions[0], target = regions[1], stat = ldstats, filter = filt, windowsize = windowsize, haps = haps)
+if sequential == True:
+    sequentialvcfcalc(vcfin, ref = regions[0], target = regions[1], stat = ldstats, windowsize = windowsize, haps = haps)  
+else:
+    singlevcfcalc(vcfin, ref = regions[0], target = regions[1], stat = ldstats, filter = filt, windowsize = windowsize, haps = haps)
