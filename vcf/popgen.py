@@ -207,11 +207,33 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
     subset of the VCF.
     '''
     vcfin = vcf.Reader(filename = vcf_file, compressed = True)
+    
     def hardsnpcheck(record):
         if len(record.REF) == 1 and len(record.ALT) == 1 and len(record.ALT[0]) == 1 and len(record.alleles) == 2:
             return True
         elif len(record.REF) != 1 or len(record.ALT) != 1 or len(record.ALT[0]) != 1 or len(record.alleles) != 2:
             return False
+    
+    def issingleton(record): # ensure not singleton
+        if type(record.INFO['AN']) == list:
+            count = record.INFO['AN'][0] - record.INFO['AC'][0]
+        else:
+            count = record.INFO['AN'] - record.INFO['AC'][0]
+        if count == 1:
+            return True
+        if record.INFO['AC'][0] == 1:
+            return True
+        else:
+            return False
+        
+    def isinvariant(record):
+        if record.INFO['AC'][0] == 0:
+            return True
+        if record.INFO['AF'][0] == 1.0:
+            return True
+        else:
+            return False
+        
     if chrom is not None and pos is not None:
         try:
             assert isinstance(pos, str) 
@@ -222,6 +244,8 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
             snippet = vcfin.fetch(chrom = chrom, start = start, end = end) 
             if snpsonly == True:
                 reclist = [record for record in snippet if hardsnpcheck(record) == True]
+                reclist = [record for record in snippet if issingleton(record) == False]
+                reclist = [record for record in snippet if isinvariant(record) == False]
             elif snpsonly == False:
                 reclist = [record for record in snippet]
         except:
@@ -238,6 +262,8 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
     else:
         if snpsonly == True:
             reclist = [record for record in vcfin if hardsnpcheck(record) == True]
+            reclist = [record for record in snippet if issingleton(record) == False]
+            reclist = [record for record in snippet if isinvariant(record) == False]
         elif snpsonly == False:
             reclist = [record for record in vcfin]
     return reclist
