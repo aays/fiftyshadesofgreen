@@ -269,7 +269,7 @@ def sequentialvcfcalc(vcf_file, ref, target, stat, windowsize = None, haps = Fal
     stat = stat.split('/') # get stat
     header(stat, haps) # print header
     # create ref vcf record list. this cannot be a generator bc itertools.cycle()
-    reflocus = [record for record in reclist(vcf_file, chrom = ref) if record.is_snp == True] # avoid non-SNPs - not very strict though...
+    reflocus = [record for record in reclist(vcf_file, chrom = ref, snpsonly = True)]
     targetlocus = snppuller(vcf_file, chrom = target)
 
     # forward
@@ -291,7 +291,7 @@ def sequentialvcfcalc(vcf_file, ref, target, stat, windowsize = None, haps = Fal
     # load in records again
     reflocus_rev = snppuller(vcf_file, chrom = ref) # now ref is the generator
     # now the 'target' is a list for use with cycle
-    targetlocus_rev = [record for record in reclist(vcf_file, chrom = target) if record.is_snp == True]
+    targetlocus_rev = [record for record in reclist(vcf_file, chrom = target, snpsonly = True)]
     record1 = next(reflocus_rev) # 'waste' first record to create offset
 
     for record2 in tqdm(itertools.cycle(targetlocus_rev)): # keep ordering of rec1, rec2 consistent with previous for loop
