@@ -270,14 +270,10 @@ def sequentialvcfcalc(vcf_file, ref, target, stat, windowsize = None, haps = Fal
     header(stat, haps) # print header
     # create ref vcf record list. this cannot be a generator bc itertools.cycle()
     reflocus = [record for record in reclist(vcf_file, chrom = ref, snpsonly = True)]
-    targetlocus = snppuller(vcf_file, chrom = target)
+    targetlocus = [record for record in reclist(vcf_file, chrom = target, snpsonly = True)]
 
     # forward
-    for record1 in tqdm(itertools.cycle(reflocus)):
-        try:
-            record2 = next(targetlocus)
-        except StopIteration:
-            break
+    for record1, record2 in tqdm(zip(itertools.cycle(reflocus), targetlocus)):
         if not windowsize:
             ldgetter(record1, record2)
         elif windowsize:
@@ -289,16 +285,10 @@ def sequentialvcfcalc(vcf_file, ref, target, stat, windowsize = None, haps = Fal
 
     # reverse
     # load in records again
-    reflocus_rev = snppuller(vcf_file, chrom = ref) # now ref is the generator
-    # now the 'target' is a list for use with cycle
+    reflocus_rev = [record for record in reclist(vcf_file, chrom = ref, snpsonly = True)][1:] # 'waste' first record to make offset
     targetlocus_rev = [record for record in reclist(vcf_file, chrom = target, snpsonly = True)]
-    record1 = next(reflocus_rev) # 'waste' first record to create offset
 
-    for record2 in tqdm(itertools.cycle(targetlocus_rev)): # keep ordering of rec1, rec2 consistent with previous for loop
-        try:
-            record1 = next(reflocus_rev)
-        except StopIteration:
-            break
+    for record2, record1 in tqdm(zip(itertools.cycle(targetlocus_rev), reflocus_rev)): # keep ordering of rec1, rec2 consistent with previous for loop
         if len(record1.ALT) > 1:
             continue
         if not windowsize:
