@@ -200,3 +200,101 @@ def singlevcfcalc(vcf_file, ref, target, stat, filter = None, windowsize = None,
                             continue
                 elif random.random() > filter:
                     continue
+
+def sequentialvcfcalc(vcf_file, ref, target, stat, windowsize = None, haps = False):
+    '''
+    Calculates LD for 'sequential' pairs as described in Lewontin 1995.
+    
+    Consider three loci A, B, and C - singlevcfcalc would calculate LD for the AB, BC, and AC pairs.
+    However, if AB and BC are both in LD, it follows that AC are in LD. This means certain pairs are
+    technically nonindependent.
+    
+    sequentialvcfcalc computes LD between two regions in a 'forward' and then 'reverse' fashion.
+    If loci A, B, and C are on region 1, while region 2 features a, b, and c, the function will first
+    calculate LD for Aa, Bb, and Cc in the 'forward' direction, and then compute aB, bC, and so on in the
+    'reverse' direction. The net effect is acquiring LD values for Aa, aB, Bb, bC, and so forth.
+    This preserves independence of pairwise tests.
+    
+    Removed filter option from singlevcfcalc - was unused. For filtering, filter input vcf using 
+    vcf_subset prior to calculation.
+    '''
+    
+    def metadata(record1, record2):
+        out = record1.CHROM + ' ' + str(record1.POS) + ' ' + record2.CHROM + ' ' + str(record2.POS)
+        return out
+    
+    def ldgetter(record1, record2):
+        if haps == False: # proceed w/o haps
+            if len(stat) == 1:
+                if 'd' in stat:
+                    print(metadata(record1, record2), dcalc(record1, record2))
+                elif 'dprime' in stat:
+                    print(metadata(record1, record2), dprimecalc(record1, record2))
+                elif 'r2' in stat:
+                    print(metadata(record1, record2), r2calc(record1, record2))
+            elif len(stat) == 2:
+                if 'd' in stat and 'dprime' in stat:
+                    print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2))
+                elif 'd' in stat and 'r2' in stat:
+                    print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
+                elif 'dprime' in stat and 'r2' in stat:
+                    print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2))
+            elif len(stat) == 3:
+                print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), r2calc(record1, record2))
+        
+        elif haps == True: # show haps/4 for each comparison
+            observed_haps = list(freqsgetter(record1, record2)[2].values()) # get hap frequencies
+            hapcount = 4 - observed_haps.count(0)
+            if len(stat) == 1:
+                if 'd' in stat:
+                    print(metadata(record1, record2), dcalc(record1, record2), hapcount)
+                elif 'dprime' in stat:
+                    print(metadata(record1, record2), dprimecalc(record1, record2), hapcount)
+                elif 'r2' in stat:
+                    print(metadata(record1, record2), r2calc(record1, record2), hapcount)
+            elif len(stat) == 2:
+                if 'd' in stat and 'dprime' in stat:
+                    print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), hapcount)
+                elif 'd' in stat and 'r2' in stat:
+                    print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2), hapcount)
+                elif 'dprime' in stat and 'r2' in stat:
+                    print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2), hapcount)
+            elif len(stat) == 3:
+                print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), r2calc(record1, record2), hapcount)
+            
+    stat = stat.split('/') # get stat
+    header(stat, haps) # print header
+    reflocus = snppuller(vcf_file, chrom = ref) # create ref vcf record generator
+    targetlocus = snppuller(vcf_file, chrom = target) # only set alt generator once
+
+    # forward
+    for record1 in tqdm(reflocus):
+        record2 = next(targetlocus)
+        if not windowsize:
+            ldgetter(record1, record2)
+        elif windowsize:
+            if abs(record2.POS - record1.POS) <= windowsize:
+                ldgetter(record1, record2)
+            elif abs(record2.POS - record1.POS) > windowsize:
+                continue
+        continue
+
+    # reverse
+    # load in generators again
+    reflocus_rev = snppuller(vcf_file, chrom = ref)
+    targetlocus_rev = snppuller(vcf_file, chrom = target)
+    record1 = next(reflocus_rev) # 'waste' first record to create offset
+
+    for record2 in tqdm(targetlocus_rev): # keep ordering consistent with previous for loop
+        record1 = next(reflocus_rev)
+        if len(record1.ALT) > 1:
+            continue
+        if not windowsize:
+            ldgetter(record1, record2)
+        elif windowsize: # if a windowsize is provided
+            if abs(record2.POS - record1.POS) <= windowsize:
+                ldgetter(record1, record2)
+            elif abs(record2.POS - record1.POS) > windowsize:
+                continue
+
+  
