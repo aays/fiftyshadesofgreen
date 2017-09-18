@@ -8,6 +8,7 @@ AH - 06/2017
 
 import vcf
 import random
+import itertools
 from tqdm import tqdm
 from popgen import *
 
@@ -267,12 +268,15 @@ def sequentialvcfcalc(vcf_file, ref, target, stat, windowsize = None, haps = Fal
             
     stat = stat.split('/') # get stat
     header(stat, haps) # print header
-    reflocus = snppuller(vcf_file, chrom = ref) # create ref vcf record generator
-    targetlocus = snppuller(vcf_file, chrom = target) # only set alt generator once
+    reflocus = reclist(vcf_file, chrom = ref) # create ref vcf record list. this cannot be a generator bc itertools.cycle()
+    targetlocus = snppuller(vcf_file, chrom = target)
 
     # forward
-    for record1 in tqdm(reflocus):
-        record2 = next(targetlocus)
+    for record1 in tqdm(itertools.cycle(reflocus)):
+        try:
+            record2 = next(targetlocus)
+        except StopIteration:
+            break
         if not windowsize:
             ldgetter(record1, record2)
         elif windowsize:
@@ -285,11 +289,14 @@ def sequentialvcfcalc(vcf_file, ref, target, stat, windowsize = None, haps = Fal
     # reverse
     # load in generators again
     reflocus_rev = snppuller(vcf_file, chrom = ref)
-    targetlocus_rev = snppuller(vcf_file, chrom = target)
+    targetlocus_rev = reclist(vcf_file, chrom = target) # now the 'target' is a list for use with cycle
     record1 = next(reflocus_rev) # 'waste' first record to create offset
 
-    for record2 in tqdm(targetlocus_rev): # keep ordering consistent with previous for loop
-        record1 = next(reflocus_rev)
+    for record2 in tqdm(itertools.cycle(targetlocus_rev)): # keep ordering of rec1, rec2 consistent with previous for loop
+        try:
+            record1 = next(reflocus_rev)
+        except StopIteration:
+            break
         if len(record1.ALT) > 1:
             continue
         if not windowsize:
