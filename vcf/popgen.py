@@ -244,8 +244,8 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
             snippet = vcfin.fetch(chrom = chrom, start = start, end = end) 
             if snpsonly == True:
                 reclist = [record for record in snippet if hardsnpcheck(record) == True]
-                reclist = [record for record in snippet if issingleton(record) == False]
-                reclist = [record for record in snippet if isinvariant(record) == False]
+                reclist = [record for record in reclist if issingleton(record) == False]
+                reclist = [record for record in reclist if isinvariant(record) == False]
             elif snpsonly == False:
                 reclist = [record for record in snippet]
         except:
@@ -262,8 +262,8 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
     else:
         if snpsonly == True:
             reclist = [record for record in vcfin if hardsnpcheck(record) == True]
-            reclist = [record for record in snippet if issingleton(record) == False]
-            reclist = [record for record in snippet if isinvariant(record) == False]
+            reclist = [record for record in reclist if issingleton(record) == False]
+            reclist = [record for record in reclist if isinvariant(record) == False]
         elif snpsonly == False:
             reclist = [record for record in vcfin]
     return reclist
