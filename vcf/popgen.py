@@ -387,3 +387,140 @@ def doublegtcounts(record1, record2, freqs = True, missing = True):
                 print('ab', str(record1.ALT[0]) + str(record2.ALT[0]))
                           
         
+### experimental functions - LD at three loci (based on Genetic Data Analysis by Weir)
+
+def triplefreqsgetter(record1, record2, record3):
+    
+    def triple_straingetter(record1, record2, record3):
+        rec1set = set([record1.samples[i].sample for i in range(len(record1.samples)) if record1.samples[i]['GT'] != '.'])
+        rec2set = set([record2.samples[i].sample for i in range(len(record2.samples)) if record2.samples[i]['GT'] != '.'])
+        rec3set = set([record3.samples[i].sample for i in range(len(record3.samples)) if record3.samples[i]['GT'] != '.'])
+        strainlist = list(rec1set.intersection(rec2set).intersection(rec3set))
+        return strainlist
+    
+    # check strains b/w compared records are identical
+    strainlist = triple_straingetter(record1, record2, record3)
+    # parse through VCF calls
+    haplist = []
+    pcount = 0 # rec 1
+    qcount = 0 # rec 2
+    rcount = 0 # rec 3
+    totcalls = 0
+    for strain in strainlist:
+        outgt = ''
+        gt1 = record1.genotype(strain)['GT']
+        gt2 = record2.genotype(strain)['GT']
+        gt3 = record3.genotype(strain)['GT']
+        if gt1 == '.' or gt2 == '.' or gt3 == '.':
+            return
+        elif gt1 == '1' and gt2 == '1' and gt3 == '1': # abc
+            outgt = str(record1.ALT[0]) + str(record2.ALT[0]) + str(record3.ALT[0])
+            totcalls = totcalls + 1
+        elif gt1 == '1' and gt2 == '0' and gt3 == '1': # aBc
+            qcount = qcount + 1
+            outgt = str(record1.ALT[0]) + record2.REF + str(record3.ALT[0])
+            totcalls = totcalls + 1
+        elif gt1 == '0' and gt2 == '1' and gt3 == '1': # Abc
+            pcount = pcount + 1
+            outgt = record1.REF + str(record2.ALT[0]) + str(record3.ALT[0])
+            totcalls = totcalls + 1
+        elif gt1 == '0' and gt2 == '0' and gt3 == '1': # ABc
+            pcount = pcount + 1
+            qcount = qcount + 1
+            outgt = record1.REF + record2.REF + str(record3.ALT[0])
+            totcalls = totcalls + 1
+        elif gt1 == '1' and gt2 == '1' and gt3 == '0': # abC
+            rcount = rcount + 1
+            outgt = str(record1.ALT[0]) + str(record2.ALT[0]) + record3.REF
+            totcalls = totcalls + 1
+        elif gt1 == '1' and gt2 == '0' and gt3 == '0': # aBC
+            qcount = qcount + 1
+            rcount = rcount + 1
+            outgt = str(record1.ALT[0]) + record2.REF + record3.REF
+            totcalls = totcalls + 1
+        elif gt1 == '0' and gt2 == '1' and gt3 == '0': # AbC
+            pcount = pcount + 1
+            rcount = rcount + 1
+            outgt = record1.REF + str(record2.ALT[0]) + record3.REF
+            totcalls = totcalls + 1
+        elif gt1 == '0' and gt2 == '0' and gt3 == '0': # ABC
+            pcount = pcount + 1
+            qcount = qcount + 1
+            rcount = rcount + 1
+            outgt = record1.REF + record2.REF + record3.REF
+            totcalls = totcalls + 1        
+        haplist.append(outgt)
+    # assign allele freq values
+    values = {}
+    if totcalls == 0:
+        values['p1'] = 0
+        values['q1'] = 0
+        values['r2'] = 0
+    else:
+        values['p1'] = pcount/totcalls
+        values['q1'] = qcount/totcalls
+        values['r1'] = rcount/totcalls
+    values['p2'] = 1 - values['p1']
+    values['q2'] = 1 - values['q1']
+    values['r2'] = 1 - values['r1']
+    # haplotype frequencies
+    uniques = dict.fromkeys(set(haplist))
+    for hap in uniques:
+        uniques[hap] = haplist.count(hap)/len(haplist)
+    # create tuples w/ actual haps and corresponding AB notation
+    homrefC = record1.REF + record2.REF + record3.REF, 'ABC'
+    homrefc = record1.REF + record2.REF + record3.REF, 'ABc'
+    homaltC = str(record1.ALT[0]) + str(record2.ALT[0]) + str(record3.ALT[0]), 'abC'
+    homaltc = str(record1.ALT[0]) + str(record2.ALT[0]) + str(record3.ALT[0]), 'abc'
+    het1c = record1.REF + str(record2.ALT[0]) + str(record3.ALT[0]), 'Abc'
+    het2c = str(record1.ALT[0]) + record2.REF + str(record3.ALT[0]), 'aBc'
+    het1C = record1.REF + str(record2.ALT[0]) + record3.REF, 'AbC'
+    het2C = str(record1.ALT[0]) + record2.REF + record3.REF, 'aBC'
+    haps = {}
+    # use tuples to assign hap freqs to AB notation for downstream use
+    genotypes = [homrefC, homrefc, homaltC, homaltc, het1c, het2c, het1C, het2C]
+    for genotype in genotypes:
+        if genotype[0] in uniques.keys():
+            haps[genotype[1]] = uniques[genotype[0]]
+        else:
+            haps[genotype[1]] = 0
+
+    return uniques, values, haps
+
+
+def triple_dcalc(record1, record2, record3):
+    # Dabc = Fabc - p1*Dbc - q1*Dac - r1*Dab - p1*q1*r1
+    
+    from popgen import freqsgetter
+    
+    def quick_dcalc(record1, record2):
+        haps = freqsgetter(record1, record2, snpcheck = False)[2]
+        try:
+            LHS = haps['AB'] * haps['ab']
+        except KeyError: # either hap missing
+            LHS = 0
+        try:
+            RHS = haps['Ab'] * haps['aB']
+        except KeyError:
+            RHS = 0
+        d = LHS - RHS
+        # d = round(d, 5)
+        return d
+
+    freqs = triplefreqsgetter(record1, record2, record3)[1]
+    haps = triplefreqsgetter(record1, record2, record3)[2]
+
+    try:
+        Fabc = haps['ABC']
+    except KeyError:
+        Fabc = 0
+
+    second_term = freqs['p1'] * quick_dcalc(record2, record3)
+    third_term = freqs['q1'] * quick_dcalc(record1, record3)
+    fourth_term = freqs['r1'] * quick_dcalc(record1, record2)
+    fifth_term = freqs['p1'] * freqs['q1'] * freqs['r1']
+
+    dabc = Fabc - second_term - third_term - fourth_term - fifth_term
+
+    # dabc = round(dabc, 5)
+    return dabc
