@@ -91,21 +91,59 @@ def header(stat, haps = False):
     elif haps == True:
         if len(stat) == 1:
             if 'd' in stat:
-                print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'hapcount')
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'hapcount', 'haplist')
             elif 'dprime' in stat:
-                print('chrom1', 'pos1', 'chrom2', 'pos2', 'dprime', 'hapcount')
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'dprime', 'hapcount', 'haplist')
             elif 'r2' in stat:
-                print('chrom1', 'pos1', 'chrom2', 'pos2', 'r2', 'hapcount')
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'r2', 'hapcount', 'haplist')
         elif len(stat) == 2:
             if 'd' in stat and 'dprime' in stat:
-                print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'dprime', 'hapcount')
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'dprime', 'hapcount', 'haplist')
             elif 'd' in stat and 'r2' in stat:
-                print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'r2', 'hapcount')
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'r2', 'hapcount', 'haplist')
             elif 'dprime' in stat and 'r2' in stat:
-                print('chrom1', 'pos1', 'chrom2', 'pos2', 'dprime', 'r2', 'hapcount')
+                print('chrom1', 'pos1', 'chrom2', 'pos2', 'dprime', 'r2', 'hapcount', 'haplist')
         elif len(stat) == 3:
-            print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'dprime', 'r2', 'hapcount')
+            print('chrom1', 'pos1', 'chrom2', 'pos2', 'd', 'dprime', 'r2', 'hapcount', 'haplist')
         
+
+def gethaps(record1, record2, missing = True):
+    '''Returns haps observed between two records as a list. Helper function for
+    singlevcfcalc. Based on doublegtcounts() from popgen.
+    '''
+    # check strains b/w compared records are identical
+    strainlist = [record1.samples[i].sample for i in range(len(record1.samples))] 
+    assert strainlist == [record2.samples[i].sample for i in range(len(record2.samples))]
+    # parse through VCF calls
+    out = []
+    for strain in strainlist:
+        gt1 = record1.genotype(strain)['GT']
+        gt2 = record2.genotype(strain)['GT']
+        if gt1 == '.' and gt2 == '.' and missing == True:
+            out.append('--')
+            continue
+        elif gt1 == '.' and missing == True:
+            if gt2 == '0':
+                out.append('-B', '-' + record2.REF)
+            elif gt2 == '1':
+                out.append('-b', '-' + str(record2.ALT[0]))
+            else:
+                continue
+        elif gt1 == '0':
+            if gt2 == '.' and missing == True:
+                out.append('A-', record1.REF + '-')
+            elif gt2 == '0':
+                out.append('AB', record1.REF + str(record2.REF))
+            elif gt2 == '1':
+                out.append('Ab', record1.REF + str(record2.ALT[0]))
+        elif gt1 == '1':
+            if gt2 == '.' and missing == True:
+                out.append('a-', str(record1.ALT[0]) + '-')
+            elif gt2 == '0':
+                out.append('aB', str(record1.ALT[0]) + record2.REF)
+            elif gt2 == '1':
+                out.append('ab', str(record1.ALT[0]) + str(record2.ALT[0]))
+        return out
         
 def singlevcfcalc(vcf_file, ref, target, stat, filter = None, windowsize = None, haps = False):
     '''
@@ -153,22 +191,23 @@ def singlevcfcalc(vcf_file, ref, target, stat, filter = None, windowsize = None,
         elif haps == True: # show haps/4 for each comparison
             observed_haps = list(freqsgetter(record1, record2)[2].values()) # get hap frequencies
             hapcount = 4 - observed_haps.count(0)
+            haplist = gethaps(record1, record2)
             if len(stat) == 1:
                 if 'd' in stat:
-                    print(metadata(record1, record2), dcalc(record1, record2), hapcount)
+                    print(metadata(record1, record2), dcalc(record1, record2), hapcount, haplist)
                 elif 'dprime' in stat:
-                    print(metadata(record1, record2), dprimecalc(record1, record2), hapcount)
+                    print(metadata(record1, record2), dprimecalc(record1, record2), hapcount, haplist)
                 elif 'r2' in stat:
-                    print(metadata(record1, record2), r2calc(record1, record2), hapcount)
+                    print(metadata(record1, record2), r2calc(record1, record2), hapcount, haplist)
             elif len(stat) == 2:
                 if 'd' in stat and 'dprime' in stat:
-                    print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), hapcount)
+                    print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), hapcount, haplist)
                 elif 'd' in stat and 'r2' in stat:
-                    print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2), hapcount)
+                    print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2), hapcount, haplist)
                 elif 'dprime' in stat and 'r2' in stat:
-                    print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2), hapcount)
+                    print(metadata(record1, record2), dcalc(record1, record2), r2calc(record1, record2), hapcount, haplist)
             elif len(stat) == 3:
-                print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), r2calc(record1, record2), hapcount)
+                print(metadata(record1, record2), dcalc(record1, record2), dprimecalc(record1, record2), r2calc(record1, record2), hapcount, haplist)
             
     reflocus = snppuller(vcf_file, chrom = ref) # create ref vcf record generator
     stat = stat.split('/') # get stat
