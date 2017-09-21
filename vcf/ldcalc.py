@@ -143,6 +143,7 @@ def gethaps(record1, record2, missing = True):
                 out.append(str(record1.ALT[0]) + record2.REF)
             elif gt2 == '1':
                 out.append(str(record1.ALT[0]) + str(record2.ALT[0]))
+    out = ','.join([str(hap) for hap in out]) # print nicer
     return out
         
 def singlevcfcalc(vcf_file, ref, target, stat, filter = None, windowsize = None, haps = False):
