@@ -124,26 +124,26 @@ def gethaps(record1, record2, missing = True):
             continue
         elif gt1 == '.' and missing == True:
             if gt2 == '0':
-                out.append('-B', '-' + record2.REF)
+                out.append('-' + record2.REF)
             elif gt2 == '1':
-                out.append('-b', '-' + str(record2.ALT[0]))
+                out.append('-' + str(record2.ALT[0]))
             else:
                 continue
         elif gt1 == '0':
             if gt2 == '.' and missing == True:
-                out.append('A-', record1.REF + '-')
+                out.append(record1.REF + '-')
             elif gt2 == '0':
-                out.append('AB', record1.REF + str(record2.REF))
+                out.append(record1.REF + str(record2.REF))
             elif gt2 == '1':
-                out.append('Ab', record1.REF + str(record2.ALT[0]))
+                out.append(record1.REF + str(record2.ALT[0]))
         elif gt1 == '1':
             if gt2 == '.' and missing == True:
-                out.append('a-', str(record1.ALT[0]) + '-')
+                out.append(str(record1.ALT[0]) + '-')
             elif gt2 == '0':
-                out.append('aB', str(record1.ALT[0]) + record2.REF)
+                out.append(str(record1.ALT[0]) + record2.REF)
             elif gt2 == '1':
-                out.append('ab', str(record1.ALT[0]) + str(record2.ALT[0]))
-        return out
+                out.append(str(record1.ALT[0]) + str(record2.ALT[0]))
+    return out
         
 def singlevcfcalc(vcf_file, ref, target, stat, filter = None, windowsize = None, haps = False):
     '''
