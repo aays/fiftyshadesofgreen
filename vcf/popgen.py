@@ -391,7 +391,7 @@ def doublegtcounts(record1, record2, freqs = True, missing = True):
 
 def triplefreqsgetter(record1, record2, record3):
     
-    def triple_straingetter(record1, record2, record3):
+    def triplestraingetter(record1, record2, record3):
         rec1set = set([record1.samples[i].sample for i in range(len(record1.samples)) if record1.samples[i]['GT'] != '.'])
         rec2set = set([record2.samples[i].sample for i in range(len(record2.samples)) if record2.samples[i]['GT'] != '.'])
         rec3set = set([record3.samples[i].sample for i in range(len(record3.samples)) if record3.samples[i]['GT'] != '.'])
@@ -399,7 +399,7 @@ def triplefreqsgetter(record1, record2, record3):
         return strainlist
     
     # check strains b/w compared records are identical
-    strainlist = triple_straingetter(record1, record2, record3)
+    strainlist = triplestraingetter(record1, record2, record3)
     # parse through VCF calls
     haplist = []
     pcount = 0 # rec 1
@@ -455,7 +455,7 @@ def triplefreqsgetter(record1, record2, record3):
     if totcalls == 0:
         values['p1'] = 0
         values['q1'] = 0
-        values['r2'] = 0
+        values['r1'] = 0
     else:
         values['p1'] = pcount/totcalls
         values['q1'] = qcount/totcalls
