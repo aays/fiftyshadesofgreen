@@ -39,7 +39,7 @@ def snpchecker(record1, record2):
         print('caution: second record is not a biallelic SNP')
         print(record2.REF, record2.ALT, record2.alleles)
 
-def straingetter(record1, record2, GQ_threshold = 50):
+def straingetter(record1, record2, GQ_threshold = 30):
     '''Given two VCF records, returns a list of individuals in the population that
     contain calls at both sites. Helper function for LD calculations.
     Will filter strains for GQ - currently hardcoded at 50.
