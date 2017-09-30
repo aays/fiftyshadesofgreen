@@ -39,13 +39,22 @@ def snpchecker(record1, record2):
         print('caution: second record is not a biallelic SNP')
         print(record2.REF, record2.ALT, record2.alleles)
 
-def straingetter(record1, record2):
+def straingetter(record1, record2, GQ_threshold = 50):
     '''Given two VCF records, returns a list of individuals in the population that
     contain calls at both sites. Helper function for LD calculations.
+    Will filter strains for GQ - currently hardcoded at 50.
     '''
     rec1set = set([record1.samples[i].sample for i in range(len(record1.samples)) if record1.samples[i]['GT'] != '.'])
     rec2set = set([record2.samples[i].sample for i in range(len(record2.samples)) if record2.samples[i]['GT'] != '.'])
     strainlist = list(rec1set.intersection(rec2set))
+    # filter for GQ
+    garbage = []
+    for strain in strainlist:
+        if record1.genotype(strain)['GQ'] < GQ_threshold or record2.genotype(strain)['GQ'] < GQ_threshold:
+            garbage.append(strain)
+    if len(garbage) > 0:
+        for trash_strain in garbage:
+            strainlist.remove(trash_strain)
     return strainlist
 
 def freqsgetter(record1, record2, snpcheck = True):
