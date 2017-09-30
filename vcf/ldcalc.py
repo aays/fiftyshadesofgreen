@@ -251,7 +251,8 @@ def sequentialvcfcalc(vcf_file, ref, target, stat, windowsize = None, haps = Fal
     
     Consider three loci A, B, and C - singlevcfcalc would calculate LD for the AB, BC, and AC pairs.
     However, if AB and BC are both in LD, it follows that AC are in LD. This means certain pairs are
-    technically nonindependent.
+    technically nonindependent, which would bias tests for 'LD hotspots' and inflate the number of
+    pairwise comparisons in apparent complete linkage.
     
     sequentialvcfcalc computes LD between two regions in a 'forward' and then 'reverse' fashion.
     If loci A, B, and C are on region 1, while region 2 features a, b, and c, the function will first
@@ -261,6 +262,11 @@ def sequentialvcfcalc(vcf_file, ref, target, stat, windowsize = None, haps = Fal
     
     Removed filter option from singlevcfcalc - was unused. For filtering, filter input vcf using 
     vcf_subset prior to calculation.
+    
+    Caution: sequentialvcfcalc behaves erratically when presented with two regions
+    of different lengths, either repeating earlier SNPs for new comparisons or ending its iterations early. 
+    As such, it is best used for intra-region calculations. There are currently no plans to introduce 
+    mathematically robust inter-region compatibility.
     '''
     
     def metadata(record1, record2):
