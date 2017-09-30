@@ -10,7 +10,9 @@ for line in chromosome_6:480316-484847 chromosome_6:559654-561075 cpDNA;
     do echo $line >> plus.intervals;
 done
 
-java -jar analysis/GenomeAnalysisTK.jar -T GenotypeGVCFs -R /scratch/research/references/chlamydomonas/5.3_chlamy_w_organelles_mt_minus/chlamy.5.3.w_organelles_mtMinus.fasta -L minus.intervals \
+java -jar analysis/GenomeAnalysisTK.jar -T GenotypeGVCFs \
+-R /scratch/research/references/chlamydomonas/5.3_chlamy_w_organelles_mt_minus/chlamy.5.3.w_organelles_mtMinus.fasta \
+-L minus.intervals \
 --variant data/gvcfs/CC2935.haplotypeCalled.g.vcf.gz \
 --variant data/gvcfs/CC2938.haplotypeCalled.g.vcf.gz \
 --variant data/gvcfs/CC3079.haplotypeCalled.g.vcf.gz \
@@ -21,7 +23,9 @@ java -jar analysis/GenomeAnalysisTK.jar -T GenotypeGVCFs -R /scratch/research/re
 --variant data/gvcfs/CC3063.haplotypeCalled.g.vcf.gz \
 -o mtmtd1midminus.vcf
 
-java -jar analysis/GenomeAnalysisTK.jar -T GenotypeGVCFs -R /scratch/research/references/chlamydomonas/5.3_chlamy_w_organelles_mt_minus/chlamy.5.3.w_organelles_mtMinus.fasta -L plus.intervals \
+java -jar analysis/GenomeAnalysisTK.jar -T GenotypeGVCFs \
+-R /scratch/research/references/chlamydomonas/5.3_chlamy_w_organelles_mt_minus/chlamy.5.3.w_organelles_mtMinus.fasta \
+-L plus.intervals \
 --variant data/gvcfs/CC3071.haplotypeCalled.g.vcf.gz \
 --variant data/gvcfs/CC2937.haplotypeCalled.g.vcf.gz \
 --variant data/gvcfs/CC2936.haplotypeCalled.g.vcf.gz \
@@ -47,6 +51,12 @@ rm minus.intervals
 mv -v mtmtd1midminus.vcf* data/vcfs/organellesredux/no_clones/correctstrains/
 mv -v cpmtafusplus.vcf* data/vcfs/organellesredux/no_clones/correctstrains/
 
-python3.5 analysis/fiftyshadesofgreen/vcf/singlevcfcalc.py -v data/vcfs/organellesredux/no_clones/correctstrains/mtmtd1midminus.vcf.gz -r mtMinus mtDNA -l d/dprime/r2 > data/organellelinkage/no_clones/correctstrains/mtmtd1mid.txt
+python3.5 analysis/fiftyshadesofgreen/vcf/singlevcfcalc.py \
+-v data/vcfs/organellesredux/no_clones/correctstrains/mtmtd1midminus.vcf.gz \
+-r mtMinus mtDNA \
+-l d/dprime/r2 > data/organellelinkage/no_clones/correctstrains/mtmtd1mid.txt
 
-python3.5 analysis/fiftyshadesofgreen/vcf/singlevcfcalc.py -v data/vcfs/organellesredux/no_clones/correctstrains/cpmtafusplus.vcf.gz -r chromosome_6 cpDNA -l d/dprime/r2 > data/organellelinkage/no_clones/correctstrains/cpmtafus.txt
+python3.5 analysis/fiftyshadesofgreen/vcf/singlevcfcalc.py \
+-v data/vcfs/organellesredux/no_clones/correctstrains/cpmtafusplus.vcf.gz \
+-r chromosome_6 cpDNA \
+-l d/dprime/r2 > data/organellelinkage/no_clones/correctstrains/cpmtafus.txt
