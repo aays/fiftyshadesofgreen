@@ -1,5 +1,5 @@
 '''
-GC_content.py - returns windowed GC content values from fasta files
+GC_content.py - returns windowed GC content values from fasta files (overlapping windows)
 
 usage: python3.5 GC_content.py -i [fasta] -w [windowsize] > [outfile]
 
@@ -24,12 +24,19 @@ args = parser.parse_args()
 def GC_content(chrname, seq, windowsize):
     windows = list(range(0, len(seq), windowsize))
     windows.append(len(seq))
+    halfwindow = windowsize / 2
     
     for i in tqdm(range(len(windows) - 1)):
         subseq = seq[windows[i]:windows[i + 1]]
         GC = subseq.count('G') + subseq.count('C')
-        out = float(GC) / (windows[i + 1] - windows[i]) # divide GC count by total bases
+        out1 = float(GC) / (windows[i + 1] - windows[i]) # divide GC count by total bases
         print(chrname, windows[i], windows[i + 1], out)
+        
+        if i < len(windows) - 2:
+            subseq_ahead = seq[windows[i] + halfwindow : windows[i + 1] + halfwindow]
+            GC_ahead = subseq_ahead.count('G') + subseq.count('C')
+            out2 = float(GC_ahead) / ((windows[i + 1] + halfwindow) - (windows[i] + halfwindow))
+            print(chrname, windows[i] + halfwindow, windows[i + 1] + halfwindow, out2)
 
 # analysis
 infile = SeqIO.parse(args.input, 'fasta')
