@@ -24,7 +24,7 @@ args = parser.parse_args()
 def GC_content(chrname, seq, windowsize):
     windows = list(range(0, len(seq), windowsize))
     windows.append(len(seq))
-    halfwindow = windowsize / 2
+    halfwindow = int(windowsize / 2)
     
     for i in tqdm(range(len(windows) - 1)):
         subseq = seq[windows[i]:windows[i + 1]]
