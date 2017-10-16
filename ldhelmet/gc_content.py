@@ -35,5 +35,5 @@ def GC_content(chrname, seq, windowsize):
 infile = SeqIO.parse(args.input, 'fasta')
 
 print('chr block_start block_GC')
-for record in infile:
+for rec in infile:
     GC_content(rec.id, rec.seq, args.windowsize)
