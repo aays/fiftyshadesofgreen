@@ -33,7 +33,9 @@ def GC_content(chrname, seq, windowsize):
         print(chrname, windows[i], windows[i + 1], out1)
         
         if i < len(windows) - 2:
-            subseq_ahead = seq[windows[i] + halfwindow : windows[i + 1] + halfwindow]
+            coord1 = windows[i] + halfwindow
+            coord2 = windows[i + 1] + halfwindow
+            subseq_ahead = seq[coord1:coord2]
             GC_ahead = subseq_ahead.count('G') + subseq.count('C')
             out2 = float(GC_ahead) / ((windows[i + 1] + halfwindow) - (windows[i] + halfwindow))
             print(chrname, windows[i] + halfwindow, windows[i + 1] + halfwindow, out2)
