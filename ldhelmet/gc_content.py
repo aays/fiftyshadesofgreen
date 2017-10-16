@@ -28,12 +28,12 @@ def GC_content(chrname, seq, windowsize):
     for i in tqdm(range(len(windows) - 1)):
         subseq = seq[windows[i]:windows[i + 1]]
         GC = subseq.count('G') + subseq.count('C')
-        out = float(GC) / (windows[i + 1] - windows[i])
-        print(chrname, windows[i], out)
+        out = float(GC) / (windows[i + 1] - windows[i]) # divide GC count by total bases
+        print(chrname, windows[i], windows[i + 1], out)
 
 # analysis
 infile = SeqIO.parse(args.input, 'fasta')
 
-print('chr block_start block_GC')
+print('chr block_start block_end block_GC')
 for rec in infile:
     GC_content(rec.id, rec.seq, args.windowsize)
