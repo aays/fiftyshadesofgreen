@@ -1,7 +1,9 @@
 '''
 GC_content.py - returns windowed GC content values from fasta files
 
-usage: 
+usage: python3.5 GC_content.py -i [fasta] -w [windowsize] > [outfile]
+
+useful for correlating GC content with LDhelmet rho outputs
 
 AH - 10/2017
 '''
