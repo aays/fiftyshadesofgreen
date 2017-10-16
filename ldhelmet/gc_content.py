@@ -30,7 +30,7 @@ def GC_content(chrname, seq, windowsize):
         subseq = seq[windows[i]:windows[i + 1]]
         GC = subseq.count('G') + subseq.count('C')
         out1 = float(GC) / (windows[i + 1] - windows[i]) # divide GC count by total bases
-        print(chrname, windows[i], windows[i + 1], out)
+        print(chrname, windows[i], windows[i + 1], out1)
         
         if i < len(windows) - 2:
             subseq_ahead = seq[windows[i] + halfwindow : windows[i + 1] + halfwindow]
