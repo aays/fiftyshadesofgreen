@@ -29,7 +29,11 @@ def GC_content(chrname, seq, windowsize):
     for i in tqdm(range(len(windows) - 1)):
         subseq = seq[windows[i]:windows[i + 1]]
         GC = subseq.count('G') + subseq.count('C')
-        out1 = float(GC) / (windows[i + 1] - windows[i]) # divide GC count by total bases
+        all_bases1 = GC + subseq.count('A') + subseq.count('T') # avoids counting Ns
+        try:
+            out1 = float(GC) / float(all_bases1)
+        except ZeroDivisionError: # all Ns
+            out1 = 0.0
         print(chrname, windows[i], windows[i + 1], out1)
         
         if i < len(windows) - 2:
@@ -37,7 +41,11 @@ def GC_content(chrname, seq, windowsize):
             coord2 = windows[i + 1] + halfwindow
             subseq_ahead = seq[coord1:coord2]
             GC_ahead = subseq_ahead.count('G') + subseq.count('C')
-            out2 = float(GC_ahead) / ((windows[i + 1] + halfwindow) - (windows[i] + halfwindow))
+            all_bases2 = GC_ahead + subseq.count('A') + subseq.count('T')
+            try:
+                out2 = float(GC_ahead) / all_bases2
+            except ZeroDivisionError: # all Ns
+                out2 = 0.0
             print(chrname, windows[i] + halfwindow, windows[i + 1] + halfwindow, out2)
 
 # analysis
