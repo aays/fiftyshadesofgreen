@@ -9,6 +9,8 @@ AH - 10/2017
 import gzip
 
 class _Record(object):
+    '''A record object - stores all information at a single row in the annotation table.
+    '''
     def __init__(self, chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
         utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types,
         feature_ID, cds_position, strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination):
@@ -73,6 +75,14 @@ class _Record(object):
 
 
 class Reader(object):
+    '''The actual parser.
+    
+    Usage: 
+    parser = ant.Reader([annotation table filename])
+    records = [r for r in parser.reader] # make sure to have reader attribute to access generator
+    
+    Tabix compatibility unavailable at present, but actively being worked on.
+    '''
     def __init__(self, filename = None, compressed = None):
         
         super(Reader, self).__init__
@@ -89,7 +99,7 @@ class Reader(object):
 
         self.reader = (line for line in self._reader) # init generator
 
-        # 'burn' header from generator + set aside
+        # 'burn' header from generator + set aside if user needs
         line = next(self.reader)
         header = []
         header.append(line)
@@ -97,10 +107,13 @@ class Reader(object):
             line = next(self.reader)
             header.append(line)
 
-        assert line.startswith('#chromosome')
+        assert line.startswith('#chromosome') # make sure header has been read in
 
         def _line_to_rec(line):
-            '''Converts lines in annotation table to record objects.'''
+            '''Converts lines in annotation table to Record objects.
+            Helper function to ensure easy fetching of actual Records and not just
+            tab-split lines.
+            '''
             row = line.rstrip().split('\t')
             assert len(row) == 30
 
@@ -144,19 +157,19 @@ class Reader(object):
         # generator without header
         self.reader = (_line_to_rec(line) for line in self.reader)
 
-        self.cols = line.split('#')[1].split('\t')
+        self.cols = line.split('#')[1].split('\t') # get column names
         self.header = list(header)
 
     def __iter__(self):
         return self
 
-    def metadata(self):
+    def metadata(self): # parser.metadata returns column names
         return self.cols
 
-    def head(self):
+    def head(self): # parser.head returns entire header
         return self.header
 
-    def next(self):
+    def next(self): # very similar to _line_to_rec above
         '''Return next record in file.'''
         line = next(self.reader)
         row = line.rstrip().split('\t')
@@ -195,6 +208,6 @@ class Reader(object):
 
         record = _Record(chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
         utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types,
-        feature_ID, cds_position, strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination)
+        feature_ID, cds_position, strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination) # most args I've ever written...
 
         return record
