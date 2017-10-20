@@ -218,17 +218,12 @@ class Reader(object):
 
         return record
 
-	def fetch(self, chrom, start = None, end = None):
-		'''Returns an iterable of _Record instances.'''
-
-	    if not pysam:
-		    raise Exception('Error: pysam not installed.')
-
-	    if not self._tabix:
-		    self._tabix = pysam.TabixFile(self.filename)
-
-	    self.reader = self._tabix.fetch(chrom, start, end)
-
-	    return self.reader
-        
+    def fetch(self, chrom, start = None, end = None):
+        '''Returns an iterable of _Record instances.'''
+        if not pysam:
+            raise Exception('Error: pysam not installed.')
+        if not self._tabix:
+            self._tabix = pysam.TabixFile(self.filename)
+        self.reader = self._tabix.fetch(chrom, start, end)
+        return self.reader    
         
