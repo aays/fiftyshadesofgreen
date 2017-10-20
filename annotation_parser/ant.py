@@ -32,8 +32,10 @@ class _Record(object):
                 try:
                     ob = int(ob)
                 except ValueError:
+                    print('ValueError', ob)
                     ob = 'NA'
                 else:
+                    print('else', ob)
                     ob = 'NA'
                 return ob
             elif type == 'float':
