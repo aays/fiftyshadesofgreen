@@ -102,8 +102,9 @@ class Reader(object):
         self.filename = filename
         if compressed:
             self._reader = gzip.GzipFile(fileobj = self._reader)
-
-        self.reader = (line for line in self._reader) # init generator
+            self.reader = (line.decode('utf-8') for line in self._reader) # gzipped obj returns lines as bytes objs
+        else:
+            self.reader = (line for line in self._reader) # init generator
 
         # 'burn' header from generator + set aside if user needs
         line = next(self.reader)
@@ -113,7 +114,7 @@ class Reader(object):
             line = next(self.reader)
             header.append(line)
 
-        assert line.startswith('#chromosome') # make sure header has been read in
+        assert line.startswith('#chromosome') # make sure header has been completely read in
 
         def _line_to_rec(line):
             '''Converts lines in annotation table to Record objects.
