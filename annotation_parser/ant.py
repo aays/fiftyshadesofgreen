@@ -3,6 +3,17 @@ Early draft of a parser (modeled heavily after pyVCF) to read in a custom annota
 
 Uses generator objects + lazy loading of records.
 
+Usage examples:
+import ant
+parser = ant.Reader('file.txt.gz') # file should have equivalent .tbi index
+chr15_genic = [r for r in parser.fetch('chromosome_15') if r.is_genic]
+
+mt_locus = parser.fetch('chromosome_6', start = 3e5, end = 8e5)
+mt_locus_genic = len([r for r in mt_locus if r.is_genic]
+mt_locus_intergenic = len([r for r in mt_locus if r.is_intergenic])
+gen_to_intergen = mt_locus_genic / mt_locus_intergenic
+print(gen_to_intergen)
+
 AH - 10/2017
 '''
 
