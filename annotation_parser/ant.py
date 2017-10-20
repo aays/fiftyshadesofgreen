@@ -27,7 +27,7 @@ class _Record(object):
                 elif ob == 1:
                     return True
                 else:
-                    return 'NA'
+                    return False
             elif type == 'int':
                 try:
                     ob = int(ob)
