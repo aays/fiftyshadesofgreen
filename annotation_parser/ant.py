@@ -87,7 +87,10 @@ class Reader(object):
     parser = ant.Reader([annotation table filename])
     records = [r for r in parser] 
     
-    Tabix compatibility unavailable at present, but actively being worked on.
+    If file is compressed + tabix-indexed, can also use .fetch():
+    chr1_start = [r for r in parser('chromosome_1', start = 0, end = 50)]
+    
+    Fetch uses tabix's half-open (?) indexing. (ie start = 0 and end = 3 corresponds to getting 1, 2, and 3).
     '''
     def __init__(self, filename = None, compressed = None):
         
@@ -224,6 +227,7 @@ class Reader(object):
     def fetch(self, chrom, start = None, end = None):
         '''Returns an iterable of _Record instances. Tabix file needs to have been made using
         the vcf preset.'''
+        
         if not pysam:
             raise Exception('Error: pysam not installed.')
         if not self._tabix:
