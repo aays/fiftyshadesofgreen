@@ -8,6 +8,11 @@ AH - 10/2017
 
 import gzip
 
+try:
+    import pysam
+except ImportError:
+    pysam = None
+
 class _Record(object):
     '''A record object - stores all information at a single row in the annotation table.
     '''
@@ -212,3 +217,18 @@ class Reader(object):
         feature_ID, cds_position, strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination) # most args I've ever written...
 
         return record
+
+	def fetch(self, chrom, start = None, end = None):
+		'''Returns an iterable of _Record instances.'''
+
+	    if not pysam:
+		    raise Exception('Error: pysam not installed.')
+
+	    if not self._tabix:
+		    self._tabix = pysam.TabixFile(self.filename)
+
+	    self.reader = self._tabix.fetch(chrom, start, end)
+
+	    return self.reader
+        
+        
