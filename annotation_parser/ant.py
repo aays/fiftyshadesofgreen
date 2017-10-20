@@ -162,7 +162,7 @@ class Reader(object):
         self.header = list(header)
 
     def __iter__(self):
-        return self
+        return self.reader
 
     def metadata(self): # parser.metadata returns column names
         return self.cols
