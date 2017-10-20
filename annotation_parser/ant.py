@@ -109,8 +109,10 @@ class Reader(object):
     chr1_start = [r for r in parser.fetch('chromosome_1', start = 0, end = 50)]
     
     Fetch uses tabix's half-open (?) indexing. (ie start = 0 and end = 3 corresponds to getting 1, 2, and 3).
+    
+    Can set raw = True when initializing parser object to get raw lines instead of _Record objects.
     '''
-    def __init__(self, filename = None, compressed = None):
+    def __init__(self, filename = None, compressed = None, raw = False):
         
         super(Reader, self).__init__
         
@@ -185,7 +187,10 @@ class Reader(object):
             return record
 
         # generator without header
-        self.reader = (_line_to_rec(line) for line in self.reader)
+        if not raw:
+            self.reader = (_line_to_rec(line) for line in self.reader)
+        elif raw:
+            self.reader = (line for line in self.reader) # lines as strings, not records
 
         self.cols = line.split('#')[1].split('\t') # get column names
         self.header = list(header)
@@ -241,7 +246,7 @@ class Reader(object):
         feature_ID, cds_position, strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination) # most args I've ever written...
 
         return record
-
+    
     def fetch(self, chrom, start = None, end = None):
         '''Returns an iterable of _Record instances. Tabix file needs to have been made using
         the vcf preset.'''
