@@ -26,25 +26,31 @@ class _Record(object):
                     return False
                 elif ob == 1:
                     return True
-                elif ob == '.':
+                else:
                     return 'NA'
             elif type == 'int':
                 try:
                     ob = int(ob)
                 except ValueError:
-                    ob = '.'
+                    ob = 'NA'
+                else:
+                    ob = 'NA'
                 return ob
             elif type == 'float':
                 try:
                     ob = float(ob)
                 except ValueError:
-                    ob = '.'
+                    ob = 'NA'
+                else:
+                    ob = 'NA'
                 return ob
             elif type == 'str':
                 try:
                     ob = str(ob)
                 except:
-                    ob = '.'
+                    ob = 'NA'
+                else:
+                    ob = 'NA'
                 return ob
 
         self.chrom = type_make(chromosome, 'str')
