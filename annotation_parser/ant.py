@@ -20,15 +20,15 @@ class _Record(object):
         utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types,
         feature_ID, cds_position, strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination):
 
-        def type_make(ob, type):
-            if type == 'bool':
+        def type_make(ob, ob_type):
+            if ob_type == 'bool':
                 if ob == 0 or ob == '0':
                     return False
                 elif ob == 1 or ob == '1':
                     return True
                 else:
                     return False
-            elif type == 'int':
+            elif ob_type == 'int':
                 if ob == '.':
                     ob = 'NA'
                 else:
@@ -40,7 +40,7 @@ class _Record(object):
                         print('else', ob, type(ob))
                         ob = 'NA'
                 return ob
-            elif type == 'float':
+            elif ob_type == 'float':
                 try:
                     ob = float(ob)
                 except ValueError:
@@ -48,7 +48,7 @@ class _Record(object):
                 else:
                     ob = 'NA'
                 return ob
-            elif type == 'str':
+            elif ob_type == 'str':
                 try:
                     ob = str(ob)
                 except:
