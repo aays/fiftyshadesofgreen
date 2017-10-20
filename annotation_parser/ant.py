@@ -22,9 +22,9 @@ class _Record(object):
 
         def type_make(ob, type):
             if type == 'bool':
-                if ob == 0:
+                if ob == 0 or ob == '0':
                     return False
-                elif ob == 1:
+                elif ob == 1 or ob == '1':
                     return True
                 else:
                     return False
