@@ -14,6 +14,10 @@ mt_locus_intergenic = len([r for r in mt_locus if r.is_intergenic])
 gen_to_intergen = mt_locus_genic / mt_locus_intergenic
 print(gen_to_intergen)
 
+Quick and dirty way to get all available methods/attributes of a record:
+parser = ant.Reader('file.txt.gz')
+print(dir([r for r in parser.fetch('chromosome_1', start = 0, end = 1)][0]))
+
 AH - 10/2017
 '''
 
