@@ -29,14 +29,16 @@ class _Record(object):
                 else:
                     return False
             elif type == 'int':
-                try:
-                    ob = int(ob)
-                except ValueError:
-                    print('ValueError', ob)
+                if ob == '.':
                     ob = 'NA'
                 else:
-                    print('else', ob)
-                    ob = 'NA'
+                    try:
+                        ob = int(ob)
+                    except ValueError:
+                        ob = 'NA'
+                    else:
+                        print('else', ob, type(ob))
+                        ob = 'NA'
                 return ob
             elif type == 'float':
                 try:
