@@ -92,7 +92,6 @@ class Reader(object):
     def __init__(self, filename = None, compressed = None):
         
         super(Reader, self).__init__
-        self._tabix = None # init for tabix usage
         
         if not filename:
             raise Exception('Error: filename not provided.')
@@ -104,8 +103,10 @@ class Reader(object):
         if compressed:
             self._reader = gzip.GzipFile(fileobj = self._reader)
             self.reader = (line.decode('utf-8') for line in self._reader) # gzipped obj returns lines as bytes objs
+            self._tabix = pysam.TabixFile(self.filename)
         else:
             self.reader = (line for line in self._reader) # init generator
+            self._tabix = None
 
         # 'burn' header from generator + set aside if user needs
         line = next(self.reader)
@@ -221,11 +222,60 @@ class Reader(object):
         return record
 
     def fetch(self, chrom, start = None, end = None):
-        '''Returns an iterable of _Record instances.'''
+        '''Returns an iterable of _Record instances. Tabix file needs to have been made using
+        the vcf preset.'''
         if not pysam:
             raise Exception('Error: pysam not installed.')
         if not self._tabix:
             self._tabix = pysam.TabixFile(self.filename)
         self.reader = self._tabix.fetch(chrom, start, end)
-        return self.reader    
+        
+        def _line_to_rec(line):
+            '''Repeated from above. I know this is very inefficient and that there's probably a better way
+            to be doing this, but I don't know what that better way is for the life of me.
+            '''
+            row = line.rstrip().split('\t')
+            assert len(row) == 30
+
+            chromosome = row[0]
+            position = row[1]
+            reference_base = row[2]
+            genic = row[3]
+            exonic = row[4]
+            intronic = row[5]
+            intergenic = row[6]
+            utr5 = row[7]
+            utr3 = row[8]
+            fold0 = row[9]
+            fold4 = row[10]
+            fold2 = row[11]
+            fold3 = row[12]
+            CDS = row[13]
+            mRNA = row[14]
+            rRNA = row[15]
+            tRNA = row[16]
+            feature_names = row[17]
+            feature_types = row[18]
+            feature_ID = row[19]
+            cds_position = row[20]
+            strand = row[21]
+            frame = row[22]
+            codon = row[23]
+            aa = row[24]
+            degen = row[25]
+            FPKM = row[26]
+            rho = row[27]
+            FAIRE = row[28]
+            recombination = row[29]
+
+            record = _Record(chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
+            utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types,
+            feature_ID, cds_position, strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination)
+
+            return record
+        
+        self.reader = (_line_to_rec(line) for line in self.reader)
+        
+        return self.reader
+    
         
