@@ -78,8 +78,9 @@ class Reader(object):
     '''The actual parser.
     
     Usage: 
+    import ant
     parser = ant.Reader([annotation table filename])
-    records = [r for r in parser.reader] # make sure to have reader attribute to access generator
+    records = [r for r in parser.reader] # make sure to have this second .reader attribute to access generator
     
     Tabix compatibility unavailable at present, but actively being worked on.
     '''
