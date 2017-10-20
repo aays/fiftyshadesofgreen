@@ -92,7 +92,8 @@ class Reader(object):
     def __init__(self, filename = None, compressed = None):
         
         super(Reader, self).__init__
-
+        self._tabix = None # init for tabix usage
+        
         if not filename:
             raise Exception('Error: filename not provided.')
         elif filename:
