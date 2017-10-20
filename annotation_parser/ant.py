@@ -33,7 +33,7 @@ class _Record(object):
                     ob = 'NA'
                 else:
                     try:
-                        ob = int(ob)
+                        ob = int(ob) # redundant?
                     except ValueError:
                         ob = 'NA'
                 return ob
@@ -95,7 +95,7 @@ class Reader(object):
     records = [r for r in parser] 
     
     If file is compressed + tabix-indexed, can also use .fetch():
-    chr1_start = [r for r in parser('chromosome_1', start = 0, end = 50)]
+    chr1_start = [r for r in parser.fetch('chromosome_1', start = 0, end = 50)]
     
     Fetch uses tabix's half-open (?) indexing. (ie start = 0 and end = 3 corresponds to getting 1, 2, and 3).
     '''
