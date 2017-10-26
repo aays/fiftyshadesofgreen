@@ -36,7 +36,6 @@ def linetodict(line):
     return range(start, end), float(line[2]) # range + mean rho
 
 rholist = [linetodict(line) for line in tqdm(lines)]
-print('done loading file')
 ldh_dict = dict(rholist)
 del(rholist) # clear up
 
@@ -53,8 +52,8 @@ def checkrho(record, ld_dict):
             continue
         elif record.pos not in key:
             pass
+    print('found -', record.pos, currentrho)
     return currentrho
-
 
 print('chrom type avgrho numrecords')
 
