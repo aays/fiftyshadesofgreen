@@ -1,8 +1,8 @@
 '''
-test_exonic.py - correlate ldhelmet results to whether sites are exonic or not
+test_exonic_intronic.py - correlate ldhelmet results to whether sites are exonic or not
 
 usage:
-python3.5 test_exonic.py -l [ldhelmetfile (.txt)] -c chromosome_5 -a annotation_table.txt.gz > chromosome_5_exonic.txt
+python3.5 test_exonic_intronic.py -l [ldhelmetfile (.txt)] -c chromosome_5 -a annotation_table.txt.gz > chromosome_5_exonic.txt
 
 AH - 10/2017
 '''
