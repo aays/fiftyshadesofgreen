@@ -11,8 +11,8 @@ import ant
 import argparse
 from tqdm import tqdm
 
-parser = argparse.ArgumentParser(description = 'Correlate stuff b/w LDhelmet output + annotation table.', 
-                                usage = 'ant_correlation.py [options]')
+parser = argparse.ArgumentParser(description = 'Returns rho for exonic regions', 
+                                usage = 'test_exonic.py [options]')
 
 parser.add_argument('-l', '--ldhelmetfile', required = True,
                    type = str, help = 'LDhelmet file')
