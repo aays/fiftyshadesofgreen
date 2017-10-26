@@ -1,8 +1,8 @@
 '''
-test_exonic.py - correlate ldhelmet results to whether sites are exonic or not
+test_genic_intergenic.py - correlate ldhelmet results to whether sites are exonic or not
 
 usage:
-python3.5 test_intergenic.py -l [ldhelmetfile (.txt)] -c chromosome_5 -a annotation_table.txt.gz > chromosome_5_intergenic.txt
+python3.5 test_genic_intergenic.py -l [ldhelmetfile (.txt)] -c chromosome_5 -a annotation_table.txt.gz > chromosome_5.txt
 
 AH - 10/2017
 '''
@@ -11,8 +11,8 @@ import ant
 import argparse
 from tqdm import tqdm
 
-parser = argparse.ArgumentParser(description = 'Returns rho for intergenic regions.', 
-                                usage = 'test_intergenic.py [options]')
+parser = argparse.ArgumentParser(description = 'Returns rho for genic and intergenic regions', 
+                                usage = 'test_exonic_intronic.py [options]')
 
 parser.add_argument('-l', '--ldhelmetfile', required = True,
                    type = str, help = 'LDhelmet file')
@@ -35,7 +35,9 @@ with open(ldhelmetfile, 'r') as f:
             line_start, line_end, rho = int(line_content[0]), int(line_content[1]), float(line_content[2])
             p = ant.Reader(annotation).fetch(chrom = chrom, start = line_start, end = line_end)
             for record in p:
-                if record.is_intergenic:
+                if record.is_genic:
+                    print(chrom, 'genic', rho)
+                elif record.is_intergenic:
                     print(chrom, 'intergenic', rho)
                 else:
                     continue
