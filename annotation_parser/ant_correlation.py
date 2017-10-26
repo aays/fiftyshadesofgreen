@@ -54,7 +54,7 @@ def checkrho(record, ld_dict):
     return currentrho
 
 print('chrom type avgrho numrecords')
-
+print('starting exonic')
 exonic_rho = [checkrho(r, ldh_dict) for r in p if r.is_exonic]
 were_exonic = len(exonic_rho)
 exonic_rho = sum(exonic_rho) / were_exonic # overwrites massive list
