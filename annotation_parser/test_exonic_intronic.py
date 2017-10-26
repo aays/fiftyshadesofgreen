@@ -11,8 +11,8 @@ import ant
 import argparse
 from tqdm import tqdm
 
-parser = argparse.ArgumentParser(description = 'Returns rho for exonic regions', 
-                                usage = 'test_exonic.py [options]')
+parser = argparse.ArgumentParser(description = 'Returns rho for exonic and intronic regions', 
+                                usage = 'test_exonic_intronic.py [options]')
 
 parser.add_argument('-l', '--ldhelmetfile', required = True,
                    type = str, help = 'LDhelmet file')
@@ -37,6 +37,8 @@ with open(ldhelmetfile, 'r') as f:
             for record in p:
                 if record.is_exonic:
                     print(chrom, 'exonic', rho)
+                elif record.is_intronic:
+                    print(chrom, 'intronic', rho)
                 else:
                     continue
             
