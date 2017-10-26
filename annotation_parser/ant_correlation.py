@@ -34,8 +34,9 @@ def linetodict(line):
     line = line.split(' ')
     start, end = int(line[0]), int(line[1])
     return range(start, end), float(line[2]) # range + mean rho
-    
-rholist = [linetodict(line) for line in lines]
+
+rholist = [linetodict(line) for line in tqdm(lines)]
+print('done loading file')
 ldh_dict = dict(rholist)
 del(rholist) # clear up
 
