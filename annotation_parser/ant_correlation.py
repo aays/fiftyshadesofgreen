@@ -45,14 +45,12 @@ p = ant.Reader(annotation).fetch(chrom)
 
 def checkrho(record, ld_dict):
     currentrho = 0.0
-    print(record.pos)
     for key in ld_dict.keys():
         if record.pos in key:
             currentrho = ld_dict[key]
             continue
         elif record.pos not in key:
             pass
-    print('found -', record.pos, currentrho)
     return currentrho
 
 print('chrom type avgrho numrecords')
