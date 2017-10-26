@@ -10,6 +10,7 @@ AH - 10/2017
 
 import ant
 import argparse
+from collections import OrderedDict
 from tqdm import tqdm
 
 parser = argparse.ArgumentParser(description = 'Correlate stuff b/w LDhelmet output + annotation table.', 
@@ -36,7 +37,7 @@ def linetodict(line):
     return range(start, end), float(line[2]) # range + mean rho
     
 rholist = [linetodict(line) for line in lines]
-ldh_dict = dict(rholist)
+ldh_dict = OrderedDict(rholist)
 del(rholist) # clear up
 
 # introduce annotation table
