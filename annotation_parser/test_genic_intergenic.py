@@ -27,7 +27,7 @@ chrom = str(args.chrom)
 annotation = str(args.annotation)
 
 with open(ldhelmetfile, 'r') as f:
-    for line in f:
+    for line in tqdm(f):
         if line.split(' ')[0].startswith(('#', 'ver')):
             pass
         else:
