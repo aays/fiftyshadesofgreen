@@ -16,7 +16,7 @@ print(gen_to_intergen)
 
 Quick and dirty way to get all available methods/attributes of a record:
 parser = ant.Reader('file.txt.gz')
-dir(next(parser))
+dir(next(parser.fetch('chromosome_1'))
 
 AH - 10/2017
 '''
