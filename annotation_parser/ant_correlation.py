@@ -32,7 +32,7 @@ with open(ldhelmetfile, 'r') as f:
     
 def linetodict(line):
     line = line.split(' ')
-    start, end = int(line[0]), (line[1])
+    start, end = int(line[0]), int(line[1])
     return range(start, end), float(line[2]) # range + mean rho
     
 rholist = [linetodict(line) for line in lines]
