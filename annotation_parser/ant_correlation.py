@@ -4,6 +4,8 @@ ant_correlation.py - correlate ldhelmet results to genomic features
 usage:
 python3.5 ant_correlation.py -l [ldhelmetfile (.txt)] -c chromosome_5 -a annotation_table.txt.gz > chromosome_5_ant.txt
 
+warning: horrendously, horrifically slow. would avoid using, in all honesty
+
 AH - 10/2017
 '''
 
