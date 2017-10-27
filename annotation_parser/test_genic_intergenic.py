@@ -1,5 +1,5 @@
 '''
-test_genic_intergenic.py - correlate ldhelmet results to whether sites are exonic or not
+test_genic_intergenic.py - correlate ldhelmet results to whether sites are genic or not
 
 usage:
 python3.5 test_genic_intergenic.py -l [ldhelmetfile (.txt)] -c chromosome_5 -a annotation_table.txt.gz > chromosome_5.txt
