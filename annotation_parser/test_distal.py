@@ -11,7 +11,7 @@ import ant
 import argparse
 from tqdm import tqdm
 
-parser = argparse.ArgumentParser(description = 'Returns flat file with distance to closest end of chr + recombination rate'
+parser = argparse.ArgumentParser(description = 'Returns flat file with distance to closest end of chr + recombination rate',
                                 usage = 'test_distal.py [options]')
 
 parser.add_argument('-l', '--ldhelmetfile', required = True,
