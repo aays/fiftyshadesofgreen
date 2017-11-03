@@ -47,10 +47,7 @@ lengths = {'chromosome_1': 8033585, # hardcoded for chlamy
 'chromosome_16': 7783580,
 'chromosome_17': 7188315}
 
-chromname = ldhelmetfile[:-7] # file name is chromosome_x_50.txt 
-# though hardcoding is probably less than ideal...
-
-length = lengths[chromname]
+length = lengths[chrom]
 midpoint = int(length / 2) # rounds down
 
 if header:
