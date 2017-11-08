@@ -251,9 +251,9 @@ class Reader(object):
 
         return record
     
-    def fetch(self, chrom, start = None, end = None):
+    def fetch(self, chrom, start = None, end = None, raw = False):
         '''Returns an iterable of _Record instances. Tabix file needs to have been made using
-        the vcf preset.'''
+        the vcf preset. If raw = True, returns raw lines.'''
         
         if not pysam:
             raise Exception('Error: pysam not installed.')
@@ -305,7 +305,10 @@ class Reader(object):
 
             return record
         
-        self.reader = (_line_to_rec(line) for line in self.reader)
+        if not raw:
+            self.reader = (_line_to_rec(line) for line in self.reader)
+        elif raw:
+            self.reader = (line for line in self.reader)
         
         return self.reader
     
