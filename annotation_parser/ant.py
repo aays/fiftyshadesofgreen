@@ -141,7 +141,10 @@ class Reader(object):
         header.append(line)
         while line.startswith('##'):
             line = next(self.reader)
-            header.append(line)
+            if line.startswith('#chromosome'):
+                break
+            else:
+                header.append(line)
 
         assert line.startswith('#chromosome') # make sure header has been completely read in
 
