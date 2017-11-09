@@ -155,37 +155,11 @@ class Reader(object):
             '''
             row = line.rstrip().split('\t')
             assert len(row) == 30
-
-            chromosome = row[0]
-            position = row[1]
-            reference_base = row[2]
-            genic = row[3]
-            exonic = row[4]
-            intronic = row[5]
-            intergenic = row[6]
-            utr5 = row[7]
-            utr3 = row[8]
-            fold0 = row[9]
-            fold4 = row[10]
-            fold2 = row[11]
-            fold3 = row[12]
-            CDS = row[13]
-            mRNA = row[14]
-            rRNA = row[15]
-            tRNA = row[16]
-            feature_names = row[17]
-            feature_types = row[18]
-            feature_ID = row[19]
-            cds_position = row[20]
-            strand = row[21]
-            frame = row[22]
-            codon = row[23]
-            aa = row[24]
-            degen = row[25]
-            FPKM = row[26]
-            rho = row[27]
-            FAIRE = row[28]
-            recombination = row[29]
+            
+            chromosome, position, reference_base, genic, exonic, intronic, intergenic, \
+            utr5, utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, \
+            feature_types, feature_ID, cds_position, strand, frame, codon, aa, degen, \
+            FPKM, rho, FAIRE, recombination = row # unpacking list
 
             record = _Record(chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
             utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types,
@@ -217,36 +191,10 @@ class Reader(object):
         row = line.rstrip().split('\t')
         assert len(row) == 30
 
-        chromosome = row[0]
-        position = row[1]
-        reference_base = row[2]
-        genic = row[3]
-        exonic = row[4]
-        intronic = row[5]
-        intergenic = row[6]
-        utr5 = row[7]
-        utr3 = row[8]
-        fold0 = row[9]
-        fold4 = row[10]
-        fold2 = row[11]
-        fold3 = row[12]
-        CDS = row[13]
-        mRNA = row[14]
-        rRNA = row[15]
-        tRNA = row[16]
-        feature_names = row[17]
-        feature_types = row[18]
-        feature_ID = row[19]
-        cds_position = row[20]
-        strand = row[21]
-        frame = row[22]
-        codon = row[23]
-        aa = row[24]
-        degen = row[25]
-        FPKM = row[26]
-        rho = row[27]
-        FAIRE = row[28]
-        recombination = row[29]
+        chromosome, position, reference_base, genic, exonic, intronic, intergenic, \
+        utr5, utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, \
+        feature_types, feature_ID, cds_position, strand, frame, codon, aa, degen, \
+        FPKM, rho, FAIRE, recombination = row # unpacking list
 
         record = _Record(chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
         utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types,
@@ -271,36 +219,10 @@ class Reader(object):
             row = line.rstrip().split('\t')
             assert len(row) == 30
 
-            chromosome = row[0]
-            position = row[1]
-            reference_base = row[2]
-            genic = row[3]
-            exonic = row[4]
-            intronic = row[5]
-            intergenic = row[6]
-            utr5 = row[7]
-            utr3 = row[8]
-            fold0 = row[9]
-            fold4 = row[10]
-            fold2 = row[11]
-            fold3 = row[12]
-            CDS = row[13]
-            mRNA = row[14]
-            rRNA = row[15]
-            tRNA = row[16]
-            feature_names = row[17]
-            feature_types = row[18]
-            feature_ID = row[19]
-            cds_position = row[20]
-            strand = row[21]
-            frame = row[22]
-            codon = row[23]
-            aa = row[24]
-            degen = row[25]
-            FPKM = row[26]
-            rho = row[27]
-            FAIRE = row[28]
-            recombination = row[29]
+            chromosome, position, reference_base, genic, exonic, intronic, intergenic, \
+            utr5, utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, \
+            feature_types, feature_ID, cds_position, strand, frame, codon, aa, degen, \
+            FPKM, rho, FAIRE, recombination = row # unpacking list
 
             record = _Record(chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
             utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types,
