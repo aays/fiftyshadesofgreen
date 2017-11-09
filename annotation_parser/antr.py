@@ -1,7 +1,9 @@
 '''
-Copy of the parser in ant.py that incorporates ld_rho measures. Will later be merged into main parser.
+Copy of the parser in ant.py that incorporates ld_rho measures (see add_ld_rho.py)
 
-AH - 10/2017
+Will later be merged into main parser.
+
+AH - 11/2017
 '''
 
 import gzip
