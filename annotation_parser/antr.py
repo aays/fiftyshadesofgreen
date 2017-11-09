@@ -22,12 +22,10 @@ class _Record(object):
 
         def type_make(ob, ob_type):
             if ob_type == 'bool':
-                if ob == 0 or ob == '0':
+                if ob in [0, '0', '.']:
                     return False
                 elif ob == 1 or ob == '1':
                     return True
-                else:
-                    return False
             elif ob_type == 'int':
                 if ob == '.':
                     ob = 'NA'
@@ -42,15 +40,11 @@ class _Record(object):
                     ob = float(ob)
                 except ValueError:
                     ob = 'NA'
-                else:
-                    ob = 'NA'
                 return ob
             elif ob_type == 'str':
                 try:
                     ob = str(ob)
                 except:
-                    ob = 'NA'
-                else:
                     ob = 'NA'
                 return ob
 
