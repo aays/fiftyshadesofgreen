@@ -99,7 +99,7 @@ for chrom in range(1, 18):
         allvals = ' '.join([str(rhovals[i] / countvals[i]) for i in range(len(rhovals))])
         totals = ' '.join([str(v) for v in rhovals])
 
-        print(current, window[0], window[1], allvals, totals, total_counter)
+        print(current_chrom, window[0], window[1], allvals, totals, total_counter)
 
 
 
