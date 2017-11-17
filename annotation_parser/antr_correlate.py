@@ -1,6 +1,6 @@
 '''
 takes in a table + windowsize + list of correlates, and returns mean rho values / window for records
-satisying a given correlate.
+satisfying a given correlate.
 
 usage:
 python3.5 antr_correlate.py -t [table (.txt.gz)] -w [windowsize] -c [correlates] > output.txt
