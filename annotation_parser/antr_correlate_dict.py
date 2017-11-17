@@ -83,7 +83,7 @@ for chrom in range(1, 18):
         count = OrderedDict.fromkeys(correlates, 0)
         total_counter = 0
 
-        for record in p.fetch(current_chrom, window[0], window[1]):
+        for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
             for key in rho.keys():
                 if attr_fetch(record, key) and not record.ld_rho == 'NA':
                     rho[key] += record.ld_rho
