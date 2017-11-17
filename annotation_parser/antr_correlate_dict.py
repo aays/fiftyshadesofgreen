@@ -79,6 +79,7 @@ for chrom in range(1, 18):
     p = antr.Reader(table) 
 
     for i in range(len(windows) - 1):
+        window = (windows[i], windows[i + 1])
         rho = OrderedDict.fromkeys(correlates, 0.0)
         count = OrderedDict.fromkeys(correlates, 0)
         total_counter = 0
