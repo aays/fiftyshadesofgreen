@@ -1,3 +1,15 @@
+'''
+takes in a table + windowsize + list of correlates, and returns mean rho values / window for records
+satisfying a given correlate.
+
+usage:
+python3.5 antr_correlate.py -t [table (.txt.gz)] -w [windowsize] -c [correlates] > output.txt
+python3.5 antr_correlate.py -t table.txt.gz -w 100000 -c exonic intronic > output.txt
+
+AH - 11/2017
+'''
+
+
 import argparse
 import sys
 from tqdm import tqdm
