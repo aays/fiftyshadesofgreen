@@ -96,9 +96,12 @@ for chrom in range(1, 18):
         rhovals = list(rho.values())
         countvals = list(count.values())
 
-        allvals = ' '.join([str(rhovals[i] / countvals[i]) for i in range(len(rhovals))])
-        totals = ' '.join([str(v) for v in rhovals])
-
+        try:
+            allvals = ' '.join([str(rhovals[i] / countvals[i]) for i in range(len(rhovals))])
+            totals = ' '.join([str(v) for v in rhovals])
+        except ZeroDivisionError: # nothing in window
+            allvals = ' '.join([str(0) for i in range(len(rhovals))])
+            totals = ' '.join([str(0) for v in rhovals])
         print(current_chrom, window[0], window[1], allvals, totals, total_counter)
 
 
