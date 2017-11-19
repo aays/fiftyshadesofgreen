@@ -58,8 +58,7 @@ lengths = {'chromosome_1': 8033585,
 def attr_fetch(rec, attribute):
     '''(rec, str) -> bool/float
     Used for fetching desired attributes from a record.'''
-    rec_attr = [item for item in dir(rec) if '__' not in item]
-    rec_attr = [item for item in rec_attr if attribute in item]
+    rec_attr = [item for item in dir(rec) if '__' not in item and if attribute in item]
     try:
         assert len(rec_attr) == 1
     except:
