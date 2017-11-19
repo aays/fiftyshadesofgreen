@@ -62,7 +62,7 @@ def attr_fetch(rec, attribute):
     try:
         assert len(rec_attr) == 1
     except:
-        raise AssertionError('{} is not a valid attribute.'.format(attribute))
+        raise AssertionError('{} is not a valid attribute. {} matches found - {}'.format(attribute, len(rec_attr), rec_attr)
     rec_attr = rec_attr[0] # extract item from list
     out = getattr(rec, rec_attr)
     return out
