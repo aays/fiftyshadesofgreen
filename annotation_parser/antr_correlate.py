@@ -83,7 +83,7 @@ if len(correlates) == 1:
             corr_rho_out = 0.0
             corr_count = 0 # no need for a 'total counter' - only one correlate
 
-            for record in p.fetch(current_chrom, window[0], window[1]):
+            for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
                 if not record.ld_rho == 'NA' and attr_fetch(record, corr):
                     corr_rho_out += record.ld_rho
                     corr_count += 1
@@ -109,7 +109,7 @@ if len(correlates) == 2:
             corr2_rho_out = 0.0
             corr1_count, corr2_count, total_counter = 0, 0, 0
 
-            for record in p.fetch(current_chrom, window[0], window[1]):
+            for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
                 if not record.ld_rho == 'NA' and attr_fetch(record, corr1):
                     corr1_rho_out += record.ld_rho
                     corr1_count += 1
@@ -142,7 +142,7 @@ elif len(correlates) == 3:
             corr3_rho_out = 0.0
             corr1_count, corr2_count, corr3_count, total_counter = 0, 0, 0, 0
 
-            for record in p.fetch(current_chrom, window[0], window[1]):
+            for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
                 if not record.ld_rho == 'NA' and attr_fetch(record, corr1):
                     corr1_rho_out += record.ld_rho
                     corr1_count += 1
@@ -181,7 +181,7 @@ elif len(correlates) == 4:
             corr4_rho_out = 0.0
             corr1_count, corr2_count, corr3_count, corr4_count, total_counter = 0, 0, 0, 0, 0
 
-            for record in p.fetch(current_chrom, window[0], window[1]):
+            for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
                 if not record.ld_rho == 'NA' and attr_fetch(record, corr1):
                     corr1_rho_out += record.ld_rho
                     corr1_count += 1
