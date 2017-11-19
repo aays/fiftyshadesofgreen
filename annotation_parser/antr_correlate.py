@@ -121,7 +121,7 @@ if len(correlates) == 2:
                 else:
                     continue
             print(current_chrom, window[0], window[1], corr1_rho_out / corr1_count, 
-                  corr2_rho_out / corr2_count, corr1_rho_out, corr2_rho_out, counter)
+                  corr2_rho_out / corr2_count, corr1_rho_out, corr2_rho_out, total_counter)
 
 elif len(correlates) == 3:
 
@@ -159,7 +159,7 @@ elif len(correlates) == 3:
                     continue
             print(current_chrom, window[0], window[1], corr1_rho_out / corr1_count, 
                   corr2_rho_out / corr2_count, corr3_rho_out / corr3_count, corr1_rho_out, 
-                  corr2_rho_out, corr3_rho_out, counter)
+                  corr2_rho_out, corr3_rho_out, total_counter)
 
 elif len(correlates) == 4:
 
@@ -202,7 +202,7 @@ elif len(correlates) == 4:
                     continue
             print(current_chrom, window[0], window[1], corr1_rho_out / corr1_count, 
                   corr2_rho_out / corr2_count, corr3_rho_out / corr3_count, corr4_rho_out / corr4_count, 
-                  corr1_rho_out, corr2_rho_out, corr3_rho_out, corr4_rho_out, counter)
+                  corr1_rho_out, corr2_rho_out, corr3_rho_out, corr4_rho_out, total_counter)
 
 elif len(correlates) > 4:
     raise InputError('Too many correlates. Please provide 1-4 correlates as input.')
