@@ -120,7 +120,7 @@ if len(correlates) == 2:
                     total_counter += 1
                 else:
                     continue
-            print(current, window[0], window[1], corr1_rho_out / corr1_count, 
+            print(current_chrom, window[0], window[1], corr1_rho_out / corr1_count, 
                   corr2_rho_out / corr2_count, corr1_rho_out, corr2_rho_out, counter)
 
 elif len(correlates) == 3:
@@ -157,7 +157,7 @@ elif len(correlates) == 3:
                     total_count += 1
                 else:
                     continue
-            print(current, window[0], window[1], corr1_rho_out / corr1_count, 
+            print(current_chrom, window[0], window[1], corr1_rho_out / corr1_count, 
                   corr2_rho_out / corr2_count, corr3_rho_out / corr3_count, corr1_rho_out, 
                   corr2_rho_out, corr3_rho_out, counter)
 
@@ -200,7 +200,7 @@ elif len(correlates) == 4:
                     total_count += 1
                 else:
                     continue
-            print(current, window[0], window[1], corr1_rho_out / corr1_count, 
+            print(current_chrom, window[0], window[1], corr1_rho_out / corr1_count, 
                   corr2_rho_out / corr2_count, corr3_rho_out / corr3_count, corr4_rho_out / corr4_count, 
                   corr1_rho_out, corr2_rho_out, corr3_rho_out, corr4_rho_out, counter)
 
