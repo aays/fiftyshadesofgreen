@@ -30,12 +30,15 @@ parser.add_argument('-w', '--windowsize', required = True,
                    type = int, help = 'Window size')
 parser.add_argument('-c', '--correlates', required = True,
                    type = str, nargs = '+', help = 'Space separated list of correlates. Be as exact with naming as possible.')
+parser.add_argument('-g', '--gc_content', required = False,
+                   type = 'store_true', help = 'Include GC content in output file? (Optional)')
 
 args = parser.parse_args()
 
 table = args.table
 windowsize = int(args.windowsize)
 correlates = args.correlates
+gc = args.gc_content
 
 lengths = {'chromosome_1': 8033585,
 'chromosome_2': 9223677,
@@ -67,9 +70,20 @@ def attr_fetch(rec, attribute):
     out = getattr(rec, rec_attr)
     return out
 
+def gc_calc(chromosome, window, table):
+    seq = ''.join([record.ref for record in antr.Reader(table).fetch(chromosome, window[0], window[1])])
+    total = len(seq)
+    GC = seq.count('G') + seq.count('C')
+    GC_content = GC / total
+    return GC_content
+
 title1 = ' '.join(correlates)
 title2 = ' '.join([item + '_total' for item in correlates])
-print('chromosome', 'start', 'end', title1, title2, 'count')
+
+if gc:
+    print('chromosome', 'start', 'end', title1, title2, 'GC%', 'count')
+elif not gc:
+    print('chromosome', 'start', 'end', title1, title2, 'count')
 
 for chrom in range(1, 18):
     current_chrom = 'chromosome_{}'.format(str(chrom))
@@ -91,7 +105,7 @@ for chrom in range(1, 18):
                     total_counter += 1
                 else:
                     continue
-        
+                
         rhovals = list(rho.values())
         countvals = list(count.values())
 
@@ -101,8 +115,8 @@ for chrom in range(1, 18):
         except ZeroDivisionError: # nothing in window
             allvals = ' '.join([str(0) for i in range(len(rhovals))])
             totals = ' '.join([str(0) for v in rhovals])
-        print(current_chrom, window[0], window[1], allvals, totals, total_counter)
-
-
-
-
+        if gc:
+            gc_window = gc_calc(current_chrom, window, table)
+            print(current_chrom, window[0], window[1], allvals, totals, gc_window, total_counter)
+        elif not gc:
+            print(current_chrom, window[0], window[1], allvals, totals, total_counter)
