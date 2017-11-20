@@ -91,7 +91,7 @@ if gc and correlates:
 elif correlates and not gc:
     print('chromosome', 'start', 'end', title1, title2, 'count')
 elif gc and not correlates:
-    print('chromosome', 'start', 'end', 'GC%', 'rho', 'count')
+    print('chromosome', 'start', 'end', 'GC%', 'rho', 'rho_total', 'count')
 
 for chrom in range(1, 18):
     current_chrom = 'chromosome_{}'.format(str(chrom))
@@ -135,10 +135,11 @@ for chrom in range(1, 18):
                 gc_counter += 1
             
             gc_window = gc_calc(current_chrom, window, table)
+            gc_rho_perbp = gc_rho / gc_counter
             
             if correlates:
                 print(current_chrom, window[0], window[1], allvals, totals, gc_window, total_counter)
             elif not correlates:
-                print(current_chrom, window[0], window[1], gc_window, gc_rho, gc_counter)
+                print(current_chrom, window[0], window[1], gc_window, gc_rho_perbp, gc_rho, gc_counter)
         elif not gc:
             print(current_chrom, window[0], window[1], allvals, totals, total_counter)
