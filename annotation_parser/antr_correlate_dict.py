@@ -28,10 +28,10 @@ parser.add_argument('-t', '--table', required = True,
                    type = str, help = 'Annotation table file (.txt.gz)')
 parser.add_argument('-w', '--windowsize', required = True,
                    type = int, help = 'Window size')
-parser.add_argument('-c', '--correlates', required = True,
+parser.add_argument('-c', '--correlates', required = False,
                    type = str, nargs = '+', help = 'Space separated list of correlates. Be as exact with naming as possible.')
 parser.add_argument('-g', '--gc_content', required = False,
-                   type = 'store_true', help = 'Include GC content in output file? (Optional)')
+                   action = 'store_true', help = 'Include GC content in output file? (Optional)')
 
 args = parser.parse_args()
 
@@ -39,6 +39,11 @@ table = args.table
 windowsize = int(args.windowsize)
 correlates = args.correlates
 gc = args.gc_content
+
+if not correlates and not gc:
+    print('Please provide one or more correlates.')
+    print('This could also be just GC content (use --gc_content) without providing anything to -c')
+    sys.exit(1)
 
 lengths = {'chromosome_1': 8033585,
 'chromosome_2': 9223677,
@@ -77,13 +82,16 @@ def gc_calc(chromosome, window, table):
     GC_content = GC / total
     return GC_content
 
-title1 = ' '.join(correlates)
-title2 = ' '.join([item + '_total' for item in correlates])
+if correlates:
+    title1 = ' '.join(correlates)
+    title2 = ' '.join([item + '_total' for item in correlates])
 
 if gc:
     print('chromosome', 'start', 'end', title1, title2, 'GC%', 'count')
-elif not gc:
+elif correlates and not gc:
     print('chromosome', 'start', 'end', title1, title2, 'count')
+elif gc and not correlates:
+    print('chromosome', 'start', 'end', 'GC%', 'rho', 'count')
 
 for chrom in range(1, 18):
     current_chrom = 'chromosome_{}'.format(str(chrom))
@@ -93,30 +101,44 @@ for chrom in range(1, 18):
 
     for i in range(len(windows) - 1):
         window = (windows[i], windows[i + 1])
-        rho = OrderedDict.fromkeys(correlates, 0.0)
-        count = OrderedDict.fromkeys(correlates, 0)
-        total_counter = 0
+        
+        if correlates:
+            rho = OrderedDict.fromkeys(correlates, 0.0)
+            count = OrderedDict.fromkeys(correlates, 0)
+            total_counter = 0
 
-        for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
-            for key in rho.keys():
-                if attr_fetch(record, key) and not record.ld_rho == 'NA':
-                    rho[key] += record.ld_rho
-                    count[key] += 1
-                    total_counter += 1
-                else:
-                    continue
-                
-        rhovals = list(rho.values())
-        countvals = list(count.values())
+            for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
+                for key in rho.keys():
+                    if attr_fetch(record, key) and not record.ld_rho == 'NA':
+                        rho[key] += record.ld_rho
+                        count[key] += 1
+                        total_counter += 1
+                    else:
+                        continue
 
-        try:
-            allvals = ' '.join([str(rhovals[i] / countvals[i]) for i in range(len(rhovals))])
-            totals = ' '.join([str(v) for v in rhovals])
-        except ZeroDivisionError: # nothing in window
-            allvals = ' '.join([str(0) for i in range(len(rhovals))])
-            totals = ' '.join([str(0) for v in rhovals])
+            rhovals = list(rho.values())
+            countvals = list(count.values())
+
+            try:
+                allvals = ' '.join([str(rhovals[i] / countvals[i]) for i in range(len(rhovals))])
+                totals = ' '.join([str(v) for v in rhovals])
+            except ZeroDivisionError: # nothing in window
+                allvals = ' '.join([str(0) for i in range(len(rhovals))])
+                totals = ' '.join([str(0) for v in rhovals])
+            
         if gc:
+            gc_rho = 0.0
+            gc_counter = 0
+            
+            for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
+                gc_rho += record.ld_rho
+                gc_counter += 1
+            
             gc_window = gc_calc(current_chrom, window, table)
-            print(current_chrom, window[0], window[1], allvals, totals, gc_window, total_counter)
+            
+            if correlates:
+                print(current_chrom, window[0], window[1], allvals, totals, gc_window, total_counter)
+            elif not correlates:
+                print(current_chrom, window[0], window[1], gc_window, gc_rho, gc_counter)
         elif not gc:
             print(current_chrom, window[0], window[1], allvals, totals, total_counter)
