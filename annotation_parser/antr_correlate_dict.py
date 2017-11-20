@@ -86,7 +86,7 @@ if correlates:
     title1 = ' '.join(correlates)
     title2 = ' '.join([item + '_total' for item in correlates])
 
-if gc:
+if gc and correlates:
     print('chromosome', 'start', 'end', title1, title2, 'GC%', 'count')
 elif correlates and not gc:
     print('chromosome', 'start', 'end', title1, title2, 'count')
