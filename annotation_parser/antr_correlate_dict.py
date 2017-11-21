@@ -20,7 +20,7 @@ try:
 except ImportError:
     sys.path.append('/scratch/research/projects/chlamydomonas/genomewide_recombination/analysis/fiftyshadesofgreen/annotation_parser/')
 
-
+# args
 parser = argparse.ArgumentParser(description = 'General purpose calculation of rho w/ attributes in defined windows.',
                                 usage = 'antr_correlation.py [options]')
 
@@ -42,9 +42,10 @@ gc = args.gc_content
 
 if not correlates and not gc:
     print('Please provide one or more correlates.')
-    print('This could also be just GC content (use --gc_content) without providing anything to -c')
+    print('This could also be just GC content (use --gc_content without providing anything to -c)')
     sys.exit(1)
 
+# chromosome lengths - hardcoded for chlamy
 lengths = {'chromosome_1': 8033585,
 'chromosome_2': 9223677,
 'chromosome_3': 9219486,
@@ -76,6 +77,7 @@ def attr_fetch(rec, attribute):
     return out
 
 def gc_calc(chromosome, window, table):
+    '''Returns GC content in given window as proportion.'''
     seq = ''.join([record.ref for record in antr.Reader(table).fetch(chromosome, window[0], window[1])])
     total = len(seq)
     GC = seq.count('G') + seq.count('C')
