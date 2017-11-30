@@ -64,9 +64,9 @@ def freqsgetter(record1, record2, snpcheck = True):
     freq calculations than freqscalc() - handles missing data better (i.e. when biallelic genotype
     not present).
     '''
-    if snpcheck == True:
+    if snpcheck:
         snpchecker(record1, record2)
-    elif snpcheck == False:
+    elif not snpcheck:
         pass
     # check strains b/w compared records are identical
     strainlist = straingetter(record1, record2)
@@ -131,9 +131,9 @@ def dcalc(record1, record2, snpcheck = True):
     '''Calculates D statistic between two VCF records.
     Will check that records are biallelic (single-ALT) SNPs unless snpcheck = False.
     '''
-    if snpcheck == True:
+    if snpcheck:
         snpchecker(record1, record2)
-    elif snpcheck == False:
+    elif not snpcheck:
         pass    
     haps = freqsgetter(record1, record2, snpcheck = False)[2]
     try:
@@ -152,9 +152,9 @@ def dprimecalc(record1, record2, snpcheck = True):
     '''Calculates Lewontin's D' statistic (D/Dmax) between two VCF records.
     Will check that records are biallelic (single-ALT) SNPs unless snpcheck = False.
     '''
-    if snpcheck == True:
+    if snpcheck:
         snpchecker(record1, record2)
-    elif snpcheck == False:
+    elif not snpcheck:
         pass
     values = freqsgetter(record1, record2, snpcheck = False)[1] # get allele frequencies
     d = dcalc(record1, record2, snpcheck = False)
@@ -178,9 +178,9 @@ def r2calc(record1, record2, snpcheck = True):
     '''Calculates r^2 (correlation) between two VCF records.
     Will check that records are biallelic (single-ALT) SNPs unless snpcheck = False.
     '''
-    if snpcheck == True:
+    if snpcheck:
         snpchecker(record1, record2)
-    elif snpcheck == False:
+    elif not snpcheck:
         pass
     values = freqsgetter(record1, record2, snpcheck = False)[1]
     if values['p1'] == 0 or values['q1'] == 0 or values['p2'] == 0 or values['q2'] == 0:
@@ -196,9 +196,9 @@ def ldstats(record1, record2, snpcheck = True, freqs = False):
     If freqs = True, will also return an allele frequency report.
     Will check that records are biallelic (single-ALT) SNPs unless snpcheck = False.
     '''
-    if snpcheck == True:
+    if snpcheck:
         snpchecker(record1, record2)
-    elif snpcheck == False:
+    elif not snpcheck:
         pass
     print('D =', dcalc(record1, record2, snpcheck = False))
     print("D'=", dprimecalc(record1, record2, snpcheck = False)) 
@@ -299,9 +299,9 @@ def freqscalc(record1, record2, snpcheck = True, aaf = False):
     itself, while aaf = False (default) will make freqscalc calculate them instead
     (more accurate option).
     '''
-    if snpcheck == True:
+    if snpcheck:
         snpchecker(record1, record2)
-    elif snpcheck == False:
+    elif not snpcheck:
         pass
     # get allele frequencies
     if aaf == True:
@@ -362,18 +362,18 @@ def doublegtcounts(record1, record2, freqs = True, missing = True):
     # check strains b/w compared records are identical
     strainlist = [record1.samples[i].sample for i in range(len(record1.samples))] 
     assert strainlist == [record2.samples[i].sample for i in range(len(record2.samples))]
-    if freqs == True:
+    if freqs:
         freqscalc(record1, record2)
-    elif freqs == False:
+    elif not freqs:
         pass
     # parse through VCF calls
     for strain in strainlist:
         gt1 = record1.genotype(strain)['GT']
         gt2 = record2.genotype(strain)['GT']
-        if gt1 == '.' and gt2 == '.' and missing == True:
+        if gt1 == '.' and gt2 == '.' and missing:
             print('--')
             continue
-        elif gt1 == '.' and missing == True:
+        elif gt1 == '.' and missing:
             if gt2 == '0':
                 print('-B', '-' + record2.REF)
             elif gt2 == '1':
@@ -381,14 +381,14 @@ def doublegtcounts(record1, record2, freqs = True, missing = True):
             else:
                 continue
         elif gt1 == '0':
-            if gt2 == '.' and missing == True:
+            if gt2 == '.' and missing:
                 print('A-', record1.REF + '-')
             elif gt2 == '0':
                 print('AB', record1.REF + str(record2.REF))
             elif gt2 == '1':
                 print('Ab', record1.REF + str(record2.ALT[0]))
         elif gt1 == '1':
-            if gt2 == '.' and missing == True:
+            if gt2 == '.' and missing:
                 print('a-', str(record1.ALT[0]) + '-')
             elif gt2 == '0':
                 print('aB', str(record1.ALT[0]) + record2.REF)
