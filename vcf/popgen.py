@@ -42,7 +42,7 @@ def snpchecker(record1, record2):
 def straingetter(record1, record2, GQ_threshold = 30):
     '''Given two VCF records, returns a list of individuals in the population that
     contain calls at both sites. Helper function for LD calculations.
-    Will filter strains for GQ - currently hardcoded at 50.
+    Will filter strains for GQ (default 30).
     '''
     rec1set = set([record1.samples[i].sample for i in range(len(record1.samples)) if record1.samples[i]['GT'] != '.'])
     rec2set = set([record2.samples[i].sample for i in range(len(record2.samples)) if record2.samples[i]['GT'] != '.'])
