@@ -253,31 +253,25 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
             start = int(pos[0]) - 1
             end = int(pos[1])
             snippet = vcfin.fetch(chrom = chrom, start = start, end = end) 
-            if snpsonly == True:
-                reclist = [record for record in snippet if hardsnpcheck(record) == True]
-                reclist = [record for record in reclist if issingleton(record) == False]
-                reclist = [record for record in reclist if isinvariant(record) == False]
-            elif snpsonly == False:
+            if snpsonly:
+                reclist = [record for record in snippet if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record)]
+            elif not snpsonly:
                 reclist = [record for record in snippet]
         except:
             print('Error in pos parameter.')
             print('Please enter positions in a start-end format with no spaces.')
     elif chrom is not None and pos is None:
         snippet = vcfin.fetch(chrom = chrom)
-        if snpsonly == True:
-            reclist = [record for record in snippet if hardsnpcheck(record) == True]
-            reclist = [record for record in reclist if issingleton(record) == False]
-            reclist = [record for record in reclist if isinvariant(record) == False]
-        elif snpsonly == False:
+        if snpsonly:
+            reclist = [record for record in snippet if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record)]
+        elif not snpsonly:
             reclist = [record for record in snippet]
     elif chrom is None and pos is not None:
         print('Error - positions supplied without chromosome specification.')
     else:
-        if snpsonly == True:
-            reclist = [record for record in vcfin if hardsnpcheck(record) == True]
-            reclist = [record for record in reclist if issingleton(record) == False]
-            reclist = [record for record in reclist if isinvariant(record) == False]
-        elif snpsonly == False:
+        if snpsonly:
+            reclist = [record for record in vcfin if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record)]
+        elif not snpsonly:
             reclist = [record for record in vcfin]
     return reclist
 
