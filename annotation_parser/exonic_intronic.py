@@ -72,12 +72,14 @@ for key in genes.keys():
             first_exons[key] = first_exons[key] + [[current_exons[0][0], current_exons[0][1]]]
             other_exons[key] = other_exons[key] + current_exons[1:-1]
             last_exons[key] = last_exons[key] + [[current_exons[-1][0], current_exons[-1][1]]]
-
+        except IndexError:
+            eprint('exon not found at', key, gene)
+            
+        try:
             first_introns[key] = first_introns[key] + [[current_introns[0][0], current_introns[0][1]]]
             other_introns[key] = other_introns[key] + current_introns[1:-1]
             last_introns[key] = last_introns[key] + [[current_introns[-1][0], current_introns[-1][1]]]
-        except IndexError:
-            print(key, gene)
+        except IndexError: # some genes don't have intronic regions?
             continue
 
 
