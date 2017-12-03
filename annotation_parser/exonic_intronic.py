@@ -157,6 +157,6 @@ for chrom in range(1, 18):
             except ZeroDivisionError:
                 rho = 0
 
-            print(current_chrom, intron_start, intron_end, intron_length, 'e', intron_order, rho, intron_total_rho, count)
+            print(current_chrom, intron_start, intron_end, intron_length, 'i', intron_order, rho, intron_total_rho, count)
 
         intron_order += 1
