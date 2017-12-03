@@ -145,7 +145,7 @@ for chrom in range(1, 18):
             # iterate through exon records
             for record in p.fetch(current_chrom, intron_start, intron_end):
                 try:
-                    assert record.is_exonic
+                    assert record.is_intronic
                 except AssertionError:
                     eprint(current_chrom, intron_start, intron_end, counter)
                     break
