@@ -135,9 +135,9 @@ for chrom in range(1, 18):
             
             p = antr.Reader(table)
 
-            intron = [int(v) for v in exon]
+            intron = [int(v) for v in intron]
 
-            intron_start, intron_end = exon # unpack
+            intron_start, intron_end = intron # unpack
             intron_length = intron_end - intron_start
             intron_total_rho = 0.0
             count = 0
