@@ -145,7 +145,7 @@ for chrom in range(1, 18):
                 try:
                     assert record.is_exonic
                 except AssertionError:
-                    eprint(current_chrom, exon_start, exon_end, counter)
+                    eprint(current_chrom, exon_start, exon_end, count)
                     break
                 exon_total_rho += record.ld_rho
                 count += 1
@@ -179,8 +179,7 @@ for chrom in range(1, 18):
                 try:
                     assert record.is_intronic
                 except AssertionError:
-                    eprint(current_chrom, intron_start, intron_end, counter)
-                    break
+                    continue
                 intron_total_rho += record.ld_rho
                 count += 1
 
