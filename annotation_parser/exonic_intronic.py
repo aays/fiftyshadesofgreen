@@ -63,25 +63,57 @@ for key in genes.keys():
         current_exons = [[int(line[3]), int(line[4])] for line in all_exons \
                         if int(line[3]) >= gene[0] and int(line[4]) <= gene[1]]
 
-        # pull all introns in current gene
-        all_introns = [line for line in gff_filt if line[0] == key and 'intron' in line[2]]
-        current_introns = [[int(line[3]), int(line[4])] for line in all_introns \
-                        if int(line[3]) >= gene[0] and int(line[4]) <= gene[1]]
-
-        try:
-            first_exons[key] = first_exons[key] + [[current_exons[0][0], current_exons[0][1]]]
-            other_exons[key] = other_exons[key] + current_exons[1:-1]
-            last_exons[key] = last_exons[key] + [[current_exons[-1][0], current_exons[-1][1]]]
-        except IndexError:
-            eprint('exon not found at', key, gene)
+        if len(current_exons) == 1:
+            try:
+                first_exons[key] = first_exons[key] + [[current_exons[0][0], current_exons[0][1]]]
+            except IndexError:
+                eprint('exon not found at', key, gene)
+        elif len(current_exons) == 2:
+            try:
+                first_exons[key] = first_exons[key] + [[current_exons[0][0], current_exons[0][1]]]
+                last_exons[key] = last_exons[key] + [[current_exons[-1][0], current_exons[-1][1]]]
+            except IndexError:
+                eprint('exon not found at', key, gene)
+        elif len(current_exons) >= 3:
+            try:
+                first_exons[key] = first_exons[key] + [[current_exons[0][0], current_exons[0][1]]]
+                other_exons[key] = other_exons[key] + current_exons[1:-1]
+                last_exons[key] = last_exons[key] + [[current_exons[-1][0], current_exons[-1][1]]]
+            except IndexError:
+                eprint('exon not found at', key, gene)
             
-        try:
-            first_introns[key] = first_introns[key] + [[current_introns[0][0], current_introns[0][1]]]
-            other_introns[key] = other_introns[key] + current_introns[1:-1]
-            last_introns[key] = last_introns[key] + [[current_introns[-1][0], current_introns[-1][1]]]
-        except IndexError: # some genes don't have intronic regions?
-            continue
+        # get introns in current gene
+        current_introns = []
 
+        for i in range(len(current_exons) - 1):
+            prev_end = current_exons[i][1] # end of current exon
+            next_start = current_exons[i + 1][0] # start of following exon
+            diff = next_start - prev_end
+            if diff: # not 0
+                intron_start = prev_end + 1
+                intron_end = next_start - 1
+                current_introns += [[intron_start, intron_end]]
+
+        if len(current_introns) >= 3: # introns found
+            try:
+                first_introns[key] = first_introns[key] + [[current_introns[0][0], current_introns[0][1]]]
+                other_introns[key] = other_introns[key] + current_introns[1:-1]
+                last_introns[key] = last_introns[key] + [[current_introns[-1][0], current_introns[-1][1]]]
+            except IndexError:
+                continue
+        elif len(current_introns) == 2:
+            try:
+                first_introns[key] = first_introns[key] + [[current_introns[0][0], current_introns[0][1]]]
+                last_introns[key] = last_introns[key] + [[current_introns[-1][0], current_introns[-1][1]]]
+            except IndexError:
+                continue
+        elif len(current_introns) == 1:
+            try:
+                first_introns[key] = first_introns[key] + [[current_introns[0][0], current_introns[0][1]]]
+            except IndexError:
+                continue
+        else:
+            continue
 
 # col headers for file
 print('chromosome', 'start', 'end', 'length', 'type', 'order', 'rho', 'total_rho', 'count')
