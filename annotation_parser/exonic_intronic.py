@@ -89,7 +89,7 @@ for key in genes.keys():
             prev_end = current_exons[i][1] # end of current exon
             next_start = current_exons[i + 1][0] # start of following exon
             diff = next_start - prev_end
-            if diff: # not 0
+            if diff > 0:
                 intron_start = prev_end + 1
                 intron_end = next_start - 1
                 current_introns += [[intron_start, intron_end]]
