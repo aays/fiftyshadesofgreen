@@ -1,6 +1,8 @@
 '''
 quick and dirty hardcoded-paths script to create a new annotation with LDhelmet rho values appended
 
+python3.5 add_ld_rho.py > [output table]
+
 AH - 11/2017
 '''
 
@@ -20,7 +22,7 @@ print('#', '\t'.join(p.cols), sep = '') # add ld_rho to end of colnames
 
 # write records
 for i in range(1, 18):
-    with open('data/ldhelmet_files/finals/genome50/chromosome_{}_50.txt'.format(i)) as f: # hardcoded for proj dir
+    with open('analysis/ldh_test/out{}.txt'.format(i)) as f: # hardcoded for proj dir
         for line in tqdm(f):
             if line.startswith(('#', 'ver')):
                 continue
