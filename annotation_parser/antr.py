@@ -17,8 +17,8 @@ class _Record(object):
     '''A record object - stores all information at a single row in the annotation table.
     '''
     def __init__(self, chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
-        utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types,
-        feature_ID, cds_position, strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination, ld_rho):
+        utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types,feature_ID, cds_position,
+        strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination, mutability, quebec_alleles, ld_rho):
 
         def type_make(ob, ob_type):
             if ob_type == 'bool':
@@ -78,6 +78,8 @@ class _Record(object):
         self.rho = type_make(rho, 'float')
         self.FAIRE = type_make(FAIRE, 'float')
         self.map_rho = type_make(recombination, 'float')
+        self.mutability = type_make(mutability, 'float')
+        self.quebec_alleles = list(quebec_alleles)
         self.ld_rho = type_make(ld_rho, 'float')
 
 
@@ -139,11 +141,11 @@ class Reader(object):
             chromosome, position, reference_base, genic, exonic, intronic, intergenic, \
             utr5, utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, \
             feature_types, feature_ID, cds_position, strand, frame, codon, aa, degen, \
-            FPKM, rho, FAIRE, recombination, ld_rho = row # unpacking list
+            FPKM, rho, FAIRE, recombination, mutability, quebec_alleles, ld_rho = row # unpacking list
 
             record = _Record(chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
-            utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types,
-            feature_ID, cds_position, strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination, ld_rho)
+            utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types, feature_ID, 
+            cds_position, strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination, mutability, quebec_alleles, ld_rho)
 
             return record
 
@@ -174,11 +176,11 @@ class Reader(object):
         chromosome, position, reference_base, genic, exonic, intronic, intergenic, \
         utr5, utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, \
         feature_types, feature_ID, cds_position, strand, frame, codon, aa, degen, \
-        FPKM, rho, FAIRE, recombination, ld_rho = row # unpacking list
+        FPKM, rho, FAIRE, recombination, mutability, quebec_alleles, ld_rho = row # unpacking list
 
         record = _Record(chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
-        utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types,
-        feature_ID, cds_position, strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination, ld_rho) # most args I've ever written...
+        utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types, feature_ID, 
+        cds_position, strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination, mutability, quebec_alleles, ld_rho)
 
         return record
     
@@ -202,11 +204,11 @@ class Reader(object):
             chromosome, position, reference_base, genic, exonic, intronic, intergenic, \
             utr5, utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, \
             feature_types, feature_ID, cds_position, strand, frame, codon, aa, degen, \
-            FPKM, rho, FAIRE, recombination, ld_rho = row # unpacking list
+            FPKM, rho, FAIRE, recombination, mutability, quebec_alleles, ld_rho = row # unpacking list
 
             record = _Record(chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
-            utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types,
-            feature_ID, cds_position, strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination, ld_rho)
+            utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types, feature_ID, 
+            cds_position, strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination, mutability, quebec_alleles, ld_rho)
 
             return record
         
