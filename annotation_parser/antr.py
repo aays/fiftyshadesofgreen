@@ -78,9 +78,9 @@ class _Record(object):
         self.rho = type_make(rho, 'float')
         self.FAIRE = type_make(FAIRE, 'float')
         self.map_rho = type_make(recombination, 'float')
-        self.mutability = type_make(mutability, 'float')
-#       self.quebec_alleles = list(quebec_alleles)
-#       self.ld_rho = type_make(ld_rho, 'float')
+#        self.mutability = type_make(mutability, 'float')
+#        self.quebec_alleles = list(quebec_alleles)
+        self.ld_rho = type_make(ld_rho, 'float')
 
 
 class Reader(object):
