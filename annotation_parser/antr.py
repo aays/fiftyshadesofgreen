@@ -18,7 +18,7 @@ class _Record(object):
     '''
     def __init__(self, chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
         utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types,feature_ID, cds_position,
-        strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination, ld_rho):
+        strand, frame, codon, aa, degen, FPKM, map_rho, FAIRE, recombination, ld_rho):
 
         def type_make(ob, ob_type):
             if ob_type == 'bool':
@@ -75,7 +75,7 @@ class _Record(object):
         self.aa = type_make(aa, 'bool')
         self.degeneracy = type_make(degen, 'int')
         self.FPKM = type_make(FPKM, 'float')
-        self.rho = type_make(rho, 'float')
+        self.map_rho = type_make(map_rho, 'float')
         self.FAIRE = type_make(FAIRE, 'float')
         self.map_rho = type_make(recombination, 'float')
 #        self.mutability = type_make(mutability, 'float')
@@ -141,11 +141,11 @@ class Reader(object):
             chromosome, position, reference_base, genic, exonic, intronic, intergenic, \
             utr5, utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, \
             feature_types, feature_ID, cds_position, strand, frame, codon, aa, degen, \
-            FPKM, rho, FAIRE, recombination, ld_rho = row # unpacking list
+            FPKM, map_rho, FAIRE, recombination, ld_rho = row # unpacking list
 
             record = _Record(chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
             utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types, feature_ID, 
-            cds_position, strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination, ld_rho)
+            cds_position, strand, frame, codon, aa, degen, FPKM, map_rho, FAIRE, recombination, ld_rho)
 
             return record
 
@@ -176,11 +176,11 @@ class Reader(object):
         chromosome, position, reference_base, genic, exonic, intronic, intergenic, \
         utr5, utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, \
         feature_types, feature_ID, cds_position, strand, frame, codon, aa, degen, \
-        FPKM, rho, FAIRE, recombination, ld_rho = row # unpacking list
+        FPKM, map_rho, FAIRE, recombination, ld_rho = row # unpacking list
 
         record = _Record(chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
         utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types, feature_ID, 
-        cds_position, strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination, ld_rho)
+        cds_position, strand, frame, codon, aa, degen, FPKM, map_rho, FAIRE, recombination, ld_rho)
 
         return record
     
@@ -204,11 +204,11 @@ class Reader(object):
             chromosome, position, reference_base, genic, exonic, intronic, intergenic, \
             utr5, utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, \
             feature_types, feature_ID, cds_position, strand, frame, codon, aa, degen, \
-            FPKM, rho, FAIRE, recombination, ld_rho = row # unpacking list
+            FPKM, map_rho, FAIRE, recombination, ld_rho = row # unpacking list
 
             record = _Record(chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
             utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types, feature_ID, 
-            cds_position, strand, frame, codon, aa, degen, FPKM, rho, FAIRE, recombination, ld_rho)
+            cds_position, strand, frame, codon, aa, degen, FPKM, map_rho, FAIRE, recombination, ld_rho)
 
             return record
         
