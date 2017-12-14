@@ -16,8 +16,8 @@ try:
 except ImportError:
     sys.path.append('/scratch/research/projects/chlamydomonas/genomewide_recombination/analysis/fiftyshadesofgreen/annotation_parser/')
 
-parser = argparse.ArgumentParser(description = 'General purpose calculation of rho w/ attributes in defined windows.',
-                                usage = 'antr_correlation.py [options]')
+parser = argparse.ArgumentParser(description = 'Returns rho in first/middle/last exons and introns.',
+                                usage = 'exonic_intronic.py [options]')
 
 parser.add_argument('-g', '--gff', required = True,
                    type = str, help = 'GFF file (.GFF/.GFF3)')
@@ -45,7 +45,7 @@ genes = dict.fromkeys(['chromosome_' + str(i) for i in range(1,18)], [])
 
 for key in genes.keys():
     snippet = [line for line in gff_filt if line[0] == key and 'gene' in line[2]]
-    genes[key] = [[int(line[3]), int(line[4])] for line in snippet]
+    genes[key] = [[int(line[3]), int(line[4]), str(line[6])] for line in snippet] # start, end, strand direction
 
 # create dicts to store coords in
 first_exons = dict.fromkeys(['chromosome_' + str(i) for i in range(1,18)], [])
@@ -58,29 +58,51 @@ last_introns = dict.fromkeys(['chromosome_' + str(i) for i in range(1,18)], [])
 for key in genes.keys():
     for gene in tqdm(genes[key]):
 
+        strand_dir = gene[2]
         # pull all exons in current gene
         all_exons = [line for line in gff_filt if line[0] == key and 'exon' in line[2]]
         current_exons = [[int(line[3]), int(line[4])] for line in all_exons \
                         if int(line[3]) >= gene[0] and int(line[4]) <= gene[1]]
 
-        if len(current_exons) == 1:
-            try:
-                first_exons[key] = first_exons[key] + [[current_exons[0][0], current_exons[0][1]]]
-            except IndexError:
-                eprint('exon not found at', key, gene)
-        elif len(current_exons) == 2:
-            try:
-                first_exons[key] = first_exons[key] + [[current_exons[0][0], current_exons[0][1]]]
-                last_exons[key] = last_exons[key] + [[current_exons[-1][0], current_exons[-1][1]]]
-            except IndexError:
-                eprint('exon not found at', key, gene)
-        elif len(current_exons) >= 3:
-            try:
-                first_exons[key] = first_exons[key] + [[current_exons[0][0], current_exons[0][1]]]
-                other_exons[key] = other_exons[key] + current_exons[1:-1]
-                last_exons[key] = last_exons[key] + [[current_exons[-1][0], current_exons[-1][1]]]
-            except IndexError:
-                eprint('exon not found at', key, gene)
+        if strand_dir == '+':
+            if len(current_exons) == 1:
+                try:
+                    first_exons[key] = first_exons[key] + [[current_exons[0][0], current_exons[0][1]]]
+                except IndexError:
+                    eprint('exon not found at', key, gene)
+            elif len(current_exons) == 2:
+                try:
+                    first_exons[key] = first_exons[key] + [[current_exons[0][0], current_exons[0][1]]]
+                    last_exons[key] = last_exons[key] + [[current_exons[-1][0], current_exons[-1][1]]]
+                except IndexError:
+                    eprint('exon not found at', key, gene)
+            elif len(current_exons) >= 3:
+                try:
+                    first_exons[key] = first_exons[key] + [[current_exons[0][0], current_exons[0][1]]]
+                    other_exons[key] = other_exons[key] + current_exons[1:-1]
+                    last_exons[key] = last_exons[key] + [[current_exons[-1][0], current_exons[-1][1]]]
+                except IndexError:
+                    eprint('exon not found at', key, gene)
+
+        elif strand_dir == '-': # negative strand
+            if len(current_exons) == 1:
+                try:
+                    first_exons[key] = first_exons[key] + [[current_exons[0][0], current_exons[0][1]]]
+                except IndexError:
+                    eprint('exon not found at', key, gene)
+            elif len(current_exons) == 2:
+                try:
+                    first_exons[key] = first_exons[key] + [[current_exons[-1][0], current_exons[-1][1]]]
+                    last_exons[key] = last_exons[key] + [[current_exons[0][0], current_exons[0][1]]]
+                except IndexError:
+                    eprint('exon not found at', key, gene)
+            elif len(current_exons) >= 3:
+                try:
+                    first_exons[key] = first_exons[key] + [[current_exons[-1][0], current_exons[-1][1]]]
+                    other_exons[key] = other_exons[key] + current_exons[1:-1]
+                    last_exons[key] = last_exons[key] + [[current_exons[0][0], current_exons[0][1]]]
+                except IndexError:
+                    eprint('exon not found at', key, gene)
             
         # get introns in current gene
         current_introns = []
@@ -94,26 +116,49 @@ for key in genes.keys():
                 intron_end = next_start - 1
                 current_introns += [[intron_start, intron_end]]
 
-        if len(current_introns) >= 3: # introns found
-            try:
-                first_introns[key] = first_introns[key] + [[current_introns[0][0], current_introns[0][1]]]
-                other_introns[key] = other_introns[key] + current_introns[1:-1]
-                last_introns[key] = last_introns[key] + [[current_introns[-1][0], current_introns[-1][1]]]
-            except IndexError:
+        if strand_dir == '+':
+            if len(current_introns) >= 3: # introns found
+                try:
+                    first_introns[key] = first_introns[key] + [[current_introns[0][0], current_introns[0][1]]]
+                    other_introns[key] = other_introns[key] + current_introns[1:-1]
+                    last_introns[key] = last_introns[key] + [[current_introns[-1][0], current_introns[-1][1]]]
+                except IndexError:
+                    continue
+            elif len(current_introns) == 2:
+                try:
+                    first_introns[key] = first_introns[key] + [[current_introns[0][0], current_introns[0][1]]]
+                    last_introns[key] = last_introns[key] + [[current_introns[-1][0], current_introns[-1][1]]]
+                except IndexError:
+                    continue
+            elif len(current_introns) == 1:
+                try:
+                    first_introns[key] = first_introns[key] + [[current_introns[0][0], current_introns[0][1]]]
+                except IndexError:
+                    continue
+            else:
                 continue
-        elif len(current_introns) == 2:
-            try:
-                first_introns[key] = first_introns[key] + [[current_introns[0][0], current_introns[0][1]]]
-                last_introns[key] = last_introns[key] + [[current_introns[-1][0], current_introns[-1][1]]]
-            except IndexError:
+        elif strand_dir == '-':
+            if len(current_introns) >= 3: # introns found
+                try:
+                    first_introns[key] = first_introns[key] + [[current_introns[-1][0], current_introns[-1][1]]]
+                    other_introns[key] = other_introns[key] + current_introns[1:-1]
+                    last_introns[key] = last_introns[key] + [[current_introns[0][0], current_introns[0][1]]]
+                except IndexError:
+                    continue
+            elif len(current_introns) == 2:
+                try:
+                    first_introns[key] = first_introns[key] + [[current_introns[-1][0], current_introns[-1][1]]]
+                    last_introns[key] = last_introns[key] + [[current_introns[0][0], current_introns[0][1]]]
+                except IndexError:
+                    continue
+            elif len(current_introns) == 1:
+                try:
+                    first_introns[key] = first_introns[key] + [[current_introns[0][0], current_introns[0][1]]]
+                except IndexError:
+                    continue
+            else:
                 continue
-        elif len(current_introns) == 1:
-            try:
-                first_introns[key] = first_introns[key] + [[current_introns[0][0], current_introns[0][1]]]
-            except IndexError:
-                continue
-        else:
-            continue
+
 
 # col headers for file
 print('chromosome', 'start', 'end', 'length', 'type', 'order', 'rho', 'total_rho', 'count')
