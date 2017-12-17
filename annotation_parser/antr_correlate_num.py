@@ -71,14 +71,6 @@ def attr_fetch(rec, attribute):
     out = getattr(rec, rec_attr)
     return out
 
-def gc_calc(chromosome, window, table):
-    '''Returns GC content in given window as proportion.'''
-    seq = ''.join([record.ref for record in antr.Reader(table).fetch(chromosome, window[0], window[1])])
-    total = len(seq)
-    GC = seq.count('G') + seq.count('C')
-    GC_content = GC / total
-    return GC_content
-
 # print column headers
 
 title1 = ' '.join(correlates)
