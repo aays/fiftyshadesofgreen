@@ -77,7 +77,7 @@ class _Record(object):
         self.FPKM = type_make(FPKM, 'float')
         self.map_rho = type_make(map_rho, 'float')
         self.FAIRE = type_make(FAIRE, 'float')
-        self.map_rho = type_make(recombination, 'float')
+        self.recombination = type_make(recombination, 'float')
 #        self.mutability = type_make(mutability, 'float')
 #        self.quebec_alleles = list(quebec_alleles)
         self.ld_rho = type_make(ld_rho, 'float')
