@@ -88,51 +88,51 @@ title4 = ' '.join([item + '_rho' for item in correlates])
 title5 = ' '.join([item + '_rho_totals' for item in correlates])
 title6 = ' '.join([item + '_count' for item in correlates])
 print('chromosome', 'start', 'end', title1, title2, title3, \
-	title4, title5, title6, 'count')
+    title4, title5, title6, 'count')
 
 for chrom in range(1, 18):
-	current_chrom = 'chromosome_{}'.format(str(chrom))
-	windows = list(range(0, lengths[current_chrom], windowsize)) + [lengths[current_chrom]]
+    current_chrom = 'chromosome_{}'.format(str(chrom))
+    windows = list(range(0, lengths[current_chrom], windowsize)) + [lengths[current_chrom]]
 
-	p = antr.Reader(table)
+    p = antr.Reader(table)
 
-	for i in range(len(windows) - 1):
-		window = (windows[i], windows[i + 1])
+    for i in range(len(windows) - 1):
+        window = (windows[i], windows[i + 1])
 
-		if correlates:
-			rho = OrderedDict.fromkeys(correlates, 0.0)
-			corr = OrderedDict.fromkeys(correlates, 0.0)
-			count = OrderedDict.fromkeys(correlates, 0)
-			total_counter = 0
+        if correlates:
+            rho = OrderedDict.fromkeys(correlates, 0.0)
+            corr = OrderedDict.fromkeys(correlates, 0.0)
+            count = OrderedDict.fromkeys(correlates, 0)
+            total_counter = 0
 
-			# iterate through records in window
-			for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
-				for key in correlates:
-					if attr_fetch(record, key) != 'NA' and record.ld_rho != 'NA':
-						rho[key] += record.ld_rho
-						corr[key] += attr_fetch(record, key)
-						count[key] += 1
-						total_counter += 1
-					else:
-						continue
+            # iterate through records in window
+            for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
+                for key in correlates:
+                    if attr_fetch(record, key) != 'NA' and record.ld_rho != 'NA':
+                        rho[key] += record.ld_rho
+                        corr[key] += attr_fetch(record, key)
+                        count[key] += 1
+                        total_counter += 1
+                    else:
+                        continue
 
-			corrvals = list(corr.values())
-			rhovals = list(rho.values())
-			countvals = list(count.values())
+            corrvals = list(corr.values())
+            rhovals = list(rho.values())
+            countvals = list(count.values())
 
-			try:
-				corr_out = ' '.join([str(corrvals[i] / countvals[i]) for i in range(len(corrvals))])
-				corr_totals = ' '.join([str(v) for v in corrvals])
-				rho_out = ' '.join([str(rhovals[i] / countvals[i]) for i in range(len(rhovals))])
-				rho_totals = ' '.join([str(v) for v in rhovals])
-				counts = ' '.join([str(v) for v in countvals])
-			except ZeroDivisionError: # nothing in window
-				corr_out = ' '.join([str(0) for i in range(len(corrvals))])
-				corr_totals = ' '.join([str(0) for v in corrvals])
-				rho_out = ' '.join([str(0) for i in range(len(rhovals))])
-				rho_totals = ' '.join([str(0) for v in rhovals])
-				counts = ' '.join([str(0) for v in countvals])
+            try:
+                corr_out = ' '.join([str(corrvals[i] / countvals[i]) for i in range(len(corrvals))])
+                corr_totals = ' '.join([str(v) for v in corrvals])
+                rho_out = ' '.join([str(rhovals[i] / countvals[i]) for i in range(len(rhovals))])
+                rho_totals = ' '.join([str(v) for v in rhovals])
+                counts = ' '.join([str(v) for v in countvals])
+            except ZeroDivisionError: # nothing in window
+                corr_out = ' '.join([str(0) for i in range(len(corrvals))])
+                corr_totals = ' '.join([str(0) for v in corrvals])
+                rho_out = ' '.join([str(0) for i in range(len(rhovals))])
+                rho_totals = ' '.join([str(0) for v in rhovals])
+                counts = ' '.join([str(0) for v in countvals])
 
             print(current_chrom, window[0], window[1], \
-            	corr_out, corr_totals, rho_out, rho_totals, counts, total_counter)
+                corr_out, corr_totals, rho_out, rho_totals, counts, total_counter)
 
