@@ -4,7 +4,7 @@ TSS + TES, where TSS is the start of UTR5 and
 TES is the start of UTR3 for a given gene in a GFF
 
 usage:
-python3.5 tss_tes.py --gff [.gff] --table [.txt.gz] > out.txt
+python3.5 tss_tes.py --gff [.gff] --table [.txt.gz] --distance [int] > out.txt
 '''
 
 import argparse
@@ -26,7 +26,7 @@ parser.add_argument('-t', '--table', required = True,
     type = str, help = 'Annotation table (.txt.gz)')
 parser.add_argument('-g', '--gff', required = True,
     type = str, help = 'GFF file (.gff/gff3)')
-parser.add_argument('d', '--distance', required = True,
+parser.add_argument('-d', '--distance', required = True,
     type = int, help = 'Distance from TES/TSS to consider')
 
 args = parser.parse_args()
