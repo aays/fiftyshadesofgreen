@@ -39,7 +39,7 @@ print('type distance rho') # colnames
 
 utr_lines = []
 with open(gff, 'r') as f:
-    for line in f:
+    for line in tqdm(f):
 
         p = antr.Reader(table)
 
