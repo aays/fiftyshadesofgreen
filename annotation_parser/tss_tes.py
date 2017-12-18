@@ -35,7 +35,7 @@ args = parser.parse_args()
 
 table = args.table
 gff = args.gff
-distance = args.distance
+distance = int(args.distance)
 chromosome = args.chromosome
 
 print('type distance rho') # colnames
@@ -50,6 +50,8 @@ with open(gff, 'r') as f:
 
                 sp = line.split('\t')[0:7] # type start end . strand
                 chrom, origin, utr, start, end, junk, strand = sp
+                start = int(start)
+                end = int(end)
 
                 if 'five' in utr: # 5' UTR
                     if strand == '+':
