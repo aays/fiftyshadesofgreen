@@ -61,7 +61,12 @@ if windowsize:
                 rho_cumulative += record.ld_rho
                 count += 1
             
-            rho_out = rho_cumulative / count
+            try:
+                rho_out = rho_cumulative / count
+            except ZeroDivisionError:
+                assert count == 0
+                rho_out = 0
+                
             if feature_type == 'TSS' and strand == '+':
                 windowleft_out = windowleft - start
                 windowright_out = windowright - start
