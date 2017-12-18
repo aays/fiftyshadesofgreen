@@ -79,7 +79,7 @@ title3 = ' '.join([item + '_rho' for item in correlates])
 title4 = ' '.join([item + '_rho_totals' for item in correlates])
 title5 = ' '.join([item + '_count' for item in correlates])
 print('chromosome', 'start', 'end', title1, title2, title3, \
-    title4, title5, 'count')
+    title4, title5, 'iter_count', 'record_count')
 
 for chrom in range(1, 18):
     current_chrom = 'chromosome_{}'.format(str(chrom))
@@ -95,6 +95,7 @@ for chrom in range(1, 18):
             corr = OrderedDict.fromkeys(correlates, 0.0)
             count = OrderedDict.fromkeys(correlates, 0)
             total_counter = 0
+            record_counter = 0
 
             # iterate through records in window
             for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
@@ -106,6 +107,7 @@ for chrom in range(1, 18):
                         total_counter += 1
                     else:
                         continue
+                record_counter += 1
 
             corrvals = list(corr.values())
             rhovals = list(rho.values())
@@ -125,5 +127,5 @@ for chrom in range(1, 18):
                 counts = ' '.join([str(0) for v in countvals])
 
             print(current_chrom, window[0], window[1], \
-                corr_out, corr_totals, rho_out, rho_totals, counts, total_counter)
+                corr_out, corr_totals, rho_out, rho_totals, counts, total_counter, record_counter)
 
