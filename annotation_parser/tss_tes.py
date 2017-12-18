@@ -150,8 +150,8 @@ with open(gff, 'r') as f:
                             singlecalc('TES', strand, distance, table, chromosome, region_inside, start, end)
 
                         elif windowsize:
-                            windowcalc('TES', strand, distance, table, chromosome, region_outside, start, end)
-                            windowcalc('TES', strand, distance, table, chromosome, region_inside, start, end)
+                            windowcalc('TES', strand, distance, windowsize, table, chromosome, region_outside, start, end)
+                            windowcalc('TES', strand, distance, windowsize, table, chromosome, region_inside, start, end)
 
                     elif strand == '-':
                         region_outside = (start - distance, start)
@@ -162,5 +162,5 @@ with open(gff, 'r') as f:
                             singlecalc('TES', strand, distance, table, chromosome, region_inside, start, end)
 
                         elif windowsize:
-                            windowcalc('TES', strand, distance, table, chromosome, region_outside, start, end)
-                            windowcalc('TES', strand, distance, table, chromosome, region_inside, start, end)
+                            windowcalc('TES', strand, distance, windowsize, table, chromosome, region_outside, start, end)
+                            windowcalc('TES', strand, distance, windowsize, table, chromosome, region_inside, start, end)
