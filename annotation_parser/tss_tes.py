@@ -99,8 +99,8 @@ else: # no windowsize
             elif feature_type == 'TES' and strand == '-':
                 dist = start - record.pos
 
-        out = ' '.join([feature_type, str(dist), str(rho)])
-        print(out)
+            out = ' '.join([feature_type, str(dist), str(rho)])
+            print(out)
 
 
 with open(gff, 'r') as f:
