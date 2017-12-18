@@ -57,7 +57,7 @@ if windowsize:
             rho_cumulative = 0.0
             count = 0
                           
-            for record in p.fetch(chromosome, region[0], region[1]):
+            for record in p.fetch(chromosome, windowleft, windowright):
                 rho_cumulative += record.ld_rho
                 count += 1
             
