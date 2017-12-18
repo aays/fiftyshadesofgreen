@@ -73,14 +73,13 @@ def attr_fetch(rec, attribute):
 
 # print column headers
 
-title1 = ' '.join(correlates)
-title2 = ' '.join([item + '_values' for item in correlates])
-title3 = ' '.join([item + '_values_totals' for item in correlates])
-title4 = ' '.join([item + '_rho' for item in correlates])
-title5 = ' '.join([item + '_rho_totals' for item in correlates])
-title6 = ' '.join([item + '_count' for item in correlates])
+title1 = ' '.join([item + '_values' for item in correlates])
+title2 = ' '.join([item + '_values_totals' for item in correlates])
+title3 = ' '.join([item + '_rho' for item in correlates])
+title4 = ' '.join([item + '_rho_totals' for item in correlates])
+title5 = ' '.join([item + '_count' for item in correlates])
 print('chromosome', 'start', 'end', title1, title2, title3, \
-    title4, title5, title6, 'count')
+    title4, title5, 'count')
 
 for chrom in range(1, 18):
     current_chrom = 'chromosome_{}'.format(str(chrom))
