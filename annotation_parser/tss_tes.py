@@ -62,14 +62,14 @@ with open(gff, 'r') as f:
                             rho = record.ld_rho
                             dist = record.pos - start
                             assert dist <= 0
-                            out = ' '.join(['TSS', dist, rho])
+                            out = ' '.join(['TSS', str(dist), str(rho)])
                             print(out)
 
                         for record in p.fetch(chrom, region_inside[0], region_inside[1]): # 'right side' of TSS
                             rho = record.ld_rho
                             dist = record.pos - start
                             assert dist >= 0
-                            out = ' '.join(['TSS', dist, rho])
+                            out = ' '.join(['TSS', str(dist), str(rho)])
                             print(out)
 
                     if strand == '-':
@@ -80,14 +80,14 @@ with open(gff, 'r') as f:
                             rho = record.ld_rho
                             dist = end - record.pos
                             assert dist <= 0
-                            out = ' '.join(['TSS', dist, rho])
+                            out = ' '.join(['TSS', str(dist), str(rho)])
                             print(out)
 
                         for record in p.fetch(chrom, region_inside[0], region_inside[1]):
                             rho = record.ld_rho
                             dist = end - record.pos
                             assert dist >= 0
-                            out = ' '.join(['TSS', dist, rho])
+                            out = ' '.join(['TSS', str(dist), str(rho)])
 
                 elif 'three' in utr: # 3' UTR - outside gene is POSITIVE and inside gene is NEGATIVE
                     if strand == '+':
@@ -98,14 +98,14 @@ with open(gff, 'r') as f:
                             rho = record.ld_rho
                             dist = record.pos - end
                             assert dist >= 0
-                            out = ' '.join(['TES', dist, rho])
+                            out = ' '.join(['TES', str(dist), str(rho)])
                             print(out)
 
                         for record in p.fetch(chrom, region_inside[0], region_inside[1]):
                             rho = record.ld_rho
                             dist = record.pos - end
                             assert dist <= 0
-                            out = ' '.join(['TES', dist, rho])
+                            out = ' '.join(['TES', str(dist), str(rho)])
                             print(out)
 
                     if strand == '-':
@@ -116,11 +116,11 @@ with open(gff, 'r') as f:
                             rho = record.ld_rho
                             dist = start - record.pos
                             assert dist >= 0
-                            out = ' '.join(['TES', dist, rho])
+                            out = ' '.join(['TES', str(dist), str(rho)])
                             print(out)
 
                         for record in p.fetch(chrom, region_inside[0], region_inside[1]):
                             rho = record.ld_rho
                             dist = start - record.pos
                             assert dist <= 0
-                            out = ' '.join(['TES', dist, rho])
+                            out = ' '.join(['TES', str(dist), str(rho)])
