@@ -42,7 +42,7 @@ windowsize = args.windowsize
 
 if windowsize:
     
-    print('type dist rho rho_total rho_count') # colnames
+    print('type windowleft windowright rho rho_total rho_count') # colnames
 
     def windowcalc(feature_type, strand, distance, windowsize, table, chromosome, region, start, end):
         '''Where region is a tuple of size 2, indicating the start and the end of the region
