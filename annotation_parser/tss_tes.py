@@ -122,8 +122,12 @@ with open(gff, 'r') as f:
 
                 if 'five' in utr:
                     if strand == '+':
-                        region_outside = (start - distance, start)
-                        region_inside = (start, start + distance)
+                        if start > distance:
+                            region_outside = (start - distance, start)
+                            region_inside = (start, start + distance)
+                        else:
+                            region_outside = (0, start)
+                            region_instide = (start, start + distance)
 
                         if not windowsize:
                             singlecalc('TSS', strand, distance, table, chromosome, region_outside, start, end)
