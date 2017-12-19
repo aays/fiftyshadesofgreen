@@ -138,8 +138,12 @@ with open(gff, 'r') as f:
                             windowcalc('TSS', strand, distance, windowsize, table, chromosome, region_inside, start, end)
 
                     elif strand == '-':
-                        region_outside = (end, end + distance)
-                        region_inside = (end - distance, end)
+                        if end > distance:
+                            region_outside = (end, end + distance)
+                            region_inside = (end - distance, end)
+                        else:
+                            region_outside = (end, end + distance)
+                            region_inside = (0, end)
                         
                         if not windowsize:
                             singlecalc('TSS', strand, distance, table, chromosome, region_outside, start, end)
@@ -151,8 +155,12 @@ with open(gff, 'r') as f:
 
                 elif 'three' in utr:
                     if strand == '+':
-                        region_outside = (end, end + distance)
-                        region_inside = (end - distance, end)
+                        if end > distance:
+                            region_outside = (end, end + distance)
+                            region_inside = (end - distance, end)
+                        else:
+                            region_outside = (end, end + distance)
+                            region_inside = (0, end)
 
                         if not windowsize:
                             singlecalc('TES', strand, distance, table, chromosome, region_outside, start, end)
@@ -163,8 +171,12 @@ with open(gff, 'r') as f:
                             windowcalc('TES', strand, distance, windowsize, table, chromosome, region_inside, start, end)
 
                     elif strand == '-':
-                        region_outside = (start - distance, start)
-                        region_inside = (start, start + distance)
+                        if start > distance:
+                            region_outside = (start - distance, start)
+                            region_inside = (start, start + distance)
+                        else:
+                            region_outside = (0, start)
+                            region_inside = (start, start + distance)
                         
                         if not windowsize:
                             singlecalc('TES', strand, distance, table, chromosome, region_outside, start, end)
