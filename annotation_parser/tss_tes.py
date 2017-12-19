@@ -127,7 +127,7 @@ with open(gff, 'r') as f:
                             region_inside = (start, start + distance)
                         else:
                             region_outside = (0, start)
-                            region_instide = (start, start + distance)
+                            region_inside = (start, start + distance)
 
                         if not windowsize:
                             singlecalc('TSS', strand, distance, table, chromosome, region_outside, start, end)
