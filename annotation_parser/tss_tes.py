@@ -49,6 +49,7 @@ if windowsize:
         i.e. windowcalc('TES', '+', 20, 'table.txt.gz', 'chromosome_2', (900, 1000), 16200, 17300)'''
         
         windowlist = list(range(region[0], region[1] + 1, windowsize))
+        windowlist = [w for w in windowlist if w >= 0].sort()
         
         p = antr.Reader(table)
         
