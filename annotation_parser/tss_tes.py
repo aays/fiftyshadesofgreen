@@ -49,8 +49,6 @@ if windowsize:
         i.e. windowcalc('TES', '+', 20, 'table.txt.gz', 'chromosome_2', (900, 1000), 16200, 17300)'''
         
         windowlist = list(range(region[0], region[1] + 1, windowsize))
-        print(windowlist)
-        #windowlist = [w for w in windowlist if w >= 0].sort()
         
         p = antr.Reader(table)
         
@@ -128,7 +126,7 @@ with open(gff, 'r') as f:
                             region_outside = (start - distance, start)
                             region_inside = (start, start + distance)
                         else:
-                            region_outside = (0, start)
+                            region_outside = (start % windowsize, start)
                             region_inside = (start, start + distance)
 
                         if not windowsize:
@@ -145,7 +143,7 @@ with open(gff, 'r') as f:
                             region_inside = (end - distance, end)
                         else:
                             region_outside = (end, end + distance)
-                            region_inside = (0, end)
+                            region_inside = (end % windowsize, end)
                         
                         if not windowsize:
                             singlecalc('TSS', strand, distance, table, chromosome, region_outside, start, end)
@@ -162,7 +160,7 @@ with open(gff, 'r') as f:
                             region_inside = (end - distance, end)
                         else:
                             region_outside = (end, end + distance)
-                            region_inside = (0, end)
+                            region_inside = (end % windowsize, end)
 
                         if not windowsize:
                             singlecalc('TES', strand, distance, table, chromosome, region_outside, start, end)
@@ -177,7 +175,7 @@ with open(gff, 'r') as f:
                             region_outside = (start - distance, start)
                             region_inside = (start, start + distance)
                         else:
-                            region_outside = (0, start)
+                            region_outside = (start % windowsize, start)
                             region_inside = (start, start + distance)
                         
                         if not windowsize:
