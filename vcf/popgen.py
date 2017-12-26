@@ -215,7 +215,9 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
     and pos (in the format 'start-end') will fetch just that 
     subset of the VCF.
     '''
+    
     vcfin = vcf.Reader(filename = vcf_file, compressed = True)
+    outlist = []
     
     # filters
     def hardsnpcheck(record):
@@ -254,26 +256,26 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
             end = int(pos[1])
             snippet = vcfin.fetch(chrom = chrom, start = start, end = end) 
             if snpsonly:
-                reclist = [record for record in snippet if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record)]
+                outlist = [record for record in snippet if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record)]
             elif not snpsonly:
-                reclist = [record for record in snippet]
+                outlist = [record for record in snippet]
         except:
             print('Error in pos parameter.')
             print('Please enter positions in a start-end format with no spaces.')
     elif chrom is not None and pos is None:
         snippet = vcfin.fetch(chrom = chrom)
         if snpsonly:
-            reclist = [record for record in snippet if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record)]
+            outlist = [record for record in snippet if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record)]
         elif not snpsonly:
-            reclist = [record for record in snippet]
+            outlist = [record for record in snippet]
     elif chrom is None and pos is not None:
         print('Error - positions supplied without chromosome specification.')
     else:
         if snpsonly:
-            reclist = [record for record in vcfin if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record)]
+            outlist = [record for record in vcfin if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record)]
         elif not snpsonly:
-            reclist = [record for record in vcfin]
-    return reclist
+            outlist = [record for record in vcfin]
+    return outlist
 
 def reclook(reclist, pos):
     '''Convenience function. If VCF records are saved to a list 
