@@ -18,7 +18,7 @@ class _Record(object):
     '''
     def __init__(self, chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
         utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types,feature_ID, cds_position,
-        strand, frame, codon, aa, degen, FPKM, map_rho, FAIRE, recombination, ld_rho):
+        strand, frame, codon, aa, degen, FPKM, map_rho, FAIRE, recombination, mutability, quebec_alleles, ld_rho):
 
         def type_make(ob, ob_type):
             if ob_type == 'bool':
@@ -78,8 +78,8 @@ class _Record(object):
         self.map_rho = type_make(map_rho, 'float')
         self.FAIRE = type_make(FAIRE, 'float')
         self.recombination = type_make(recombination, 'float')
-#        self.mutability = type_make(mutability, 'float')
-#        self.quebec_alleles = list(quebec_alleles)
+        self.mutability = type_make(mutability, 'float')
+        self.quebec_alleles = ':'.split(quebec_alleles)
         self.ld_rho = type_make(ld_rho, 'float')
 
 
@@ -136,16 +136,16 @@ class Reader(object):
             tab-split lines.
             '''
             row = line.rstrip().split('\t')
-            assert len(row) == 31
+            assert len(row) == 33
             
             chromosome, position, reference_base, genic, exonic, intronic, intergenic, \
             utr5, utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, \
             feature_types, feature_ID, cds_position, strand, frame, codon, aa, degen, \
-            FPKM, map_rho, FAIRE, recombination, ld_rho = row # unpacking list
+            FPKM, map_rho, FAIRE, recombination, mutability, quebec_alleles, ld_rho = row # unpacking list
 
             record = _Record(chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
             utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types, feature_ID, 
-            cds_position, strand, frame, codon, aa, degen, FPKM, map_rho, FAIRE, recombination, ld_rho)
+            cds_position, strand, frame, codon, aa, degen, FPKM, map_rho, FAIRE, recombination, mutability, quebec_alleles, ld_rho)
 
             return record
 
@@ -171,16 +171,16 @@ class Reader(object):
         '''Return next record in file.'''
         line = next(self.reader)
         row = line.rstrip().split('\t')
-        assert len(row) == 31
+        assert len(row) == 33
 
         chromosome, position, reference_base, genic, exonic, intronic, intergenic, \
         utr5, utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, \
         feature_types, feature_ID, cds_position, strand, frame, codon, aa, degen, \
-        FPKM, map_rho, FAIRE, recombination, ld_rho = row # unpacking list
+        FPKM, map_rho, FAIRE, recombination, mutability, quebec_alleles, ld_rho = row # unpacking list
 
         record = _Record(chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
         utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types, feature_ID, 
-        cds_position, strand, frame, codon, aa, degen, FPKM, map_rho, FAIRE, recombination, ld_rho)
+        cds_position, strand, frame, codon, aa, degen, FPKM, map_rho, FAIRE, recombination, mutability, quebec_alleles, ld_rho)
 
         return record
     
@@ -199,16 +199,16 @@ class Reader(object):
             to be doing this, but I don't know what that better way is for the life of me.
             '''
             row = line.rstrip().split('\t')
-            assert len(row) == 31
+            assert len(row) == 33
 
             chromosome, position, reference_base, genic, exonic, intronic, intergenic, \
             utr5, utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, \
             feature_types, feature_ID, cds_position, strand, frame, codon, aa, degen, \
-            FPKM, map_rho, FAIRE, recombination, ld_rho = row # unpacking list
+            FPKM, map_rho, FAIRE, recombination, mutability, quebec_alleles, ld_rho = row # unpacking list
 
             record = _Record(chromosome, position, reference_base, genic, exonic, intronic, intergenic, utr5,
             utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, feature_types, feature_ID, 
-            cds_position, strand, frame, codon, aa, degen, FPKM, map_rho, FAIRE, recombination, ld_rho)
+            cds_position, strand, frame, codon, aa, degen, FPKM, map_rho, FAIRE, recombination, mutability, quebec_alleles, ld_rho)
 
             return record
         
