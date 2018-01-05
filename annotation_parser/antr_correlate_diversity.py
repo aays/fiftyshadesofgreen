@@ -124,12 +124,12 @@ for chrom in range(1, 18):
             else:
                 continue
             record_counter += 1
-        
-        curr_div = SFS_from_antr(table, current_chrom, window[0], window[1], min_alleles = min_alleles, neutral_only = neutral_only)
 
         try:
             rho_out = rho / count
+            curr_div = SFS_from_antr(table, current_chrom, window[0], window[1], min_alleles = min_alleles, neutral_only = neutral_only)
         except ZeroDivisionError: # nothing in window
             rho_out = 0
+            curr_div = 0
 
         print(current_chrom, window[0], window[1], curr_div, rho_out, rho, count, record_counter)
