@@ -84,7 +84,7 @@ def MAF_from_allele_count(allele_counts, min_alleles = None):
 def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_only = False):
     SFSs = {}
     p = antr.Reader(table)
-    for record in tqdm(p.fetch(chromosome, start - 1, end)):
+    for record in tqdm(p.fetch(chromosome, start, end)):
         # diversity calc
         allele_counts = record.quebec_alleles
         if neutral_only and True not in [record.is_intergenic, record.is_intronic, record.is_fold4]:
@@ -101,10 +101,7 @@ def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_onl
     diversity = sum([sfs.theta_pi() * sfs.sites() for sfs in SFSs.values()]) / sum([sfs.sites() for sfs in SFSs.values()])
     return diversity
 
-
-
 # print column headers
-
 print('chromosome', 'start', 'end', 'diversity', 'rho', 'rho_total', 'rho_count', 'iter_count')
 
 for chrom in range(1, 18):
@@ -128,7 +125,7 @@ for chrom in range(1, 18):
                 continue
             record_counter += 1
         
-        curr_div = SFS_from_antr(table, chrom, window[0], window[1], min_alleles = min_alleles, neutral_only = neutral_only)
+        curr_div = SFS_from_antr(table, current_chrom, window[0], window[1], min_alleles = min_alleles, neutral_only = neutral_only)
 
         try:
             rho_out = rho / count
