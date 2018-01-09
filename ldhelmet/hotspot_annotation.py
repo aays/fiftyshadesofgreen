@@ -9,6 +9,7 @@ AH - 01/2018
 '''
 
 import sys
+import argparse
 from tqdm import tqdm
 
 try:
