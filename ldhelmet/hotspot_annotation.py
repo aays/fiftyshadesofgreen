@@ -38,7 +38,7 @@ with open(filename, 'r') as f:
             continue
         else:
             sp = line.rstrip().split(',')
-            chrom, start, end = sp[1:4]
+            chrom, start, end = sp[1], int(sp[2]), int(sp[3])
 
             p = antr.Reader(table)
 
