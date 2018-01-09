@@ -3,7 +3,7 @@ where are hotspots located?
 
 script should take in a flat file, select columns of interest, and loop through the annotation table using the boolean attributes
 
-python3.5 hotspot_annotation.py
+python3.5 hotspot_annotation.py -t [table (.txt.gz)] -f [hotspot file (.txt/csv)] > [out (.txt)]
 
 AH - 01/2018
 '''
