@@ -16,7 +16,7 @@ p.cols = [item.strip() for item in p.cols]
 print('#', '\t'.join(p.cols), sep = '') # add ld_rho to end of colnames
 
 # write records
-with open('data/methylation/beta_vals_no_context.bed', 'f') as f:
+with open('data/methylation/beta_vals_no_context.bed', 'r') as f:
     for line in tqdm(f):
         split = [i.rstrip() for i in line.split('\t')]
         chrom, c_pos, beta = str(split[0]), int([split[1]]), float(split[3])
