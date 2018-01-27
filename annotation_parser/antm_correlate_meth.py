@@ -97,8 +97,9 @@ for chrom in range(1, 18):
             rho_out = rho / count
             meth_out = meth / count
         except ZeroDivisionError: # nothing in window
-            rho_out = 0
-            meth_out = 0
+            continue
+            #rho_out = 0
+            #meth_out = 0
 
         print(current_chrom, window[0], window[1], rho_out, rho, meth_out, meth, count, record_counter)
 
