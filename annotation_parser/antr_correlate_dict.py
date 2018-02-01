@@ -149,13 +149,13 @@ for chrom in range(1, 18):
                 for key in rho.keys():
                     if attr_fetch(record, key) and not record.ld_rho == 'NA':
 
-                        if key == 'intergenic' and attr_fetch(record, 'intergenic') and gene_context:
-                            if check_gene_proximity(record, gene_context, 'u'):
+                        if key == 'intergenic' and attr_fetch(record, 'intergenic') and context_size:
+                            if check_gene_proximity(record, context_size, 'u'):
                                 rho['upstream'] += record.ld_rho
                                 count['upstream'] += 1
                                 total_counter += 1
                                 continue # skip ahead - don't class this in both upstream + intergenic
-                            if check_gene_proximity(record, gene_context, 'd'): # not elif - a site could be both...
+                            if check_gene_proximity(record, context_size, 'd'): # not elif - a site could be both...
                                 rho['downstream'] += record.ld_rho
                                 count['downstream'] += 1
                                 total_counter += 1
