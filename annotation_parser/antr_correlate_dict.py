@@ -70,6 +70,8 @@ lengths = {'chromosome_1': 8033585,
 def attr_fetch(rec, attribute):
     '''(rec, str) -> bool/float
     Used for fetching desired attributes from a record.'''
+    if attribute == 'upstream' or attribute == 'downstream':
+        return None
     rec_attr = [item for item in dir(rec) if '__' not in item and attribute in item]
     try:
         assert len(rec_attr) == 1
@@ -147,8 +149,10 @@ for chrom in range(1, 18):
             # iterate through records in window
             for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
                 for key in rho.keys():
-                    if attr_fetch(record, key) and not record.ld_rho == 'NA':
-
+                    if key in ['upstream', 'downstream']:
+                        continue
+                        
+                    elif attr_fetch(record, key) and not record.ld_rho == 'NA':
                         if key == 'intergenic' and attr_fetch(record, 'intergenic') and context_size:
                             if check_gene_proximity(record, context_size, 'u'):
                                 rho['upstream'] += record.ld_rho
