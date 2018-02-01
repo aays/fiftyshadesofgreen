@@ -32,6 +32,8 @@ parser.add_argument('-c', '--correlates', required = False,
                    type = str, nargs = '+', help = 'Space separated list of correlates. Be as exact with naming as possible.')
 parser.add_argument('-g', '--gc_content', required = False,
                    action = 'store_true', help = 'Include GC content in output file? (Optional)')
+parser.add_argument('-x', '--gene_context', required = False,
+                   type = int, help = 'Report rho for regions of x kb downstream and upstream of all genes. (Optional)')
 
 args = parser.parse_args()
 
@@ -39,6 +41,7 @@ table = args.table
 windowsize = int(args.windowsize)
 correlates = args.correlates
 gc = args.gc_content
+context_size = args.gene_context
 
 if not correlates and not gc:
     print('Please provide one or more correlates.')
@@ -84,8 +87,38 @@ def gc_calc(chromosome, window, table):
     GC_content = GC / total
     return GC_content
 
+def check_gene_proximity(rec, dist, direction):
+    '''(rec, int, str) -> bool
+    dir = 'u' for upstream, 'd' for downstream
+    '''
+    p = antr.Reader(table)
+
+    try: # in case site hits end of chrom
+        if direction == 'u':
+            region = p.fetch(record.chrom, record.pos, record.pos + dist)
+        elif direction == 'd':
+            region = p.fetch(record.chrom, record.pos - dist, record.pos)
+        else:
+            print('Invalid argument provided to direction.')
+            print('Valid arguments are: u (upstream) and d (downstream)')
+        for record in region:
+            if record.is_genic:
+                out = True
+                break
+            else:
+                continue
+        if out:
+            return True
+        elif not out:
+            return False
+    except:
+        return False
+
+
 # print column headers
 if correlates:
+    if context_size: # ie upstream/downstream of genes
+        correlates.extend(['upstream', 'downstream'])
     title1 = ' '.join(correlates)
     title2 = ' '.join([item + '_total' for item in correlates])
     title3 = ' '.join([item + '_count' for item in correlates])
@@ -115,6 +148,21 @@ for chrom in range(1, 18):
             for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
                 for key in rho.keys():
                     if attr_fetch(record, key) and not record.ld_rho == 'NA':
+
+                        if key == 'intergenic' and attr_fetch(record, 'intergenic') and gene_context:
+                            if check_gene_proximity(record, gene_context, 'u'):
+                                rho['upstream'] += record.ld_rho
+                                count['upstream'] += 1
+                                total_counter += 1
+                                continue # skip ahead - don't class this in both upstream + intergenic
+                            if check_gene_proximity(record, gene_context, 'd'): # not elif - a site could be both...
+                                rho['downstream'] += record.ld_rho
+                                count['downstream'] += 1
+                                total_counter += 1
+                                continue
+                            else: # intergenic, but neither of the above
+                                pass
+
                         rho[key] += record.ld_rho
                         count[key] += 1
                         total_counter += 1
