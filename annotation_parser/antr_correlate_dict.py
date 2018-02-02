@@ -89,7 +89,7 @@ def gc_calc(chromosome, window, table):
     GC_content = GC / total
     return GC_content
 
-def check_gene_proximity(rec, dist, direction):
+def check_gene_proximity(record, dist, direction):
     '''(rec, int, str) -> bool
     dir = 'u' for upstream, 'd' for downstream
     '''
@@ -121,13 +121,12 @@ def check_gene_proximity(rec, dist, direction):
 if correlates:
     if context_size: # ie upstream/downstream of genes
         correlates.extend(['upstream', 'downstream'])
-    title1 = ' '.join(correlates)
-    title2 = ' '.join([item + '_total' for item in correlates])
-    title3 = ' '.join([item + '_count' for item in correlates])
+    title1 = ' '.join([item + '_total' for item in correlates])
+    title2 = ' '.join([item + '_count' for item in correlates])
     if gc:
-        print('chromosome', 'start', 'end', title1, title2, title3, 'GC%', 'count')
+        print('chromosome', 'start', 'end', title1, title2, 'GC%', 'count')
     elif not gc:
-        print('chromosome', 'start', 'end', title1, title2, title3, 'count')    
+        print('chromosome', 'start', 'end', title1, title2, 'count')    
 elif gc and not correlates:
     print('chromosome', 'start', 'end', 'GC%', 'rho', 'rho_total', 'count')
 
@@ -176,14 +175,8 @@ for chrom in range(1, 18):
             rhovals = list(rho.values())
             countvals = list(count.values())
 
-            try:
-                allvals = ' '.join([str(rhovals[i] / countvals[i]) for i in range(len(rhovals))])
-                totals = ' '.join([str(v) for v in rhovals])
-                counts = ' '.join([str(v) for v in countvals])
-            except ZeroDivisionError: # nothing in window
-                allvals = ' '.join([str(0) for i in range(len(rhovals))])
-                totals = ' '.join([str(0) for v in rhovals])
-                counts = ' '.join([str(0) for v in countvals])
+            totals = ' '.join([str(v) for v in rhovals])
+            counts = ' '.join([str(v) for v in countvals])
             
         if gc: # gc content option selected
             gc_rho = 0.0
@@ -197,8 +190,8 @@ for chrom in range(1, 18):
             gc_rho_perbp = gc_rho / gc_counter
             
             if correlates:
-                print(current_chrom, window[0], window[1], allvals, totals, counts, gc_window, total_counter)
+                print(current_chrom, window[0], window[1], totals, counts, gc_window, total_counter)
             elif not correlates:
                 print(current_chrom, window[0], window[1], gc_window, gc_rho_perbp, gc_rho, gc_counter)
         elif not gc:
-            print(current_chrom, window[0], window[1], allvals, totals, counts, total_counter)
+            print(current_chrom, window[0], window[1], totals, counts, total_counter)
