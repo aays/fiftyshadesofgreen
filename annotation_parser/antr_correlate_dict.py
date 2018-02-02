@@ -173,7 +173,7 @@ for chrom in range(1, 18):
                                 count['both'] += 1 # don't increment total counter
                             elif upstream or downstream:
                                 continue # ie don't class as plain intergenic
-                            else neither: # continue to the code below
+                            elif neither: # continue to the code below
                                 pass
 
                         rho[key] += record.ld_rho
