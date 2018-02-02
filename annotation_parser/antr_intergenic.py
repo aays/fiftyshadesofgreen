@@ -109,7 +109,7 @@ for chrom in range(1, 18):
         count = OrderedDict.fromkeys(['upstream', 'downstream', 'intergenic', 'both'], 0)
         total_counter = 0
 
-        for record in tqdm(p.fetch(current_chrom), window[0], window[1]):
+        for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
             if record.is_intergenic:
                 total_counter += 1
                 if check_gene_proximity(record, context_size, 'u'):
