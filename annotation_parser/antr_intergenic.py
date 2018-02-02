@@ -33,11 +33,6 @@ table = args.table
 windowsize = int(args.windowsize)
 context_size = args.gene_context
 
-if not correlates and not gc:
-    print('Please provide one or more correlates.')
-    print('This could also be just GC content (use --gc_content without providing anything to -c)')
-    sys.exit(1)
-
 # chromosome lengths - hardcoded for chlamy
 lengths = {'chromosome_1': 8033585,
 'chromosome_2': 9223677,
