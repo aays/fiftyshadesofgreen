@@ -111,17 +111,22 @@ for chrom in range(1, 18):
 
         for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
             if record.is_intergenic:
+                upstream = False
+                downstream = False
+                neither = True
                 total_counter += 1
                 if check_gene_proximity(record, context_size, 'u'):
                     rho['upstream'] += record.ld_rho
                     count['upstream'] += 1
+                    upstream = True
                 if check_gene_proximity(record, context_size, 'd'):
                     rho['downstream'] += record.ld_rho
                     count['downstream'] += 1
-                if check_gene_proximity(record, context_size, 'u') and check_gene_proximity(record, context_size, 'd'):
+                    downstream = True
+                if upstream and downstream:
                     rho['both'] += record.ld_rho
                     count['both'] += 1
-                elif not check_gene_proximity(record, context_size, 'u') and not check_gene_proximity(record, context_size, 'd'):
+                elif neither:
                     rho['intergenic'] += record.ld_rho
                     count['intergenic'] += 1
             else:
