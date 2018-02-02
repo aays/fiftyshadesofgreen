@@ -120,7 +120,7 @@ def check_gene_proximity(record, dist, direction):
 # print column headers
 if correlates:
     if context_size: # ie upstream/downstream of genes
-        correlates.extend(['upstream', 'downstream'])
+        correlates.extend(['upstream', 'downstream', 'both'])
     title1 = ' '.join([item + '_total' for item in correlates])
     title2 = ' '.join([item + '_count' for item in correlates])
     if gc:
@@ -148,22 +148,32 @@ for chrom in range(1, 18):
             # iterate through records in window
             for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
                 for key in rho.keys():
-                    if key in ['upstream', 'downstream']:
+                    if key in ['upstream', 'downstream', 'both']:
                         continue
                         
                     elif attr_fetch(record, key) and not record.ld_rho == 'NA':
                         if key == 'intergenic' and attr_fetch(record, 'intergenic') and context_size:
+                            neither = True
+                            upstream = False
+                            downstream = False
                             if check_gene_proximity(record, context_size, 'u'):
                                 rho['upstream'] += record.ld_rho
                                 count['upstream'] += 1
                                 total_counter += 1
-                                continue # skip ahead - don't class this in both upstream + intergenic
+                                neither = False
+                                upstream = True
                             if check_gene_proximity(record, context_size, 'd'): # not elif - a site could be both...
                                 rho['downstream'] += record.ld_rho
                                 count['downstream'] += 1
                                 total_counter += 1
-                                continue
-                            else: # intergenic, but neither of the above
+                                neither = False
+                                downstream = True
+                            if upstream and downstream:
+                                rho['both'] += record.ld_rho
+                                count['both'] += 1 # don't increment total counter
+                            elif upstream or downstream:
+                                continue # ie don't class as plain intergenic
+                            else neither: # continue to the code below
                                 pass
 
                         rho[key] += record.ld_rho
