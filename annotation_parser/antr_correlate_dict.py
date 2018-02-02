@@ -171,7 +171,7 @@ for chrom in range(1, 18):
                             if upstream and downstream:
                                 rho['both'] += record.ld_rho
                                 count['both'] += 1 # don't increment total counter
-                            elif upstream or downstream:
+                            if upstream or downstream:
                                 continue # ie don't class as plain intergenic
                             elif neither: # continue to the code below
                                 pass
