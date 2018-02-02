@@ -102,6 +102,8 @@ for chrom in range(1, 18):
 
     for i in range(len(windows) - 1):
         window = (windows[i], windows[i + 1])
+        
+        p = antr.Reader(table)
 
         rho = OrderedDict.fromkeys(['upstream', 'downstream', 'intergenic', 'both'], 0.0)
         count = OrderedDict.fromkeys(['upstream', 'downstream', 'intergenic', 'both'], 0)
