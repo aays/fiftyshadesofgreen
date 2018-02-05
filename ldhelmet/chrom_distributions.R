@@ -27,6 +27,7 @@ rhogetter <- function(chr, indf){
         filter(chromosome == chr) %>%
         select(rho) %>%
         unlist()
+    return(out)
 }
 
 
