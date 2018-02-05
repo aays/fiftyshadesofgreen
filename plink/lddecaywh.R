@@ -10,6 +10,8 @@
 
 # AH - 03/2017
 
+# update 02/2018 - fixed equation
+
 library(ggplot2)
 library(tidyr)
 library(dplyr, warn.conflicts = FALSE)
@@ -36,7 +38,7 @@ diffgetter <- function(df) {
 
 plotter <- function(df, outfile, graphwd) {
     df <- as.data.frame(df)
-    weirhilleq <- '((10 + p*d)/(22 + (13*p*d) + (p*d)^2))*(1 + (((3 + (p*d))/(24*(22 + (13*p*d) + (p*d)^2)^2)) * (12 + (12*p*d) + (p*d)^2)))'
+    weirhilleq <- '((10 + p*d)/(22 + (13*p*d) + (p*d)^2))*(1 + (((3 + (p*d))/(24*(22 + (13*p*d) + (p*d)^2))) * (12 + (12*p*d) + (p*d)^2)))'
 
     subdf <- df %>%
         select(one_of(c('d', 'r2'))) %>%
@@ -54,18 +56,18 @@ plotter <- function(df, outfile, graphwd) {
     colnames(tempdf)[1] <- 'rho'
     tempdf <- apply(tempdf, 2, as.numeric)
     
-    message('Creating plot...')
+    #message('Creating plot...')
     
-    r2plot <- ggplot(subdf, aes(x = d, y = r2)) +
-        geom_point() +
-        geom_line(data = as.data.frame(tempdf), aes(x = d, y = rho), col = 'red')
+    #r2plot <- ggplot(subdf, aes(x = d, y = r2)) +
+    #    geom_point() +
+    #    geom_line(data = as.data.frame(tempdf), aes(x = d, y = rho), col = 'red')
 
-    message(paste('Saving plot to ', graphwd, outfile, '...', sep = ''))
+    #message(paste('Saving plot to ', graphwd, outfile, '...', sep = ''))
   
-    ggsave(filename = paste(outfile, '.png', sep = ''),
-           plot = r2plot, path = graphwd,
-           width = par("din")[2], height = par("din")[2],
-           units = "in", dpi = 750)
+    #ggsave(filename = paste(outfile, '.png', sep = ''),
+    #       plot = r2plot, path = graphwd,
+    #       width = par("din")[2], height = par("din")[2],
+    #       units = "in", dpi = 750)
     
     message('Complete.')
     
