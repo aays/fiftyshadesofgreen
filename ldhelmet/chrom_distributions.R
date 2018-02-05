@@ -44,6 +44,6 @@ for (chrom in chrnames){
         geom_vline(aes(xintercept = rhogetter(chrom, refdf)), linetype = 'dashed', col = 'blue') +
         ggtitle(paste(chrom, 'binwidth = 0.01'))
     
-    ggsave(paste(chrom, '.png'), plot = plot, path = getwd(), dpi = 300)
+    ggsave(paste0(chrom, '.png'), plot = plot, path = getwd(), dpi = 300)
     message(paste('done', chrom))
 }
