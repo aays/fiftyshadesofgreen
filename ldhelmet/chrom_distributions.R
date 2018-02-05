@@ -39,8 +39,8 @@ for (chrom in chrnames){
         geom_histogram(binwidth = 0.01) +
         labs(x = 'recombination rate', y = 'proportion') +
         theme_bw() +
-        geom_vline(aes(xintercept = 5 * rhogetter(chrom, indf)), linetype = 'dashed', col = 'red') +
-        geom_vline(aes(xintercept = rhogetter(chrom, indf)), linetype = 'dashed', col = 'blue') +
+        geom_vline(aes(xintercept = 5 * rhogetter(chrom, refdf)), linetype = 'dashed', col = 'red') +
+        geom_vline(aes(xintercept = rhogetter(chrom, refdf)), linetype = 'dashed', col = 'blue') +
         ggtitle(paste(chrom, 'binwidth = 0.01'))
     
     ggsave(paste(chrom, '.png'), plot = plot, path = getwd(), dpi = 300)
