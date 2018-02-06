@@ -25,6 +25,7 @@ AH - 04/2017
 import sys
 import vcf
 import random
+from tqdm import tqdm
 
 random.seed(42) 
 
@@ -124,7 +125,7 @@ ranges = windowranger(windowsize, lengths[chrom])
 
 snplist = []
 
-for start, end in zip(ranges[0], ranges[1]):
+for start, end in tqdm(zip(ranges[0], ranges[1])):
     snplist = randvariantgetter(vcfin, chrom, start, end, snplist)
     
 outname = outfilename + 'sampled.vcf'
