@@ -25,6 +25,7 @@ AH - 04/2017
 
 import sys
 import pandas as pd
+from tqdm import tqdm
 
 def ranger(snppos, df):
     '''Takes a SNP position, a df of all pairwise comparisons,
@@ -64,7 +65,7 @@ data.drop(data.columns[[0]], axis = 1, inplace = True) # cleanup
 
 print('pos1', 'pos2', 'r2') # initialize headers
 
-for i in range(data.shape[0]):
+for i in tqdm(range(data.shape[0])):
     print(int(data.iloc[i,0]), int(data.iloc[i,1]), data.iloc[i,2])
 
 pairwisedoer(data) 
