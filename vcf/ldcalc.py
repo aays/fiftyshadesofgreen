@@ -12,7 +12,7 @@ import itertools
 from tqdm import tqdm
 from popgen import *
 
-def snppuller(vcf_file, chrom = None, pos = None):
+def snppuller(vcf_file, chrom = None, start = None, end = None):
     '''Returns a generator object for a specified VCF snippet that returns only
     SNPs, while filtering out singletons.
     '''
@@ -47,14 +47,13 @@ def snppuller(vcf_file, chrom = None, pos = None):
             return False
         
     # fetch
-    if chrom is not None and pos is not None:
-        pos = [int(i) for i in pos.split('-')]
-        for record in vcfin.fetch(chrom = chrom, start = pos[0], end = pos[1]):
+    if chrom and start and end:
+        for record in vcfin.fetch(chrom = chrom, start = start, end = end):
             if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record):
                 yield record
             else:
                 pass
-    elif chrom is not None and pos is None:
+    elif chrom and not start or not end:
         for record in vcfin.fetch(chrom = chrom):
             if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record):
                 yield record
