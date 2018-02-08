@@ -39,8 +39,19 @@ def check_methylation(chrom, pos):
         if not found:
             return None
 
+def makelookup(chrom):
+    filename = 'data/methylation/bed_split/{}.bed'.format(chrom)
+    lookup = {}
+    with open(filename, 'r') as m:
+        for line in tqdm(m):
+            split = [i.rstrip() for i in line.split('\t')]
+            c_pos, beta = int(split[1]), float(split[3])
+            lookup[c_pos] = beta
+    return lookup
+
 # write records
 for i in range(1, 18):
+    methylation_lookup = makelookup('chromosome_{}'.format(i))
     with open('analysis/ldh_test/out{}.txt'.format(i)) as f: # hardcoded for proj dir
         for line in tqdm(f):
             if line.startswith(('#', 'ver')):
@@ -51,10 +62,9 @@ for i in range(1, 18):
                 p = ant.Reader('data/annotation_table.txt.gz').fetch('chromosome_{}'.format(i), 
                                                                         start - 1, end - 1, raw = True)
                 for record in p:
-                    temp = record.split('\t')[:2]
-                    m = check_methylation(temp[0], temp[1])
-                    if m:
-                        record = record + '\t' + str(rho) + '\t' + str(m)
-                    elif not m:
+                    pos = record.split('\t')[1]
+                    if pos in methylation_lookup.keys():
+                        record = record + '\t' + str(rho) + '\t' + str(methylation_lookup[pos])
+                    else:
                         record = record + '\t' + str(rho) + '\t' + '.'
                     print(record)
