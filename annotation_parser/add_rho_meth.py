@@ -24,21 +24,6 @@ p.cols.append('methylation')
 p.cols = [item.strip() for item in p.cols]
 print('#', '\t'.join(p.cols), sep = '') # add new cols
 
-def check_methylation(chrom, pos):
-    filename = 'data/methylation/bed_split/{}.bed'.format(chrom)
-    with open(filename, 'r') as m:
-        found = False
-        for line in m:
-            split = [i.rstrip() for i in line.split('\t')]
-            chrom, c_pos, beta = str(split[0]), int(split[1]), float(split[3])
-            if pos == c_pos:
-                found = True
-                return beta
-            else:
-                continue
-        if not found:
-            return None
-
 def makelookup(chrom):
     filename = 'data/methylation/bed_split/{}.bed'.format(chrom)
     lookup = {}
