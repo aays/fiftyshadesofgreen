@@ -45,8 +45,14 @@ def get_random_record(filename, chrom_length, offset, limit_center = None, dista
                 pos = random.randint(1, chrom_length)
                 record = next(snppuller(filename, chrom, pos, pos + offset))
             elif distance_limit:
-                pos = random.randint(limit_center - distance_limit, limit_center + distance_limit)
-                record = next(snppuller(filename, chrom, pos, pos + offset))
+                in_range = False
+                while not in_range:
+                    pos = random.randint(limit_center - distance_limit, limit_center + distance_limit)
+                    if pos > chrom_length or pos < 0: # out of range - fetch another record
+                        continue
+                    else:
+                        record = next(snppuller(filename, chrom, pos, pos + offset))
+                        in_range = True
             found = True
         except StopIteration:
             continue
