@@ -1,6 +1,9 @@
 '''
 pick out variants at random from the VCF and calculate LD between them
 
+can parallelize this by suppressing col header printing, running in parallel,
+and then concatenating the outfiles
+
 usage:
 python3.5 ld_decay.py --vcf [vcf.gz] --count [number of comparisons] --filter [optional distance limit] > [outfile]
 '''
@@ -17,11 +20,13 @@ parser = argparse.ArgumentParser(description = 'Calculate LD stats between rando
 parser.add_argument('-v', '--vcf', required = True, type = str, help = 'Input VCF(.gz)')
 parser.add_argument('-c', '--count', required = True, type = int, help = 'Number of pairwise draws to consider in calculations')
 parser.add_argument('-f', '--filter', required = False, type = int, help = 'Maximum distance between SNPs [optional]')
+parser.add_argument('-t', '--title', required = False, action = 'store_true', help = 'Print column headers? [optional]')
 
 args = parser.parse_args()
 filename = str(args.vcf)
 total_count = int(args.count)
 filt = args.filter
+incl_title = args.title
 
 vcfin = vcf.Reader(filename = filename, compressed = True)
 chrom = next(vcfin).CHROM
@@ -58,7 +63,9 @@ def get_random_record(filename, chrom_length, offset, limit_center = None, dista
             continue
     return record
 
-print('chrom1 pos1 chrom2 pos2 r2')
+if incl_title:
+    print('chrom1 pos1 chrom2 pos2 r2')
+    
 for i in tqdm(range(total_count)):
     if not filt:
         record1 = get_random_record(filename, chrom_length, 100)
