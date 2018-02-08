@@ -62,7 +62,7 @@ for i in range(1, 18):
                 p = ant.Reader('data/annotation_table.txt.gz').fetch('chromosome_{}'.format(i), 
                                                                         start - 1, end - 1, raw = True)
                 for record in p:
-                    pos = record.split('\t')[1]
+                    pos = int(record.split('\t')[1])
                     if pos in methylation_lookup.keys():
                         record = record + '\t' + str(rho) + '\t' + str(methylation_lookup[pos])
                     else:
