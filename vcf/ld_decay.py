@@ -21,7 +21,7 @@ parser.add_argument('-f', '--filter', required = False, type = int, help = 'Maxi
 args = parser.parse_args()
 filename = str(args.vcf)
 total_count = int(args.count)
-filt = int(args.filter)
+filt = args.filter
 
 vcfin = vcf.Reader(filename = filename, compressed = True)
 chrom = next(vcfin).CHROM
@@ -54,12 +54,12 @@ def get_random_record(filename, chrom_length, offset, limit_center = None, dista
 
 print('chrom1 pos1 chrom2 pos2 r2')
 for i in tqdm(range(total_count)):
-    if not filter:
+    if not filt:
         record1 = get_random_record(filename, chrom_length, 100)
         record2 = get_random_record(filename, chrom_length, 100)
-    elif filter:
+    elif filt:
         record1 = get_random_record(filename, chrom_length, 100)
         record2 = get_random_record(filename, chrom_length, 100, \
-            limit_center = record1.POS, distance_limit = filt)
+            limit_center = record1.POS, distance_limit = int(filt))
     r2 = r2calc(record1, record2, snpcheck = False)
     print(record1.CHROM, record1.POS, record2.CHROM, record2.POS, r2)
