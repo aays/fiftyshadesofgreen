@@ -12,7 +12,7 @@ import itertools
 from tqdm import tqdm
 from popgen import *
 
-def snppuller(vcf_file, chrom = None, start = None, end = None):
+def snppuller(vcf_file, chrom = None, start = None, end = None, return_none = False):
     '''Returns a generator object for a specified VCF snippet that returns only
     SNPs, while filtering out singletons.
     '''
@@ -47,24 +47,30 @@ def snppuller(vcf_file, chrom = None, start = None, end = None):
             return False
         
     # fetch
+    acquired = False
     if chrom and start and end:
         for record in vcfin.fetch(chrom = chrom, start = start, end = end):
             if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record):
+                acquired = True
                 yield record
             else:
                 pass
     elif chrom and not start or not end:
         for record in vcfin.fetch(chrom = chrom):
             if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record):
+                acquired = True
                 yield record
             else:
                 pass
     else:
         for record in vcfin:
             if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record):
+                acquired = True
                 yield record
             else:
                 pass
+    if return_none and not acquired:
+        return None
         
 def header(stat, haps = False):
     '''Helper function that determines output headers in singlevcfcalc.
