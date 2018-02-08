@@ -1,4 +1,4 @@
-mkdir annotatin_tables
+mkdir annotation_tables
 cp -v annotation_table_rho.txt.gz annotation_table_temp.txt.gz
 
 bgzip -d annotation_table_temp.txt.gz
