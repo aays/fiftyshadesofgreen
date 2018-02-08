@@ -51,7 +51,8 @@ for i in range(1, 18):
                 p = ant.Reader('data/annotation_table.txt.gz').fetch('chromosome_{}'.format(i), 
                                                                         start - 1, end - 1, raw = True)
                 for record in p:
-                    m = check_methylation(record.chrom, record.pos)
+                    temp = record.split('\t')[:2]
+                    m = check_methylation(temp[0], temp[1])
                     if m:
                         record = record + '\t' + str(rho) + '\t' + str(m)
                     elif not m:
