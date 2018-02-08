@@ -48,21 +48,21 @@ def snppuller(vcf_file, chrom = None, pos = None):
         
     # fetch
     if chrom is not None and pos is not None:
-        pos = pos.split('-')
+        pos = [int(i) for i in pos.split('-')]
         for record in vcfin.fetch(chrom = chrom, start = pos[0], end = pos[1]):
-            if hardsnpcheck(record) == True and issingleton(record) == False and isinvariant(record) == False:
+            if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record):
                 yield record
             else:
                 pass
     elif chrom is not None and pos is None:
         for record in vcfin.fetch(chrom = chrom):
-            if hardsnpcheck(record) == True and issingleton(record) == False and isinvariant(record) == False:
+            if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record):
                 yield record
             else:
                 pass
     else:
         for record in vcfin:
-            if hardsnpcheck(record) == True and issingleton(record) == False and isinvariant(record) == False:
+            if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record):
                 yield record
             else:
                 pass
