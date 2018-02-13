@@ -156,24 +156,30 @@ for chrom in range(1, 18):
                             neither = True
                             upstream = False
                             downstream = False
+
                             if check_gene_proximity(record, context_size, 'u'):
+                                neither = False
+                                upstream = True
+                            if check_gene_proximity(record, context_size, 'd'):
+                                neither = False
+                                downstream = True
+
+                            if upstream and downstream:
+                                rho['both'] += record.ld_rho
+                                count['both'] += 1
+                                total_counter += 1
+                                continue # don't class as intergenic
+                            elif upstream and not downstream:
                                 rho['upstream'] += record.ld_rho
                                 count['upstream'] += 1
                                 total_counter += 1
-                                neither = False
-                                upstream = True
-                            if check_gene_proximity(record, context_size, 'd'): # not elif - a site could be both...
+                                continue
+                            elif downstream and not upstream:
                                 rho['downstream'] += record.ld_rho
                                 count['downstream'] += 1
                                 total_counter += 1
-                                neither = False
-                                downstream = True
-                            if upstream and downstream:
-                                rho['both'] += record.ld_rho
-                                count['both'] += 1 # don't increment total counter
-                            if upstream or downstream:
-                                continue # ie don't class as plain intergenic
-                            elif neither: # continue to the code below
+                                continue
+                            elif neither: # continue to code below
                                 pass
 
                         rho[key] += record.ld_rho
