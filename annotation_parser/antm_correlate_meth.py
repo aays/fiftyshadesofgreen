@@ -29,11 +29,14 @@ parser.add_argument('-t', '--table', required = True,
                    type = str, help = 'Annotation table file (.txt.gz)')
 parser.add_argument('-w', '--windowsize', required = True,
                    type = int, help = 'Window size')
+parser.add_argument('-c', '--chromosome', required = True,
+                   type = str, help = 'Chromosome name as it appears in the table.')
 
 args = parser.parse_args()
 
 table = args.table
 windowsize = int(args.windowsize)
+current_chrom = args.chromosome
 
 # chromosome lengths - hardcoded for chlamy
 lengths = {'chromosome_1': 8033585,
@@ -70,37 +73,35 @@ def attr_fetch(rec, attribute):
 
 print('chromosome', 'start', 'end', 'rho', 'rho_values', 'methylation', 'methylation_values', 'iter_count', 'record_count')
 
-for chrom in range(1, 18):
-    current_chrom = 'chromosome_{}'.format(str(chrom))
-    windows = list(range(0, lengths[current_chrom], windowsize)) + [lengths[current_chrom]]
+windows = list(range(0, lengths[current_chrom], windowsize)) + [lengths[current_chrom]]
 
-    p = antm.Reader(table)
+p = antm.Reader(table)
 
-    for i in range(len(windows) - 1):
-        window = (windows[i], windows[i + 1])
-        rho = 0.0
-        meth = 0.0
-        count = 0
-        record_counter = 0
+for i in range(len(windows) - 1):
+    window = (windows[i], windows[i + 1])
+    rho = 0.0
+    meth = 0.0
+    count = 0
+    record_counter = 0
 
-        # iterate through records in window
-        for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
-            if record.ld_rho != 'NA' and record.methylation != 'NA':
-                meth += record.methylation
-                rho += record.ld_rho
-                count += 1
-            else:
-                continue
-            record_counter += 1
-
-        try:
-            rho_out = rho / count
-            meth_out = meth / count
-        except ZeroDivisionError: # nothing in window
+    # iterate through records in window
+    for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
+        if record.ld_rho != 'NA' and record.methylation != 'NA':
+            meth += record.methylation
+            rho += record.ld_rho
+            count += 1
+        else:
             continue
-            #rho_out = 0
-            #meth_out = 0
+        record_counter += 1
 
-        print(current_chrom, window[0], window[1], rho_out, rho, meth_out, meth, count, record_counter)
+    try:
+        rho_out = rho / count
+        meth_out = meth / count
+    except ZeroDivisionError: # nothing in window
+        continue
+        #rho_out = 0
+        #meth_out = 0
+
+    print(current_chrom, window[0], window[1], rho_out, rho, meth_out, meth, count, record_counter)
 
 
