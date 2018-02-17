@@ -5,8 +5,8 @@ annotation table must have both ld_rho values + methylation beta values appended
 this uses the _antm_ parser variant, not antr
 
 usage:
-python3.5 antm_correlate_meth.py -t [table (.txt.gz)] -w [windowsize] > output.txt
-python3.5 antm_correlate_meth.py -t table.txt.gz -w 100000 > output.txt
+python3.5 antm_correlate_meth.py -t [table (.txt.gz)] -w [windowsize] -c [chromosome] > output.txt
+python3.5 antm_correlate_meth.py -t table.txt.gz -w 100000 -c chromosome_2 > output.txt
 
 AH - 01/2018
 '''
@@ -31,12 +31,15 @@ parser.add_argument('-w', '--windowsize', required = True,
                    type = int, help = 'Window size')
 parser.add_argument('-c', '--chromosome', required = True,
                    type = str, help = 'Chromosome name as it appears in the table.')
+parser.add_argument('-a', '--all_sites', required = False,
+                   action = 'store_true', help = 'Include if considering _all_ sites, not just methylated ones')
 
 args = parser.parse_args()
 
 table = args.table
 windowsize = int(args.windowsize)
 current_chrom = args.chromosome
+all_sites = args.all_sites
 
 # chromosome lengths - hardcoded for chlamy
 lengths = {'chromosome_1': 8033585,
@@ -86,13 +89,22 @@ for i in tqdm(range(len(windows) - 1)):
 
     # iterate through records in window
     for record in p.fetch(current_chrom, window[0], window[1]):
-        if record.ld_rho != 'NA' and record.methylation != 'NA':
-            meth += record.methylation
-            rho += record.ld_rho
-            count += 1
-        else:
-            continue
-        record_counter += 1
+        if record.ld_rho != 'NA' and all_sites:
+            if record.methylation != 'NA':
+                meth += record.methylation
+                rho += record.ld_rho
+                count += 1
+            elif record.methylation == 'NA': # meth = 0
+                rho += record.ld_rho
+                rho_count += 1
+                count += 1
+            record_counter += 1
+        elif record.ld_rho != 'NA' and not all_sites:
+            if record.methylation != 'NA':
+                meth += record.methylation
+                rho += record.ld_rho
+                count += 1
+            record_counter += 1
 
     try:
         rho_out = rho / count
