@@ -96,7 +96,6 @@ for i in tqdm(range(len(windows) - 1)):
                 count += 1
             elif record.methylation == 'NA': # meth = 0
                 rho += record.ld_rho
-                rho_count += 1
                 count += 1
             record_counter += 1
         elif record.ld_rho != 'NA' and not all_sites:
