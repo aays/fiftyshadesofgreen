@@ -13,7 +13,6 @@ AH - 01/2018
 
 import argparse
 import sys
-from tqdm import tqdm
 from collections import OrderedDict
 
 try:
@@ -77,7 +76,7 @@ windows = list(range(0, lengths[current_chrom], windowsize)) + [lengths[current_
 
 p = antm.Reader(table)
 
-for i in range(len(windows) - 1):
+for i in tqdm(range(len(windows) - 1)):
     window = (windows[i], windows[i + 1])
     rho = 0.0
     meth = 0.0
@@ -85,7 +84,7 @@ for i in range(len(windows) - 1):
     record_counter = 0
 
     # iterate through records in window
-    for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
+    for record in p.fetch(current_chrom, window[0], window[1]):
         if record.ld_rho != 'NA' and record.methylation != 'NA':
             meth += record.methylation
             rho += record.ld_rho
