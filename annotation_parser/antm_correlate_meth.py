@@ -13,6 +13,7 @@ AH - 01/2018
 
 import argparse
 import sys
+from tqdm import tqdm
 from collections import OrderedDict
 
 try:
