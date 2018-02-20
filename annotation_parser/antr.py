@@ -199,7 +199,7 @@ class Reader(object):
             to be doing this, but I don't know what that better way is for the life of me.
             '''
             row = line.rstrip().split('\t')
-            assert len(row) == 33
+            # assert len(row) == 33
 
             chromosome, position, reference_base, genic, exonic, intronic, intergenic, \
             utr5, utr3, fold0, fold4, fold2, fold3, CDS, mRNA, rRNA, tRNA, feature_names, \
