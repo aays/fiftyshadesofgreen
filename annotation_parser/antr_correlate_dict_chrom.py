@@ -91,6 +91,9 @@ def gc_calc(chromosome, window, table):
     GC_content = GC / total
     return GC_content
 
+def eprint(*args, **kwargs): # throws out progress info
+    print(*args, file=sys.stderr, **kwargs)
+
 def check_gene_proximity(record, dist, direction):
     '''(rec, int, str) -> bool
     dir = 'u' for upstream, 'd' for downstream
@@ -147,39 +150,43 @@ for i in range(len(windows) - 1):
         
         # iterate through records in window
         for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
-            for key in rho.keys():
-                if key in ['upstream', 'downstream', 'both']:
-                    continue
-                    
-                elif attr_fetch(record, key) and not record.ld_rho == 'NA':
-                    if key == 'intergenic' and attr_fetch(record, 'intergenic') and context_size:
-                        neither = True
-                        upstream = False
-                        downstream = False
-                        if check_gene_proximity(record, context_size, 'u'):
-                            rho['upstream'] += record.ld_rho
-                            count['upstream'] += 1
-                            total_counter += 1
-                            neither = False
-                            upstream = True
-                        if check_gene_proximity(record, context_size, 'd'): # not elif - a site could be both...
-                            rho['downstream'] += record.ld_rho
-                            count['downstream'] += 1
-                            total_counter += 1
-                            neither = False
-                            downstream = True
-                        if upstream and downstream:
-                            rho['both'] += record.ld_rho
-                            count['both'] += 1 # don't increment total counter
-                        if upstream or downstream:
-                            continue # ie don't class as plain intergenic
-                        elif neither: # continue to the code below
-                            pass
+            try:
+                for key in rho.keys():
+                    if key in ['upstream', 'downstream', 'both']:
+                        continue
+                        
+                    elif attr_fetch(record, key) and not record.ld_rho == 'NA':
+                        if key == 'intergenic' and attr_fetch(record, 'intergenic') and context_size:
+                            neither = True
+                            upstream = False
+                            downstream = False
+                            if check_gene_proximity(record, context_size, 'u'):
+                                rho['upstream'] += record.ld_rho
+                                count['upstream'] += 1
+                                total_counter += 1
+                                neither = False
+                                upstream = True
+                            if check_gene_proximity(record, context_size, 'd'): # not elif - a site could be both...
+                                rho['downstream'] += record.ld_rho
+                                count['downstream'] += 1
+                                total_counter += 1
+                                neither = False
+                                downstream = True
+                            if upstream and downstream:
+                                rho['both'] += record.ld_rho
+                                count['both'] += 1 # don't increment total counter
+                            if upstream or downstream:
+                                continue # ie don't class as plain intergenic
+                            elif neither: # continue to the code below
+                                pass
 
-                    rho[key] += record.ld_rho
-                    count[key] += 1
-                    total_counter += 1
-                else:
+                        rho[key] += record.ld_rho
+                        count[key] += 1
+                        total_counter += 1
+                    else:
+                        continue
+                except:
+                    eprint(total_counter)
                     continue
 
         rhovals = list(rho.values())
