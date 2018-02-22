@@ -185,9 +185,9 @@ for i in range(len(windows) - 1):
                         total_counter += 1
                     else:
                         continue
-                except:
-                    eprint(total_counter)
-                    continue
+            except:
+                eprint(total_counter)
+                continue
 
         rhovals = list(rho.values())
         countvals = list(count.values())
