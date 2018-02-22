@@ -74,7 +74,7 @@ def attr_fetch(rec, attribute):
 
 # print column headers
 
-print('chromosome', 'start', 'end', 'rho', 'rho_values', 'methylation', 'methylation_values', 'iter_count', 'record_count')
+print('chromosome', 'start', 'end', 'rho_values', 'rho_count', 'methylation_values', 'methylation_count', 'record_count')
 
 windows = list(range(0, lengths[current_chrom], windowsize)) + [lengths[current_chrom]]
 
@@ -84,7 +84,8 @@ for i in tqdm(range(len(windows) - 1)):
     window = (windows[i], windows[i + 1])
     rho = 0.0
     meth = 0.0
-    count = 0
+    rho_count = 0
+    meth_count = 0
     record_counter = 0
 
     # iterate through records in window
@@ -93,26 +94,20 @@ for i in tqdm(range(len(windows) - 1)):
             if record.methylation != 'NA':
                 meth += record.methylation
                 rho += record.ld_rho
-                count += 1
+                rho_count += 1
+                meth_count += 1
             elif record.methylation == 'NA': # meth = 0
                 rho += record.ld_rho
-                count += 1
+                rho_count += 1
             record_counter += 1
         elif record.ld_rho != 'NA' and not all_sites:
             if record.methylation != 'NA':
                 meth += record.methylation
                 rho += record.ld_rho
-                count += 1
+                rho_count += 1
+                meth_count += 1
             record_counter += 1
 
-    try:
-        rho_out = rho / count
-        meth_out = meth / count
-    except ZeroDivisionError: # nothing in window
-        continue
-        #rho_out = 0
-        #meth_out = 0
-
-    print(current_chrom, window[0], window[1], rho_out, rho, meth_out, meth, count, record_counter)
+    print(current_chrom, window[0], window[1], rho, rho_count, meth, meth_count, record_counter)
 
 
