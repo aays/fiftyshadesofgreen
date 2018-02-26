@@ -61,41 +61,44 @@ correlates = dict.fromkeys(['is_genic', 'is_intergenic', 'is_exonic', 'is_intron
                             'is_utr5', 'is_utr3', 'is_in_CDS', 'upstream', 'downstream', 'both'], 0)
 
 with open(filename, 'r') as f:
-    for line in tqdm(f):
-        if 'chr,block_start,block_end' in line: # skip header
-            continue
-        else:
-            sp = line.rstrip().split(',')
-            chrom, start, end = sp[0], float(sp[1]), float(sp[2])
-            ratio = float(sp[7])
+    hotspot_lines = f.readlines()
 
-            p = antr.Reader(table)
 
-            if ratio >= 5.0:
-                for record in p.fetch(chrom, start, end):
-                    for key in correlates:
-                        if key in ['upstream', 'downstream', 'both']:
-                            continue
-                        if key != 'is_intergenic' and getattr(record, key):
-                            correlates[key] += 1
-                        elif key == 'is_intergenic' and getattr(record, key):
-                            upstream = False
-                            downstream = False
-                            neither = True
-                            if check_gene_proximity(record, 2000, 'u'):
-                                upstream = True
-                                neither = False
-                            if check_gene_proximity(record, 2000, 'd'):
-                                downstream = True
-                                neither = False
-                            if upstream and downstream:
-                                correlates['both'] += 1
-                            elif upstream and not downstream:
-                                correlates['upstream'] += 1
-                            elif downstream and not upstream:
-                                correlates['downstream'] += 1
-                            elif neither and not upstream and not downstream:
-                                correlates['is_intergenic'] += 1
+for line in tqdm(hotspot_lines):
+    if 'chr,block_start,block_end' in line: # skip header
+        continue
+    else:
+        sp = line.rstrip().split(',')
+        chrom, start, end = sp[0], float(sp[1]), float(sp[2])
+        ratio = float(sp[7])
+
+        p = antr.Reader(table)
+
+        if ratio >= 5.0:
+            for record in p.fetch(chrom, start, end):
+                for key in correlates:
+                    if key in ['upstream', 'downstream', 'both']:
+                        continue
+                    if key != 'is_intergenic' and getattr(record, key):
+                        correlates[key] += 1
+                    elif key == 'is_intergenic' and getattr(record, key):
+                        upstream = False
+                        downstream = False
+                        neither = True
+                        if check_gene_proximity(record, 2000, 'u'):
+                            upstream = True
+                            neither = False
+                        if check_gene_proximity(record, 2000, 'd'):
+                            downstream = True
+                            neither = False
+                        if upstream and downstream:
+                            correlates['both'] += 1
+                        elif upstream and not downstream:
+                            correlates['upstream'] += 1
+                        elif downstream and not upstream:
+                            correlates['downstream'] += 1
+                        elif neither and not upstream and not downstream:
+                            correlates['is_intergenic'] += 1
 
 print('correlate count')
 for key in correlates:
