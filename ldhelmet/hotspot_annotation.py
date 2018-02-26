@@ -61,7 +61,7 @@ correlates = dict.fromkeys(['is_genic', 'is_intergenic', 'is_exonic', 'is_intron
                             'is_utr5', 'is_utr3', 'is_in_CDS', 'upstream', 'downstream', 'both'], 0)
 
 with open(filename, 'r') as f:
-    for line in tqdm(f):
+    for line in f:
         if 'chr,block_start,block_end' in line: # skip header
             continue
         else:
@@ -70,7 +70,7 @@ with open(filename, 'r') as f:
 
             p = antr.Reader(table)
 
-            for record in p.fetch(chrom, start, end):
+            for record in tqdm(p.fetch(chrom, start, end)):
                 for key in correlates:
                     if key in ['upstream', 'downstream', 'both']:
                         continue
