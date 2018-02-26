@@ -66,7 +66,7 @@ with open(filename, 'r') as f:
             continue
         else:
             sp = line.rstrip().split(',')
-            chrom, start, end = sp[1], float(sp[2]), float(sp[3])
+            chrom, start, end = sp[0], float(sp[1]), float(sp[2])
 
             p = antr.Reader(table)
 
