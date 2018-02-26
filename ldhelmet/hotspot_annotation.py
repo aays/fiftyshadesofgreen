@@ -30,7 +30,35 @@ args = parser.parse_args()
 table = args.table
 filename = args.filename
 
-correlates = dict.fromkeys(['is_genic', 'is_intergenic', 'is_exonic', 'is_intronic', 'is_utr5', 'is_utr3', 'is_in_CDS'], 0)
+def check_gene_proximity(record, dist, direction):
+    '''(rec, int, str) -> bool
+    dir = 'u' for upstream, 'd' for downstream
+    '''
+    p = antr.Reader(table)
+
+    try: # in case site hits end of chrom
+        if direction == 'u':
+            region = p.fetch(record.chrom, record.pos, record.pos + dist)
+        elif direction == 'd':
+            region = p.fetch(record.chrom, record.pos - dist, record.pos)
+        else:
+            print('Invalid argument provided to direction.')
+            print('Valid arguments are: u (upstream) and d (downstream)')
+        for record in region:
+            if record.is_genic:
+                out = True
+                break
+            else:
+                continue
+        if out:
+            return True
+        elif not out:
+            return False
+    except:
+        return False
+
+correlates = dict.fromkeys(['is_genic', 'is_intergenic', 'is_exonic', 'is_intronic',
+                            'is_utr5', 'is_utr3', 'is_in_CDS', 'upstream', 'downstream', 'both'], 0)
 
 with open(filename, 'r') as f:
     for line in tqdm(f):
@@ -44,8 +72,28 @@ with open(filename, 'r') as f:
 
             for record in p.fetch(chrom, start, end):
                 for key in correlates:
-                    if getattr(record, key):
+                    if key in ['upstream', 'downstream', 'both']:
+                        continue
+                    if key != 'is_intergenic' and getattr(record, key):
                         correlates[key] += 1
+                    elif key == 'is_intergenic' and getattr(record, key):
+                        upstream = False
+                        downstream = False
+                        neither = True
+                        if check_gene_proximity(record, 2000, 'u'):
+                            upstream = True
+                            neither = False
+                        if check_gene_proximity(record, 2000, 'd'):
+                            downstream = True
+                            neither = False
+                        if upstream and downstream:
+                            correlates['both'] += 1
+                        elif upstream and not downstream:
+                            correlates['upstream'] += 1
+                        elif downstream and not upstream:
+                            correlates['downstream'] += 1
+                        elif neither and not upstream and not downstream:
+                            correlates['is_intergenic'] += 1
 
 print('correlate count')
 for key in correlates:
