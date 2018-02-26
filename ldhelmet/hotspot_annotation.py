@@ -67,33 +67,35 @@ with open(filename, 'r') as f:
         else:
             sp = line.rstrip().split(',')
             chrom, start, end = sp[0], float(sp[1]), float(sp[2])
+            ratio = float(sp[5])
 
             p = antr.Reader(table)
 
-            for record in tqdm(p.fetch(chrom, start, end)):
-                for key in correlates:
-                    if key in ['upstream', 'downstream', 'both']:
-                        continue
-                    if key != 'is_intergenic' and getattr(record, key):
-                        correlates[key] += 1
-                    elif key == 'is_intergenic' and getattr(record, key):
-                        upstream = False
-                        downstream = False
-                        neither = True
-                        if check_gene_proximity(record, 2000, 'u'):
-                            upstream = True
-                            neither = False
-                        if check_gene_proximity(record, 2000, 'd'):
-                            downstream = True
-                            neither = False
-                        if upstream and downstream:
-                            correlates['both'] += 1
-                        elif upstream and not downstream:
-                            correlates['upstream'] += 1
-                        elif downstream and not upstream:
-                            correlates['downstream'] += 1
-                        elif neither and not upstream and not downstream:
-                            correlates['is_intergenic'] += 1
+            if ratio >= 5.0:
+                for record in tqdm(p.fetch(chrom, start, end)):
+                    for key in correlates:
+                        if key in ['upstream', 'downstream', 'both']:
+                            continue
+                        if key != 'is_intergenic' and getattr(record, key):
+                            correlates[key] += 1
+                        elif key == 'is_intergenic' and getattr(record, key):
+                            upstream = False
+                            downstream = False
+                            neither = True
+                            if check_gene_proximity(record, 2000, 'u'):
+                                upstream = True
+                                neither = False
+                            if check_gene_proximity(record, 2000, 'd'):
+                                downstream = True
+                                neither = False
+                            if upstream and downstream:
+                                correlates['both'] += 1
+                            elif upstream and not downstream:
+                                correlates['upstream'] += 1
+                            elif downstream and not upstream:
+                                correlates['downstream'] += 1
+                            elif neither and not upstream and not downstream:
+                                correlates['is_intergenic'] += 1
 
 print('correlate count')
 for key in correlates:
