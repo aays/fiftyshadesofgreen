@@ -67,7 +67,7 @@ with open(filename, 'r') as f:
         else:
             sp = line.rstrip().split(',')
             chrom, start, end = sp[0], float(sp[1]), float(sp[2])
-            ratio = float(sp[5])
+            ratio = float(sp[7])
 
             p = antr.Reader(table)
 
