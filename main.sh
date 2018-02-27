@@ -1,3 +1,5 @@
+# rough record of main bash commands
+
 for i in {1..17}; do
     ../ldhelmet find_confs -w 50 --num_threads 30 -i out$i\.conf ../../data/fastas/no_clones/chromosome_$i\.fasta
     sleep 1
