@@ -8,7 +8,7 @@
 # AH - 04/2017
 
 library(tidyr)
-library(dplyr)
+library(dplyr, warn.conflicts = FALSE)
 
 args <- commandArgs(trailingOnly = TRUE)
 
