@@ -5,6 +5,7 @@ AH - 01/2018
 '''
 
 import gzip
+import ast
 
 try:
     import pysam
@@ -63,8 +64,8 @@ class _Record(object):
         self.is_in_mRNA = type_make(mRNA, 'bool')
         self.is_rRNA = type_make(rRNA, 'bool')
         self.is_tRNA = type_make(tRNA, 'bool')
-        self.feature_names = list(feature_names)
-        self.feature_types = list(feature_types)
+        self.feature_names = ast.literal_eval(feature_names)
+        self.feature_types = ast.literal_eval(feature_types)
         self.feature_ID = type_make(feature_ID, 'str')
         self.cds_position = type_make(cds_position, 'int')
         self.strand = type_make(strand, 'str')
