@@ -1,3 +1,14 @@
+'''
+antr_diversity_hotspots.py - calculate nucleotide diversity (theta_pi) in and out of recombination hotspots
+
+requires a specially made csv file that modifies find_hotspots.py's output to include whether windows are hotspots or not
+
+usage:
+python antr_diversity_hotspots.py --table [table (.txt.gz)] --dist [dist file (.csv/.txt)] > [outfile]
+
+AH - 04/2018
+'''
+
 from tqdm import tqdm
 from ness_vcf import SFS
 import antr
@@ -70,7 +81,8 @@ with open(dist, 'r') as f:
             sp = [l.rstrip('\n') for l in line.split(',')]
             chrom, start, end, rho, chrom_mean, actual_ratio, is_hotspot = sp
             try:
-                curr_theta, c = SFS_from_antr(table, chrom, int(start), int(end), min_alleles = None, neutral_only = False, counter = True)
+                curr_theta, c = SFS_from_antr(table, chrom, int(start), int(end), 
+                                              min_alleles = None, neutral_only = False, counter = True)
                 c = int(c)
             except ZeroDivisionError: # nothing in window
                 curr_theta, c = 0, 0
