@@ -72,7 +72,7 @@ def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_onl
 
 # column headers
 print('chromosome start end diversity record_count is_hotspot')
-s
+
 with open(dist, 'r') as f:
     for line in tqdm(f):
         if line.startswith('chr,block_start'): # header
