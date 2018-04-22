@@ -29,8 +29,14 @@ args = parser.parse_args()
 
 table = str(args.table)
 dist = str(args.dist)
-min_alleles = args.min_alleles
-neutral_only = args.neutral_only
+
+if args.min_alleles:
+    min_alleles = args.min_alleles
+else:
+    min_alleles = None
+    
+if args.neutral_only:
+    neutral_only = True
 
 def MAF_from_allele_count(allele_counts, min_alleles = None):
     minor_allele_count = sorted(allele_counts)[-2] # second most common allele count
@@ -82,7 +88,7 @@ with open(dist, 'r') as f:
             chrom, start, end, rho, chrom_mean, actual_ratio, is_hotspot = sp
             try:
                 curr_theta, c = SFS_from_antr(table, chrom, int(start), int(end), 
-                                              min_alleles = None, neutral_only = False, counter = True)
+                                              min_alleles = min_alleles, neutral_only = neutral_only, counter = True)
                 c = int(c)
             except ZeroDivisionError: # nothing in window
                 curr_theta, c = 0, 0
