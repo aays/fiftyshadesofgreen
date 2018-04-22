@@ -29,14 +29,8 @@ args = parser.parse_args()
 
 table = str(args.table)
 dist = str(args.dist)
-
-if args.min_alleles:
-    min_alleles = args.min_alleles
-else:
-    min_alleles = None
-    
-if args.neutral_only:
-    neutral_only = True
+min_alleles = args.min_alleles
+neutral_only = args.neutral_only
 
 def MAF_from_allele_count(allele_counts, min_alleles = None):
     minor_allele_count = sorted(allele_counts)[-2] # second most common allele count
