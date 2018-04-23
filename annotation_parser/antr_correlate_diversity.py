@@ -31,6 +31,8 @@ parser.add_argument('-m', '--min_alleles', required = False,
                     type = int, help = 'Filter sites with less than n alleles called. [Optional]')
 parser.add_argument('-n', '--neutral_only', required = False,
                     action = 'store_true', help = 'Only consider neutral (intergenic, intronic, 4-fold degenerate) sites? [Optional]')
+parser.add_argument('-d', '--gene_density', required = False,
+                    action = 'store_true', help = 'Compute gene density per window (CDS + intron + UTR sites) [Optional]')
 
 args = parser.parse_args()
 
@@ -38,6 +40,7 @@ table = str(args.table)
 windowsize = int(args.windowsize)
 min_alleles = args.min_alleles
 neutral_only = args.neutral_only
+gene_density = args.gene_density
 
 # chromosome lengths - hardcoded for chlamy
 lengths = {'chromosome_1': 8033585,
@@ -101,8 +104,24 @@ def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_onl
     diversity = sum([sfs.theta_pi() * sfs.sites() for sfs in SFSs.values()]) / sum([sfs.sites() for sfs in SFSs.values()])
     return diversity
 
+def calculate_gene_density(table, chromosome, start, end):
+    p = antr.Reader(table)
+    genic_annotations = ['CDS', 'intronic', 'utr5', 'utr3']
+    counts = OrderedDict.fromkeys(genic_annotations, 0)
+    total_count = 0
+    for record in p.fetch(chromosome, start, end):
+        for annotation in genic_annotations:
+            if attr_fetch(record, annotation):
+                counts[annotation] += 1
+                total_count += 1
+    return counts, total_count
+
 # print column headers
-print('chromosome', 'start', 'end', 'diversity', 'rho', 'rho_total', 'rho_count', 'iter_count')
+if gene_density:
+    print('chromosome', 'start', 'end', 'diversity', 'rho', 'rho_total', 'rho_count', 'iter_count',
+          'CDS_count', 'intronic_count', 'utr5_count', 'utr3_count', 'total_gene_count')
+else:
+    print('chromosome', 'start', 'end', 'diversity', 'rho', 'rho_total', 'rho_count', 'iter_count')
 
 for chrom in range(1, 18):
     current_chrom = 'chromosome_{}'.format(str(chrom))
@@ -128,8 +147,14 @@ for chrom in range(1, 18):
         try:
             rho_out = rho / count
             curr_div = SFS_from_antr(table, current_chrom, window[0], window[1], min_alleles = min_alleles, neutral_only = neutral_only)
+            if gene_density:
+                gene_counts, total_gene_count = calculate_gene_density(table, current_chrom, window[0], window[1])
         except ZeroDivisionError: # nothing in window
             rho_out = 0
             curr_div = 0
-
-        print(current_chrom, window[0], window[1], curr_div, rho_out, rho, count, record_counter)
+        
+        if gene_density:
+            print(current_chrom, window[0], window[1], curr_div, rho_out, rho, count, record_counter,
+                  gene_counts['CDS'], gene_counts['intronic'], gene_counts['utr5'], gene_counts['utr3'], total_gene_count)
+        elif not gene_density:
+            print(current_chrom, window[0], window[1], curr_div, rho_out, rho, count, record_counter)
