@@ -209,10 +209,10 @@ def ldstats(record1, record2, snpcheck = True, freqs = False):
 
 ### exploratory functions        
         
-def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
+def reclist(vcf_file, chrom = None, start = None, end = None, snpsonly = False):
     '''Returns records in given bgzipped VCF file as a list.
     If given chrom, will fetch just chrom; if given both chrom 
-    and pos (in the format 'start-end') will fetch just that 
+    and start-end coordinates, will fetch just that 
     subset of the VCF.
     '''
     
@@ -247,28 +247,20 @@ def reclist(vcf_file, chrom = None, pos = None, snpsonly = False):
             return False
     
     # make list
-    if chrom is not None and pos is not None:
+    if chrom and start and end:
         try:
-            assert isinstance(pos, str) 
-            pos = pos.split('-')
-            assert len(pos) == 2
-            start = int(pos[0]) - 1
-            end = int(pos[1])
-            snippet = vcfin.fetch(chrom = chrom, start = start, end = end) 
+            snippet = vcfin.fetch(chrom = chrom, start = start - 1, end = end) 
             if snpsonly:
                 outlist = [record for record in snippet if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record)]
             elif not snpsonly:
                 outlist = [record for record in snippet]
-        except:
-            print('Error in pos parameter.')
-            print('Please enter positions in a start-end format with no spaces.')
-    elif chrom is not None and pos is None:
+    elif chrom and not start and not end:
         snippet = vcfin.fetch(chrom = chrom)
         if snpsonly:
             outlist = [record for record in snippet if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record)]
         elif not snpsonly:
             outlist = [record for record in snippet]
-    elif chrom is None and pos is not None:
+    elif not chrom and start and end:
         print('Error - positions supplied without chromosome specification.')
     else:
         if snpsonly:
