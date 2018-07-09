@@ -56,5 +56,5 @@ for i in range(1, 18):
                     if pos in methylation_lookup.keys():
                         record += '\t' + str(rho) + '\t' + str(methylation_lookup[pos][0]) + str(methylation_lookup[pos][1])
                     else:
-                        record = record + '\t' + str(rho) + '\t' + '.'
+                        record = record + '\t' + str(rho) + '\t' + '[]'
                     print(record)

@@ -80,7 +80,7 @@ class _Record(object):
         self.mutability = type_make(mutability, 'float')
         self.quebec_alleles = [int(i) for i in str(quebec_alleles).split(':')]
         self.ld_rho = type_make(ld_rho, 'float')
-        self.methylation = type_make(methylation, 'float')
+        self.methylation = ast.literal_eval(methylation)
 
 
 class Reader(object):
