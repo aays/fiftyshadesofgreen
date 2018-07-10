@@ -88,27 +88,37 @@ for i in tqdm(range(len(windows) - 1)):
     rho_count = 0
     meth_count = 0
     record_counter = 0
+    meth_dict = dict.fromkeys(['CG', 'CHG', 'CHH'], 0.0)
+    meth_context_counts = dict.fromkeys(['CG', 'CHG', 'CHH'], 0)
 
     # iterate through records in window
     for record in p.fetch(current_chrom, window[0], window[1]):
         if record.ld_rho != 'NA' and all_sites:
             if record.methylation:
-                meth += record.methylation
+                beta_val, context = record.methylation
+                meth += beta_val # all methylation
                 rho += record.ld_rho
+                meth_dict[context] += beta_val # per-context methylation
+                meth_context_counts[context] += 1
                 rho_count += 1
                 meth_count += 1
-            elif record.methylation == 'NA': # meth = 0
+            elif not record.methylation:
                 rho += record.ld_rho
                 rho_count += 1
             record_counter += 1
         elif record.ld_rho != 'NA' and not all_sites:
-            if record.methylation != 'NA':
-                meth += record.methylation
+            if record.methylation:
+                beta_val, context = record.methylation
+                meth += beta_val
                 rho += record.ld_rho
+                meth_dict[context] += beta_val
+                meth_context_counts[context] += 1
                 rho_count += 1
                 meth_count += 1
             record_counter += 1
 
-    print(current_chrom, window[0], window[1], rho, rho_count, meth, meth_count, record_counter)
+    print(current_chrom, window[0], window[1], rho, rho_count, meth, meth_count, 
+          meth_dict['CG'], meth_context_counts['CG'], meth_dict['CHG'], meth_context_counts['CHG'],
+          meth_dict['CHH'], meth_context_counts['CHH'], record_counter)
 
 
