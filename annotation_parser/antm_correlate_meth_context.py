@@ -1,5 +1,5 @@
 '''
-modification of antm_correlate_num.py to account for context
+modification of antm_correlate_meth.py to account for context
 
 annotation table must have both ld_rho values + methylation beta values/sequence contexts appended as additional columns.
 this uses the _antm_ parser variant, not antr
@@ -75,7 +75,7 @@ def attr_fetch(rec, attribute):
 # print column headers
 
 print('chromosome', 'start', 'end', 'rho_values', 'rho_count', 'methylation_values', 'methylation_count',
-      'CG_values', 'CG_count', 'CHG_values', 'CHG_count', 'record_count')
+      'CG_values', 'CG_count', 'CHG_values', 'CHG_count', 'CN_values', 'CN_count', 'record_count')
 
 windows = list(range(0, lengths[current_chrom], windowsize)) + [lengths[current_chrom]]
 
@@ -88,8 +88,8 @@ for i in tqdm(range(len(windows) - 1)):
     rho_count = 0
     meth_count = 0
     record_counter = 0
-    meth_dict = dict.fromkeys(['CG', 'CHG', 'CHH'], 0.0)
-    meth_context_counts = dict.fromkeys(['CG', 'CHG', 'CHH'], 0)
+    meth_dict = dict.fromkeys(['CG', 'CHG', 'CHH', 'CN'], 0.0)
+    meth_context_counts = dict.fromkeys(['CG', 'CHG', 'CHH', 'CN'], 0)
 
     # iterate through records in window
     for record in p.fetch(current_chrom, window[0], window[1]):
@@ -119,6 +119,5 @@ for i in tqdm(range(len(windows) - 1)):
 
     print(current_chrom, window[0], window[1], rho, rho_count, meth, meth_count, 
           meth_dict['CG'], meth_context_counts['CG'], meth_dict['CHG'], meth_context_counts['CHG'],
-          meth_dict['CHH'], meth_context_counts['CHH'], record_counter)
-
+          meth_dict['CHH'], meth_context_counts['CHH'], meth_dict['CN'], meth_context_counts['CN'], record_counter)
 
