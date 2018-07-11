@@ -75,7 +75,8 @@ def attr_fetch(rec, attribute):
 # print column headers
 
 print('chromosome', 'start', 'end', 'rho_values', 'rho_count', 'methylation_values', 'methylation_count',
-      'CG_values', 'CG_count', 'CHG_values', 'CHG_count', 'CN_values', 'CN_count', 'record_count')
+      'CG_values', 'CG_count', 'CHG_values', 'CHG_count', 'CHH_values', 'CHH_counts',
+      'CN_values', 'CN_count', 'record_count')
 
 windows = list(range(0, lengths[current_chrom], windowsize)) + [lengths[current_chrom]]
 
