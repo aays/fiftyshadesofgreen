@@ -70,7 +70,7 @@ for line in tqdm(hotspot_lines):
     else:
         sp = line.rstrip().split(',')
         chrom, start, end = sp[0], float(sp[1]), float(sp[2])
-        ratio = float(sp[7])
+        ratio = float(sp[5])
 
         p = antr.Reader(table)
 
