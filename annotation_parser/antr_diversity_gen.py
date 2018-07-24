@@ -74,7 +74,7 @@ def main(table, dist, min_alleles, neutral_only):
                 continue
             else:
                 sp = [l.rstrip('\n') for l in line.split(',')]
-                chrom, block_start, block_end, flank_rate, 
+                chrom, block_start, block_end, flank_rate, \
                 block_rate, rate_ratio, spot_group, length = sp
                 try:
                     curr_theta, c = SFS_from_antr(table, chrom, int(block_start), int(block_end), 
