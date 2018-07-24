@@ -25,13 +25,8 @@ def args():
                         type = int, help = 'Filter sites with less than n alleles called. [Optional]')
     parser.add_argument('-n', '--neutral_only', required = False,
                         action = 'store_true', help = 'Only consider neutral (intergenic, intronic, 4-fold degenerate) sites? [Optional]')
-
     args = parser.parse_args()
-
-    table = str(args.table)
-    dist = str(args.dist)
-    min_alleles = args.min_alleles
-    neutral_only = args.neutral_only
+    return args
 
 def MAF_from_allele_count(allele_counts, min_alleles = None):
     minor_allele_count = sorted(allele_counts)[-2] # second most common allele count
@@ -72,8 +67,7 @@ def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_onl
         return diversity, record_count
 
 # column headers
-def main():
-    args()
+def main(table, dist, min_alleles, neutral_only):
     print('chromosome start end diversity record_count') # column names
     with open(dist, 'r') as f:
         for line in tqdm(f):
@@ -91,4 +85,5 @@ def main():
                 print(chrom, block_start, block_end, curr_theta, c)
 
 if __name__ == '__main__':
-    main()
+    arguments = args()
+    main(*arguments)
