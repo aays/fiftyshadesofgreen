@@ -67,21 +67,22 @@ def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_onl
         return diversity, record_count
 
 def main(table, dist, min_alleles, neutral_only):
-    print('chromosome start end diversity record_count') # column names
+    print('chromosome start end diversity record_count length') # column names
     with open(dist, 'r') as f:
         for line in tqdm(f):
             if line.startswith('chr,block_start'): # header
                 continue
             else:
                 sp = [l.rstrip('\n') for l in line.split(',')]
-                chrom, block_start, block_end, flank_rate, block_rate, rate_ratio, spot_group = sp
+                chrom, block_start, block_end, flank_rate, 
+                block_rate, rate_ratio, spot_group, length = sp
                 try:
                     curr_theta, c = SFS_from_antr(table, chrom, int(block_start), int(block_end), 
                                                   min_alleles = min_alleles, neutral_only = neutral_only, counter = True)
                     c = int(c)
                 except ZeroDivisionError: # nothing in window
                     curr_theta, c = 0, 0
-                print(chrom, block_start, block_end, curr_theta, c)
+                print(chrom, block_start, block_end, curr_theta, c, length)
 
 if __name__ == '__main__':
     arguments = args()
