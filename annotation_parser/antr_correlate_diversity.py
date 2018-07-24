@@ -19,41 +19,36 @@ try:
 except ImportError:
     sys.path.append('/scratch/research/projects/chlamydomonas/genomewide_recombination/analysis/fiftyshadesofgreen/annotation_parser/')
 
-# args
-parser = argparse.ArgumentParser(description = 'General purpose calculation of rho and other correlates in defined windows.',
-                                usage = 'antr_correlate_diversity.py [options]')
+def args():
+    parser = argparse.ArgumentParser(description = 'General purpose calculation of rho and other correlates in defined windows.',
+                                    usage = 'antr_correlate_diversity.py [options]')
 
-parser.add_argument('-t', '--table', required = True,
-                   type = str, help = 'Annotation table file (.txt.gz)')
-parser.add_argument('-w', '--windowsize', required = True,
-                   type = int, help = 'Window size')
-parser.add_argument('-m', '--min_alleles', required = False,
-                    type = int, help = 'Filter sites with less than n alleles called. [Optional]')
-parser.add_argument('-n', '--neutral_only', required = False,
-                    action = 'store_true', help = 'Only consider neutral (intergenic, intronic, 4-fold degenerate) sites? [Optional]')
-parser.add_argument('-d', '--gene_density', required = False,
-                    action = 'store_true', help = 'Compute gene density per window (CDS + intron + UTR sites) [Optional]')
-parser.add_argument('-s', '--measure', required = False,
-                    type = str, help = "Diversity measure to use ([theta_pi, theta_w, both]) - default is theta pi")
+    parser.add_argument('-t', '--table', required = True,
+                       type = str, help = 'Annotation table file (.txt.gz)')
+    parser.add_argument('-w', '--windowsize', required = True,
+                       type = int, help = 'Window size')
+    parser.add_argument('-m', '--min_alleles', required = False,
+                        type = int, help = 'Filter sites with less than n alleles called. [Optional]')
+    parser.add_argument('-n', '--neutral_only', required = False,
+                        action = 'store_true', help = 'Only consider neutral (intergenic, intronic, 4-fold degenerate) sites? [Optional]')
+    parser.add_argument('-d', '--gene_density', required = False,
+                        action = 'store_true', help = 'Compute gene density per window (CDS + intron + UTR sites) [Optional]')
+    parser.add_argument('-s', '--measure', required = False,
+                        type = str, help = "Diversity measure to use ([theta_pi, theta_w, both]) - default is theta pi")
 
-args = parser.parse_args()
+    args = parser.parse_args()
+    if not args.measure:
+        measure = 'theta_pi'
+    else:
+        measure = args.measure
 
-table = str(args.table)
-windowsize = int(args.windowsize)
-min_alleles = args.min_alleles
-neutral_only = args.neutral_only
-gene_density = args.gene_density
+    try:
+        assert measure in ['theta_pi', 'theta_w', 'both']
+    except:
+        raise AssertionError('Invalid measure provided. Valid options include [theta_pi, theta_w, both]')
 
-if not args.measure:
-    measure = 'theta_pi'
-else:
-    measure = args.measure
+    return [str(args.table), int(args.windowsize), args.min_alleles, args.neutral_only, args.gene_density, measure]
     
-try:
-    assert measure in ['theta_pi', 'theta_w', 'both']
-except:
-    raise AssertionError('Invalid measure provided. Valid options include [theta_pi, theta_w, both]')
-
 # chromosome lengths - hardcoded for chlamy
 lengths = {'chromosome_1': 8033585,
 'chromosome_2': 9223677,
@@ -136,54 +131,62 @@ def calculate_gene_density(table, chromosome, start, end):
                 total_count += 1
     return counts, total_count
 
-# print column headers
-if gene_density:
-    print('chromosome', 'start', 'end', 'diversity', 'rho', 'rho_total', 'rho_count', 'iter_count',
-          'CDS_count', 'intronic_count', 'utr5_count', 'utr3_count', 'total_gene_count')
-else:
-    print('chromosome', 'start', 'end', 'diversity', 'rho', 'rho_total', 'rho_count', 'iter_count')
+def main(table, windowsize, min_alleles, neutral_only, gene_density, measure):
+    if measure == 'both':
+        div_colname = 'theta_pi theta_w'
+    else:
+        div_colname = measure
+    if gene_density:
+        print('chromosome', 'start', 'end', '{}'.format(div_colname), 'rho', 'rho_total', 'rho_count', 'iter_count',
+              'CDS_count', 'intronic_count', 'utr5_count', 'utr3_count', 'total_gene_count')
+    else:
+        print('chromosome', 'start', 'end', '{}'.format(div_colname), 'rho', 'rho_total', 'rho_count', 'iter_count')
 
-for chrom in range(1, 18):
-    current_chrom = 'chromosome_{}'.format(str(chrom))
-    windows = list(range(0, lengths[current_chrom], windowsize)) + [lengths[current_chrom]]
+    for chrom in range(1, 18):
+        current_chrom = 'chromosome_{}'.format(str(chrom))
+        windows = list(range(0, lengths[current_chrom], windowsize)) + [lengths[current_chrom]]
 
-    p = antr.Reader(table)
+        p = antr.Reader(table)
 
-    for i in range(len(windows) - 1):
-        window = (windows[i], windows[i + 1])
-        rho = 0.0
-        count = 0
-        record_counter = 0
+        for i in range(len(windows) - 1):
+            window = (windows[i], windows[i + 1])
+            rho = 0.0
+            count = 0
+            record_counter = 0
 
-        # iterate through records in window
-        for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
-            if record.ld_rho != 'NA':
-                rho += record.ld_rho
-                count += 1
-            else:
-                continue
-            record_counter += 1
+            # iterate through records in window
+            for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
+                if record.ld_rho != 'NA':
+                    rho += record.ld_rho
+                    count += 1
+                else:
+                    continue
+                record_counter += 1
 
-        try:
-            rho_out = rho / count
-            if not measure == 'both':
-                curr_div = SFS_from_antr(table, current_chrom, window[0], window[1], 
-                                         min_alleles = min_alleles, neutral_only = neutral_only, measure = measure)
-            elif measure == 'both':
-                theta_pi, theta_w = SFS_from_antr(table, current_chrom, window[0], window[1],
-                                                  min_alleles = min_alleles, neutral_only = neutral_only, measure = measure)
-                curr_div = ','.join(theta_pi, theta_w)
+            try:
+                rho_out = rho / count
+                if not measure == 'both':
+                    curr_div = SFS_from_antr(table, current_chrom, window[0], window[1], 
+                                             min_alleles = min_alleles, neutral_only = neutral_only, measure = measure)
+                elif measure == 'both':
+                    theta_pi, theta_w = SFS_from_antr(table, current_chrom, window[0], window[1],
+                                                      min_alleles = min_alleles, neutral_only = neutral_only, measure = measure)
+                    curr_div = ' '.join(theta_pi, theta_w)
+                if gene_density:
+                    gene_counts, total_gene_count = calculate_gene_density(table, current_chrom, window[0], window[1])
+            except ZeroDivisionError: # nothing in window
+                rho_out = 0
+                if not measure == 'both':
+                    curr_div = 0
+                elif measure == 'both':
+                    curr_div = ' '.join([0, 0])
+
             if gene_density:
-                gene_counts, total_gene_count = calculate_gene_density(table, current_chrom, window[0], window[1])
-        except ZeroDivisionError: # nothing in window
-            rho_out = 0
-            if not measure == 'both':
-                curr_div = 0
-            elif measure == 'both':
-                curr_div = ','.join([0, 0])
-        
-        if gene_density:
-            print(current_chrom, window[0], window[1], curr_div, rho_out, rho, count, record_counter,
-                  gene_counts['CDS'], gene_counts['intronic'], gene_counts['utr5'], gene_counts['utr3'], total_gene_count)
-        elif not gene_density:
-            print(current_chrom, window[0], window[1], curr_div, rho_out, rho, count, record_counter)
+                print(current_chrom, window[0], window[1], curr_div, rho_out, rho, count, record_counter,
+                      gene_counts['CDS'], gene_counts['intronic'], gene_counts['utr5'], gene_counts['utr3'], total_gene_count)
+            elif not gene_density:
+                print(current_chrom, window[0], window[1], curr_div, rho_out, rho, count, record_counter)
+                
+if __name__ == '__main__':
+    arguments = args()
+    main(*arguments)
