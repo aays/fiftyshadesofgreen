@@ -66,7 +66,6 @@ def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_onl
     elif counter:
         return diversity, record_count
 
-# column headers
 def main(table, dist, min_alleles, neutral_only):
     print('chromosome start end diversity record_count') # column names
     with open(dist, 'r') as f:
