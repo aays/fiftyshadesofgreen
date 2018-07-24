@@ -171,7 +171,7 @@ def main(table, windowsize, min_alleles, neutral_only, gene_density, measure):
                 elif measure == 'both':
                     theta_pi, theta_w = SFS_from_antr(table, current_chrom, window[0], window[1],
                                                       min_alleles = min_alleles, neutral_only = neutral_only, measure = measure)
-                    curr_div = ' '.join(theta_pi, theta_w)
+                    curr_div = ' '.join([theta_pi, theta_w])
                 if gene_density:
                     gene_counts, total_gene_count = calculate_gene_density(table, current_chrom, window[0], window[1])
             except ZeroDivisionError: # nothing in window
