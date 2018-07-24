@@ -26,7 +26,7 @@ def args():
     parser.add_argument('-n', '--neutral_only', required = False,
                         action = 'store_true', help = 'Only consider neutral (intergenic, intronic, 4-fold degenerate) sites? [Optional]')
     args = parser.parse_args()
-    return args
+    return [args.table, args.dist, args.min_alleles, args.neutral_only]
 
 def MAF_from_allele_count(allele_counts, min_alleles = None):
     minor_allele_count = sorted(allele_counts)[-2] # second most common allele count
