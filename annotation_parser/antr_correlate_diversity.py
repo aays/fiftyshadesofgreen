@@ -33,6 +33,8 @@ parser.add_argument('-n', '--neutral_only', required = False,
                     action = 'store_true', help = 'Only consider neutral (intergenic, intronic, 4-fold degenerate) sites? [Optional]')
 parser.add_argument('-d', '--gene_density', required = False,
                     action = 'store_true', help = 'Compute gene density per window (CDS + intron + UTR sites) [Optional]')
+parser.add_argument('-s', '--measure', required = False,
+                    type = str, help = "Diversity measure to use ([theta_pi, theta_w, both]) - default is theta pi")
 
 args = parser.parse_args()
 
@@ -41,6 +43,16 @@ windowsize = int(args.windowsize)
 min_alleles = args.min_alleles
 neutral_only = args.neutral_only
 gene_density = args.gene_density
+
+if not args.measure:
+    measure = 'theta_pi'
+else:
+    measure = args.measure
+    
+try:
+    assert measure in ['theta_pi', 'theta_w', 'both']
+except:
+    raise AssertionError('Invalid measure provided. Valid options include [theta_pi, theta_w, both]')
 
 # chromosome lengths - hardcoded for chlamy
 lengths = {'chromosome_1': 8033585,
@@ -84,7 +96,7 @@ def MAF_from_allele_count(allele_counts, min_alleles = None):
     except ZeroDivisionError:
         return None
 
-def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_only = False):
+def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_only = False, measure = 'theta_pi'):
     SFSs = {}
     p = antr.Reader(table)
     for record in tqdm(p.fetch(chromosome, start, end)):
@@ -101,8 +113,16 @@ def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_onl
         if total_alleles_called not in SFSs:
             SFSs[total_alleles_called] = SFS([0]*(total_alleles_called + 1))
         SFSs[total_alleles_called].add(MAF, total_alleles_called)
-    diversity = sum([sfs.theta_pi() * sfs.sites() for sfs in SFSs.values()]) / sum([sfs.sites() for sfs in SFSs.values()])
-    return diversity
+    if measure == 'theta_pi':
+        diversity = sum([sfs.theta_pi() * sfs.sites() for sfs in SFSs.values()]) / sum([sfs.sites() for sfs in SFSs.values()])
+        return diversity
+    elif measure == 'theta_w':
+        diversity = sum([sfs.theta_w() * sfs.sites() for sfs in SFSs.values()]) / sum([sfs.sites() for sfs in SFSs.values()])
+        return diversity
+    elif measure == 'both':
+        diversity_tajima = sum([sfs.theta_pi() * sfs.sites() for sfs in SFSs.values()]) / sum([sfs.sites() for sfs in SFSs.values()])
+        diversity_watterson = sum([sfs.theta_w() * sfs.sites() for sfs in SFSs.values()]) / sum([sfs.sites() for sfs in SFSs.values()])
+        return diversity_tajima, diversity_watterson
 
 def calculate_gene_density(table, chromosome, start, end):
     p = antr.Reader(table)
@@ -146,12 +166,21 @@ for chrom in range(1, 18):
 
         try:
             rho_out = rho / count
-            curr_div = SFS_from_antr(table, current_chrom, window[0], window[1], min_alleles = min_alleles, neutral_only = neutral_only)
+            if not measure == 'both':
+                curr_div = SFS_from_antr(table, current_chrom, window[0], window[1], 
+                                         min_alleles = min_alleles, neutral_only = neutral_only, measure = measure)
+            elif measure == 'both':
+                theta_pi, theta_w = SFS_from_antr(table, current_chrom, window[0], window[1],
+                                                  min_alleles = min_alleles, neutral_only = neutral_only, measure = measure)
+                curr_div = ','.join(theta_pi, theta_w)
             if gene_density:
                 gene_counts, total_gene_count = calculate_gene_density(table, current_chrom, window[0], window[1])
         except ZeroDivisionError: # nothing in window
             rho_out = 0
-            curr_div = 0
+            if not measure == 'both':
+                curr_div = 0
+            elif measure == 'both':
+                curr_div = ','.join([0, 0])
         
         if gene_density:
             print(current_chrom, window[0], window[1], curr_div, rho_out, rho, count, record_counter,
