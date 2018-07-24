@@ -77,7 +77,7 @@ def main(table, dist, min_alleles, neutral_only):
                 chrom, block_start, block_end, flank_rate, \
                 block_rate, rate_ratio, spot_group, length = sp
                 try:
-                    curr_theta, c = SFS_from_antr(table, chrom, int(block_start), int(block_end), 
+                    curr_theta, c = SFS_from_antr(table, chrom, int(float(block_start)), int(float((block_end)),
                                                   min_alleles = min_alleles, neutral_only = neutral_only, counter = True)
                     c = int(c)
                 except ZeroDivisionError: # nothing in window
