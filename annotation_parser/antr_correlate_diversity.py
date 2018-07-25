@@ -115,8 +115,14 @@ def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_onl
         diversity = sum([sfs.theta_w() * sfs.sites() for sfs in SFSs.values()]) / sum([sfs.sites() for sfs in SFSs.values()])
         return diversity
     elif measure == 'both':
-        diversity_tajima = sum([sfs.theta_pi() * sfs.sites() for sfs in SFSs.values()]) / sum([sfs.sites() for sfs in SFSs.values()])
-        diversity_watterson = sum([sfs.theta_w() * sfs.sites() for sfs in SFSs.values()]) / sum([sfs.sites() for sfs in SFSs.values()])
+        try:
+            diversity_tajima = sum([sfs.theta_pi() * sfs.sites() for sfs in SFSs.values()]) / sum([sfs.sites() for sfs in SFSs.values()])
+        except ZeroDivisionError:
+            diversity_tajima = 0
+        try:
+            diversity_watterson = sum([sfs.theta_w() * sfs.sites() for sfs in SFSs.values()]) / sum([sfs.sites() for sfs in SFSs.values()])
+        except ZeroDivisionError:
+            diversity_watterson = 0
         return diversity_tajima, diversity_watterson
 
 def calculate_gene_density(table, chromosome, start, end):
@@ -179,7 +185,7 @@ def main(table, windowsize, min_alleles, neutral_only, gene_density, measure):
                 if not measure == 'both':
                     curr_div = 0
                 elif measure == 'both':
-                    curr_div = ' '.join([0, 0])
+                    curr_div = ' '.join(['0', '0'])
 
             if gene_density:
                 print(current_chrom, window[0], window[1], curr_div, rho_out, rho, count, record_counter,
