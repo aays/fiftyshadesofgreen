@@ -248,12 +248,11 @@ def reclist(vcf_file, chrom = None, start = None, end = None, snpsonly = False):
     
     # make list
     if chrom and start and end:
-        try:
-            snippet = vcfin.fetch(chrom = chrom, start = start - 1, end = end) 
-            if snpsonly:
-                outlist = [record for record in snippet if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record)]
-            elif not snpsonly:
-                outlist = [record for record in snippet]
+        snippet = vcfin.fetch(chrom = chrom, start = start - 1, end = end) 
+        if snpsonly:
+            outlist = [record for record in snippet if hardsnpcheck(record) and not issingleton(record) and not isinvariant(record)]
+        elif not snpsonly:
+            outlist = [record for record in snippet]
     elif chrom and not start and not end:
         snippet = vcfin.fetch(chrom = chrom)
         if snpsonly:
