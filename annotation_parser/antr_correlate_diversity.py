@@ -35,6 +35,8 @@ def args():
                         action = 'store_true', help = 'Compute gene density per window (CDS + intron + UTR sites) [Optional]')
     parser.add_argument('-s', '--measure', required = False,
                         type = str, help = "Diversity measure to use ([theta_pi, theta_w, both]) - default is theta pi")
+    parser.add_argument('-f', '--ignore_fourfold', required = False,
+                        action = 'store_true', help = '[if --neutral_only] Only calculate diversity at intronic/intergenic sites')
 
     args = parser.parse_args()
     if not args.measure:
@@ -47,7 +49,7 @@ def args():
     except:
         raise AssertionError('Invalid measure provided. Valid options include [theta_pi, theta_w, both]')
 
-    return [str(args.table), int(args.windowsize), args.min_alleles, args.neutral_only, args.gene_density, measure]
+    return [str(args.table), int(args.windowsize), args.min_alleles, args.neutral_only, args.gene_density, measure, args.ignore_fourfold]
     
 # chromosome lengths - hardcoded for chlamy
 lengths = {'chromosome_1': 8033585,
@@ -91,14 +93,18 @@ def MAF_from_allele_count(allele_counts, min_alleles = None):
     except ZeroDivisionError:
         return None
 
-def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_only = False, measure = 'theta_pi'):
+def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_only = False, measure = 'theta_pi', ignore_fourfold = False):
     SFSs = {}
     p = antr.Reader(table)
     for record in tqdm(p.fetch(chromosome, start, end)):
         # diversity calc
         allele_counts = record.quebec_alleles
-        if neutral_only and True not in [record.is_intergenic, record.is_intronic, record.is_fold4]:
-            continue
+        if not ignore_fourfold:
+            if neutral_only and True not in [record.is_intergenic, record.is_intronic, record.is_fold4]:
+                continue
+        elif ignore_fourfold:
+            if neutral_only and True not in [record.is_intergenic, record.is_intronic]: # allow 4D sites
+                continue
         try:
             MAF, total_alleles_called = MAF_from_allele_count(allele_counts, min_alleles = min_alleles)
         except TypeError:
@@ -137,7 +143,7 @@ def calculate_gene_density(table, chromosome, start, end):
                 total_count += 1
     return counts, total_count
 
-def main(table, windowsize, min_alleles, neutral_only, gene_density, measure):
+def main(table, windowsize, min_alleles, neutral_only, gene_density, measure, ignore_fourfold):
     if measure == 'both':
         div_colname = 'theta_pi theta_w'
     else:
@@ -173,10 +179,12 @@ def main(table, windowsize, min_alleles, neutral_only, gene_density, measure):
                 rho_out = rho / count
                 if not measure == 'both':
                     curr_div = SFS_from_antr(table, current_chrom, window[0], window[1], 
-                                             min_alleles = min_alleles, neutral_only = neutral_only, measure = measure)
+                                             min_alleles = min_alleles, neutral_only = neutral_only, 
+                                             measure = measure, ignore_fourfold = ignore_fourfold)
                 elif measure == 'both':
                     theta_pi, theta_w = SFS_from_antr(table, current_chrom, window[0], window[1],
-                                                      min_alleles = min_alleles, neutral_only = neutral_only, measure = measure)
+                                                      min_alleles = min_alleles, neutral_only = neutral_only, 
+                                                      measure = measure, ignore_fourfold = ignore_fourfold)
                     curr_div = ' '.join([str(theta) for theta in [theta_pi, theta_w]])
                 if gene_density:
                     gene_counts, total_gene_count = calculate_gene_density(table, current_chrom, window[0], window[1])
