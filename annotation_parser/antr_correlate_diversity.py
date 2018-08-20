@@ -19,6 +19,18 @@ try:
 except ImportError:
     sys.path.append('/scratch/research/projects/chlamydomonas/genomewide_recombination/analysis/fiftyshadesofgreen/annotation_parser/')
 
+def attr_fetch(rec, attribute):
+    '''(rec, str) -> bool/float
+    Used for fetching desired attributes from a record.'''
+    rec_attr = [item for item in dir(rec) if '__' not in item and attribute in item]
+    try:
+        assert len(rec_attr) == 1
+    except:
+        raise AssertionError('{} is not a valid attribute. {} matches found - {}'.format(attribute, len(rec_attr), rec_attr))
+    rec_attr = rec_attr[0] # extract item from list
+    out = getattr(rec, rec_attr)
+    return out    
+
 def args():
     parser = argparse.ArgumentParser(description = 'General purpose calculation of rho and other correlates in defined windows.',
                                     usage = 'antr_correlate_diversity.py [options]')
@@ -37,6 +49,8 @@ def args():
                         type = str, help = "Diversity measure to use ([theta_pi, theta_w, both]) - default is theta pi")
     parser.add_argument('-f', '--ignore_fourfold', required = False,
                         action = 'store_true', help = '[if --neutral_only] Only calculate diversity at intronic/intergenic sites')
+    parser.add_argument('-r', '--neutral_regions', required = False,
+                        type = str, nargs = '+', help = '[if --neutral_only] What regions? [intergenic, intronic, fold4]. Defaults to all')
 
     args = parser.parse_args()
     if not args.measure:
@@ -48,8 +62,18 @@ def args():
         assert measure in ['theta_pi', 'theta_w', 'both']
     except:
         raise AssertionError('Invalid measure provided. Valid options include [theta_pi, theta_w, both]')
+                        
+    if args.neutral_regions:
+        neutral_regions = [attr_fetch(item) for item in args.neutral]
+        try:
+            assert len(neutral_regions) <= 3
+        except:
+            raise AssertionError('Too many regions specified in --neutral_regions! Valid options are [intronic, intergenic, both]')
+    else:
+        neutral_regions = None
 
-    return [str(args.table), int(args.windowsize), args.min_alleles, args.neutral_only, args.gene_density, measure, args.ignore_fourfold]
+    return [str(args.table), int(args.windowsize), args.min_alleles,
+            args.neutral_only, args.gene_density, measure]
     
 # chromosome lengths - hardcoded for chlamy
 lengths = {'chromosome_1': 8033585,
@@ -70,18 +94,6 @@ lengths = {'chromosome_1': 8033585,
 'chromosome_16': 7783580,
 'chromosome_17': 7188315}
 
-def attr_fetch(rec, attribute):
-    '''(rec, str) -> bool/float
-    Used for fetching desired attributes from a record.'''
-    rec_attr = [item for item in dir(rec) if '__' not in item and attribute in item]
-    try:
-        assert len(rec_attr) == 1
-    except:
-        raise AssertionError('{} is not a valid attribute. {} matches found - {}'.format(attribute, len(rec_attr), rec_attr))
-    rec_attr = rec_attr[0] # extract item from list
-    out = getattr(rec, rec_attr)
-    return out
-
 def MAF_from_allele_count(allele_counts, min_alleles = None):
     minor_allele_count = sorted(allele_counts)[-2] # second most common allele count
     total_alleles_called = sum(allele_counts)
@@ -93,17 +105,17 @@ def MAF_from_allele_count(allele_counts, min_alleles = None):
     except ZeroDivisionError:
         return None
 
-def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_only = False, measure = 'theta_pi', ignore_fourfold = False):
+def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_only = False, measure = 'theta_pi', regions = neutral_regions):
     SFSs = {}
     p = antr.Reader(table)
     for record in tqdm(p.fetch(chromosome, start, end)):
         # diversity calc
         allele_counts = record.quebec_alleles
-        if not ignore_fourfold:
-            if neutral_only and True not in [record.is_intergenic, record.is_intronic, record.is_fold4]:
+        if neutral_only and not neutral_regions: # default - all three of intergenic, intronic, and fold 4
+            if True not in [record.is_intergenic, record.is_intronic, record.is_fold4]:
                 continue
-        elif ignore_fourfold:
-            if neutral_only and True not in [record.is_intergenic, record.is_intronic]: # allow 4D sites
+        elif neutral_only and len(neutral_regions) >= 1:
+            if True not in neutral_regions: # whatever the specified neutral regions were
                 continue
         try:
             MAF, total_alleles_called = MAF_from_allele_count(allele_counts, min_alleles = min_alleles)
@@ -143,7 +155,7 @@ def calculate_gene_density(table, chromosome, start, end):
                 total_count += 1
     return counts, total_count
 
-def main(table, windowsize, min_alleles, neutral_only, gene_density, measure, ignore_fourfold):
+def main(table, windowsize, min_alleles, neutral_only, gene_density, measure, neutral_regions):
     if measure == 'both':
         div_colname = 'theta_pi theta_w'
     else:
@@ -180,11 +192,11 @@ def main(table, windowsize, min_alleles, neutral_only, gene_density, measure, ig
                 if not measure == 'both':
                     curr_div = SFS_from_antr(table, current_chrom, window[0], window[1], 
                                              min_alleles = min_alleles, neutral_only = neutral_only, 
-                                             measure = measure, ignore_fourfold = ignore_fourfold)
+                                             measure = measure, neutral_regions = neutral_regions)
                 elif measure == 'both':
                     theta_pi, theta_w = SFS_from_antr(table, current_chrom, window[0], window[1],
                                                       min_alleles = min_alleles, neutral_only = neutral_only, 
-                                                      measure = measure, ignore_fourfold = ignore_fourfold)
+                                                      measure = measure, neutral_regions = neutral_regions)
                     curr_div = ' '.join([str(theta) for theta in [theta_pi, theta_w]])
                 if gene_density:
                     gene_counts, total_gene_count = calculate_gene_density(table, current_chrom, window[0], window[1])
