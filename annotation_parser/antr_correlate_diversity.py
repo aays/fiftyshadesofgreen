@@ -64,9 +64,9 @@ def args():
         raise AssertionError('Invalid measure provided. Valid options include [theta_pi, theta_w, both]')
                         
     if args.neutral_regions:
-        neutral_regions = [attr_fetch(item) for item in args.neutral]
+        neutral_regions = [attr_fetch(item) for item in args.neutral_regions]
         try:
-            assert len(neutral_regions) <= 3
+            assert 1 <= len(neutral_regions) <= 3
         except:
             raise AssertionError('Too many regions specified in --neutral_regions! Valid options are [intronic, intergenic, both]')
     else:
