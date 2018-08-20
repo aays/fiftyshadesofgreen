@@ -50,15 +50,16 @@ def args():
         raise AssertionError('Invalid measure provided. Valid options include [theta_pi, theta_w, both]')
                         
     if args.neutral_regions:
+        print(args.neutral_regions)
         try:
-            assert 1 <= len(neutral_regions) <= 3
+            assert 1 <= len(args.neutral_regions) <= 3
         except:
             raise AssertionError('Too many regions specified in --neutral_regions! Valid options are [intronic, intergenic, both]')
     else:
         neutral_regions = None
 
     return [str(args.table), int(args.windowsize), args.min_alleles,
-            args.neutral_only, args.gene_density, measure, neutral_regions]
+            args.neutral_only, args.gene_density, measure, args.neutral_regions]
     
 # chromosome lengths - hardcoded for chlamy
 lengths = {'chromosome_1': 8033585,
@@ -110,7 +111,7 @@ def MAF_from_allele_count(allele_counts, min_alleles = None):
     except ZeroDivisionError:
         return None
 
-def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_only = False, measure = 'theta_pi', neutral_regions = neutral_regions):
+def SFS_from_antr(table, chromosome, start, end, neutral_regions, min_alleles = None, neutral_only = False, measure = 'theta_pi'):
     SFSs = {}
     p = antr.Reader(table)
     for record in tqdm(p.fetch(chromosome, start, end)):
