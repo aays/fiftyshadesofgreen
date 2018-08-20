@@ -47,8 +47,6 @@ def args():
                         action = 'store_true', help = 'Compute gene density per window (CDS + intron + UTR sites) [Optional]')
     parser.add_argument('-s', '--measure', required = False,
                         type = str, help = "Diversity measure to use ([theta_pi, theta_w, both]) - default is theta pi")
-    parser.add_argument('-f', '--ignore_fourfold', required = False,
-                        action = 'store_true', help = '[if --neutral_only] Only calculate diversity at intronic/intergenic sites')
     parser.add_argument('-r', '--neutral_regions', required = False,
                         type = str, nargs = '+', help = '[if --neutral_only] What regions? [intergenic, intronic, fold4]. Defaults to all')
 
@@ -155,7 +153,12 @@ def calculate_gene_density(table, chromosome, start, end):
                 total_count += 1
     return counts, total_count
 
+def eprint(*args, **kwargs): # throws out progress info
+    print(*args, file=sys.stderr, **kwargs)
+
 def main(table, windowsize, min_alleles, neutral_only, gene_density, measure, neutral_regions):
+    if neutral_regions:
+        eprint('Regions selected - {}'.format(neutral_regions)
     if measure == 'both':
         div_colname = 'theta_pi theta_w'
     else:
