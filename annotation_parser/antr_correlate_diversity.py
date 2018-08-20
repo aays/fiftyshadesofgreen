@@ -71,7 +71,7 @@ def args():
         neutral_regions = None
 
     return [str(args.table), int(args.windowsize), args.min_alleles,
-            args.neutral_only, args.gene_density, measure]
+            args.neutral_only, args.gene_density, measure, neutral_regions]
     
 # chromosome lengths - hardcoded for chlamy
 lengths = {'chromosome_1': 8033585,
@@ -103,7 +103,7 @@ def MAF_from_allele_count(allele_counts, min_alleles = None):
     except ZeroDivisionError:
         return None
 
-def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_only = False, measure = 'theta_pi', regions = neutral_regions):
+def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_only = False, measure = 'theta_pi', neutral_regions = neutral_regions):
     SFSs = {}
     p = antr.Reader(table)
     for record in tqdm(p.fetch(chromosome, start, end)):
