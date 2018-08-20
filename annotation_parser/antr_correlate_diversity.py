@@ -158,7 +158,7 @@ def eprint(*args, **kwargs): # throws out progress info
 
 def main(table, windowsize, min_alleles, neutral_only, gene_density, measure, neutral_regions):
     if neutral_regions:
-        eprint('Regions selected - {}'.format(neutral_regions)
+        eprint('Regions selected - {}'.format(neutral_regions))
     if measure == 'both':
         div_colname = 'theta_pi theta_w'
     else:
