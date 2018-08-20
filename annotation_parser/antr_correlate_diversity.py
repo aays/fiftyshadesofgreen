@@ -19,18 +19,6 @@ try:
 except ImportError:
     sys.path.append('/scratch/research/projects/chlamydomonas/genomewide_recombination/analysis/fiftyshadesofgreen/annotation_parser/')
 
-def attr_fetch(rec, attribute):
-    '''(rec, str) -> bool/float
-    Used for fetching desired attributes from a record.'''
-    rec_attr = [item for item in dir(rec) if '__' not in item and attribute in item]
-    try:
-        assert len(rec_attr) == 1
-    except:
-        raise AssertionError('{} is not a valid attribute. {} matches found - {}'.format(attribute, len(rec_attr), rec_attr))
-    rec_attr = rec_attr[0] # extract item from list
-    out = getattr(rec, rec_attr)
-    return out    
-
 def args():
     parser = argparse.ArgumentParser(description = 'General purpose calculation of rho and other correlates in defined windows.',
                                     usage = 'antr_correlate_diversity.py [options]')
@@ -62,7 +50,6 @@ def args():
         raise AssertionError('Invalid measure provided. Valid options include [theta_pi, theta_w, both]')
                         
     if args.neutral_regions:
-        neutral_regions = [attr_fetch(item) for item in args.neutral_regions]
         try:
             assert 1 <= len(neutral_regions) <= 3
         except:
@@ -92,6 +79,26 @@ lengths = {'chromosome_1': 8033585,
 'chromosome_16': 7783580,
 'chromosome_17': 7188315}
 
+def attr_fetch(rec, attribute):
+    '''(rec, str) -> bool/float
+    Used for fetching desired attributes from a record.'''
+    rec_attr = [item for item in dir(rec) if '__' not in item and attribute in item]
+    try:
+        assert len(rec_attr) == 1
+    except:
+        raise AssertionError('{} is not a valid attribute. {} matches found - {}'.format(attribute, len(rec_attr), rec_attr))
+    rec_attr = rec_attr[0] # extract item from list
+    out = getattr(rec, rec_attr)
+    return out    
+
+def test_neutral(record, neutral_regions):
+    '''Helper function for SFS_from_antr if custom neutral regions defined'''
+    report = [getattr(record, 'is_' + region) for region in neutral_regions]
+    if True not in report:
+        return False
+    elif True in report:
+        return True
+
 def MAF_from_allele_count(allele_counts, min_alleles = None):
     minor_allele_count = sorted(allele_counts)[-2] # second most common allele count
     total_alleles_called = sum(allele_counts)
@@ -110,10 +117,10 @@ def SFS_from_antr(table, chromosome, start, end, min_alleles = None, neutral_onl
         # diversity calc
         allele_counts = record.quebec_alleles
         if neutral_only and not neutral_regions: # default - all three of intergenic, intronic, and fold 4
-            if True not in [record.is_intergenic, record.is_intronic, record.is_fold4]:
+            if True not in [record.is_intronic, record.is_intergenic, record.is_fold4]:
                 continue
         elif neutral_only and len(neutral_regions) >= 1:
-            if True not in neutral_regions: # whatever the specified neutral regions were
+            if test_neutral(record, neutral_regions): # whatever the specified neutral regions were
                 continue
         try:
             MAF, total_alleles_called = MAF_from_allele_count(allele_counts, min_alleles = min_alleles)
