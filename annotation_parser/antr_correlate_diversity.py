@@ -54,7 +54,7 @@ def args():
         try:
             assert 1 <= len(args.neutral_regions) <= 3
         except:
-            raise AssertionError('Too many regions specified in --neutral_regions! Valid options are [intronic, intergenic, both]')
+            raise AssertionError('Too many regions specified in --neutral_regions! Valid options are [intronic, intergenic, 4fold]')
     else:
         neutral_regions = None
 
