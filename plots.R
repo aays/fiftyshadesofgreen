@@ -2,15 +2,7 @@
 
 # these require ggplot2 3.0 - install w/ devtools
 
-# figure 1 -
-# A - combined CDF of recombination across genome
-# B - LD decay across chromosomes
-
-# refs
-# 1A - notebook 13.1
-# 1B - notebook 13.1h
-
-setwd('Desktop/Research/papers/2018-LD-recombination/plots/')
+# setwd('Desktop/Research/papers/2018-LD-recombination/plots/')
 
 library(readr)
 library(dplyr)
@@ -19,10 +11,20 @@ library(tidyr)
 library(ggplot2)
 library(purrr)
 library(patchwork)
+library(wesanderson)
+library(cowplot)
+library(stringr)
+
+# figure 1 -
+# A - combined CDF of recombination across genome
+# B - LD decay across chromosomes
+
+# refs
+# 1A - notebook 13.1
+# 1B - notebook 13.1h
 
 lengths <- read_csv('lengths.csv') %>% rename(chr = chromosome)
 dist2k <- read_csv('singhaldist2k.txt')
-
 
 non_overlapping <- function(df, windowsize) {
   df %<>%
@@ -31,11 +33,6 @@ non_overlapping <- function(df, windowsize) {
     select(-contains('div'))
   return(df)
 }
-
-# install.packages('wesanderson')
-# for color palettes
-library(wesanderson)
-
 
 fig_1_theme <- theme(axis.title = element_text(family = "Helvetica", size = 16),
                  panel.grid.major = element_blank(), 
@@ -49,8 +46,7 @@ fig_1_theme <- theme(axis.title = element_text(family = "Helvetica", size = 16),
                  panel.background = element_blank())
 
 # 1A - dist plot
-cols <- as.character(wes_palette(17, name = 'GrandBudapest1', 
-                                 type = 'continuous'))
+cols <- as.character(wes_palette(17, name = 'GrandBudapest1', type = 'continuous'))
 
 dist2k_plot <- dist2k %>% 
   left_join(lengths, by = 'chr') %>% 
@@ -63,35 +59,11 @@ dist2k_plot <- dist2k %>%
   fig_1_theme +
   geom_vline(aes(xintercept = 0.00443298965947912), linetype = 'dashed', 
              col = 'black', size = 0.9) + # genomewide mean
-  # scale_x_continuous(breaks = c(0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08)) +
   scale_x_continuous(breaks = c(0, 0.02, 0.04, 0.06, 0.08)) +
   coord_cartesian(x = c(0.0, 0.06)) +
   labs(tag = 'A')
 
-dist2k_plot
-
-# legend for figure 1
-dummy <- data.frame(x = c(1:17), y = c(1:17), p = c(1:17))
-dist2k_legend <- ggplot(dummy, aes(x, y, colour = p)) +
-  geom_point() +
-  scale_color_continuous(low = cols[1], high = cols[10], guide = 'colourbar',
-                         limits = c(1, 9), breaks = c(seq(2, 9, by = 2))) +
-  guides(colour = guide_colourbar(title = 'Chromosome\nLength (Mb)'), ticks = FALSE) +
-  theme(legend.title = element_text(family = 'Helvetica', size = 14),
-        legend.text = element_text(family = 'Helvetica', size = 14),
-        legend.key.height = unit(0.8, 'cm'),
-        legend.key.width = unit(0.8, 'cm'))
-
-dist2k_legend
-
-library(cowplot)
-
-dist2k_legend_only <- cowplot::get_legend(dist2k_legend)
-
-dist2k_legend_only
-
 # 1B - LD decay plot
-
 plink_lines <- read_csv('plink_lines.csv', col_types = cols())
 
 decay_plot <- plink_lines %>% 
@@ -107,17 +79,27 @@ decay_plot <- plink_lines %>%
        y = expression(paste('Linkage disequilibrium (r'^2, ')')),
        tag = 'B')
 
-decay_plot
+# legend for figure 1
+dummy <- data.frame(x = c(1:17), y = c(1:17), p = c(1:17))
+dist2k_legend <- ggplot(dummy, aes(x, y, colour = p)) +
+  geom_point() +
+  scale_color_continuous(low = cols[1], high = cols[10], guide = 'colourbar',
+                         limits = c(1, 9), breaks = c(seq(2, 9, by = 2))) +
+  guides(colour = guide_colourbar(title = 'Chromosome\nLength (Mb)'), ticks = FALSE) +
+  theme(legend.title = element_text(family = 'Helvetica', size = 14),
+        legend.text = element_text(family = 'Helvetica', size = 14),
+        legend.key.height = unit(0.8, 'cm'),
+        legend.key.width = unit(0.8, 'cm'))
 
-# putting it all together
+dist2k_legend_only <- cowplot::get_legend(dist2k_legend)
+
+# putting it all together w/ patchwork
 fig_1 <- dist2k_plot + decay_plot + dist2k_legend_only + 
   plot_layout(ncol = 3, nrow = 1, width = c(1.1, 1.1, 0.4))
-fig_1
 
 ggsave(fig_1, file = 'fig_1.pdf', width = par('din')[1] * 1.5, height = par('din')[1] * 0.8)
 
 #####
-
 # figure 2 - correlates plot
 # already done for evol 2018 poster
 # code reposted below
@@ -151,8 +133,6 @@ fig_2 <- ggplot(filter(correlates, correlate != 'exonic', correlate != 'is_genic
   scale_y_continuous(expand = c(0, 0), limits = c(0, 0.0063), breaks = seq(0.000, 0.006, 0.001)) +
   guides(fill = FALSE)
 
-fig_2
-
 ggsave(fig_2, file = 'fig_2.pdf', width = par('din')[1], height = par('din')[1])
 
 ### 
@@ -183,8 +163,6 @@ rho_div_plot <- ggplot(rho_div, aes(x = log10(rho), y = diversity)) +
   scale_x_continuous(breaks = c(-4:-1), labels = c('0.0001', 10^-3, 10^-2, 10^-1)) +
   theme(axis.line.x = element_line(size = 0.9),
         axis.line.y = element_line(size = 0.9))
-
-rho_div_plot
 
 ggsave(rho_div_plot, file = 'fig_3.pdf',
        width = par('din')[1], height = par('din')[1])
@@ -244,8 +222,6 @@ hotspot_plot <- dist50k %>%
         axis.text.y = element_text(family = 'Helvetica', size = 10, color = 'black'),
         panel.border = element_rect(size = 0.4, color = 'grey'))
 
-hotspot_plot
-
 ggsave(hotspot_plot, file = 'fig_s1.pdf',
        width = par('din')[1] * 1.25, height = par('din')[1])
 
@@ -283,8 +259,6 @@ fig_s2 <- ggplot(chrom_means, aes(x = lengths / 1e6, y = mean_rho)) +
            label = 'italic(R) ^ 2 == 0.48',
            parse = TRUE) # from https://github.com/tidyverse/ggplot2/pull/1553
 
-fig_s2
-
 ggsave(fig_s2, file = 'fig_s2.pdf', width = par('din')[1], height = par('din')[1])
 
 ### 
@@ -296,11 +270,9 @@ blocks <- map(
 ) %>%
   map(~non_overlapping(., 500))
 
-library(stringr)
-
 names(blocks) <- list.files('ldhelmet/') %>% 
   str_extract(., '12_[0-9]{2,3}_500') %>% 
-  str_replace('12_', 'slide') %>%  # need 'slide' to keep as character
+  str_replace('12_', 'slide') %>%  # keeps colname as character vector
   str_replace('_500', '')
 
 block_plot <- function(df_input) {
