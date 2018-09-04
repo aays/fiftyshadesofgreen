@@ -71,7 +71,6 @@ decay_plot <- plink_lines %>%
   ggplot(aes(x = d_kb, y = rho, color = factor(lengths))) +
   geom_line(size = 0.5, alpha = 0.7) +
   coord_cartesian(x = c(0, 20)) +
-  # scale_x_continuous(breaks = c(0, 10000, 20000))
   scale_color_manual(values = cols) +
   fig_1_theme +
   guides(colour = FALSE) +
