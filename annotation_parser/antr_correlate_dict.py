@@ -21,32 +21,30 @@ except ImportError:
     sys.path.append('/scratch/research/projects/chlamydomonas/genomewide_recombination/analysis/fiftyshadesofgreen/annotation_parser/')
 
 # args
-parser = argparse.ArgumentParser(description = 'General purpose calculation of rho w/ attributes in defined windows.',
-                                usage = 'antr_correlation.py [options]')
+def args():
+    parser = argparse.ArgumentParser(description = 'General purpose calculation of rho w/ attributes in defined windows.',
+                                    usage = 'antr_correlation.py [options]')
 
-parser.add_argument('-t', '--table', required = True,
-                   type = str, help = 'Annotation table file (.txt.gz)')
-parser.add_argument('-w', '--windowsize', required = True,
-                   type = int, help = 'Window size')
-parser.add_argument('-c', '--correlates', required = False,
-                   type = str, nargs = '+', help = 'Space separated list of correlates. Be as exact with naming as possible.')
-parser.add_argument('-g', '--gc_content', required = False,
-                   action = 'store_true', help = 'Include GC content in output file? (Optional)')
-parser.add_argument('-x', '--gene_context', required = False,
-                   type = int, help = 'Report rho for regions of x kb downstream and upstream of all genes. (Optional)')
+    parser.add_argument('-t', '--table', required = True,
+                       type = str, help = 'Annotation table file (.txt.gz)')
+    parser.add_argument('-w', '--windowsize', required = True,
+                       type = int, help = 'Window size')
+    parser.add_argument('-c', '--correlates', required = False,
+                       type = str, nargs = '+', help = 'Space separated list of correlates. Be as exact with naming as possible.')
+    parser.add_argument('-g', '--gc_content', required = False,
+                       action = 'store_true', help = 'Include GC content in output file? (Optional)')
+    parser.add_argument('-x', '--gene_context', required = False,
+                       type = int, help = 'Report rho for regions of x kb downstream and upstream of all genes. (Optional)')
 
-args = parser.parse_args()
+    args = parser.parse_args()
 
-table = args.table
-windowsize = int(args.windowsize)
-correlates = args.correlates
-gc = args.gc_content
-context_size = args.gene_context
-
-if not correlates and not gc:
-    print('Please provide one or more correlates.')
-    print('This could also be just GC content (use --gc_content without providing anything to -c)')
-    sys.exit(1)
+    if not args.correlates and not args.gc_content:
+        print('Please provide one or more correlates.')
+        print('This could also be just GC content (use --gc_content without providing anything to -c)')
+        sys.exit(1)
+    
+    return [args.table, int(args.windowsize), args.correlates, 
+            args.gc_content, args.gene_context]
 
 # chromosome lengths - hardcoded for chlamy
 lengths = {'chromosome_1': 8033585,
@@ -116,98 +114,102 @@ def check_gene_proximity(record, dist, direction):
     except:
         return False
 
-
-# print column headers
-if correlates:
-    if context_size: # ie upstream/downstream of genes
-        correlates.extend(['upstream', 'downstream', 'both'])
-    title1 = ' '.join([item + '_total' for item in correlates])
-    title2 = ' '.join([item + '_count' for item in correlates])
-    if gc:
-        print('chromosome', 'start', 'end', title1, title2, 'GC%', 'count')
-    elif not gc:
-        print('chromosome', 'start', 'end', title1, title2, 'count')    
-elif gc and not correlates:
-    print('chromosome', 'start', 'end', 'GC%', 'rho', 'rho_total', 'count')
-
-# iterate through chromosomes
-for chrom in range(1, 18):
-    current_chrom = 'chromosome_{}'.format(str(chrom))
-    windows = list(range(0, lengths[current_chrom], windowsize)) + [lengths[current_chrom]]
-
-    p = antr.Reader(table)
-
-    for i in range(len(windows) - 1):
-        window = (windows[i], windows[i + 1])
-        
-        if correlates:
-            rho = OrderedDict.fromkeys(correlates, 0.0)
-            count = OrderedDict.fromkeys(correlates, 0)
-            total_counter = 0
-            
-            # iterate through records in window
-            for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
-                for key in rho.keys():
-                    if key in ['upstream', 'downstream', 'both']:
-                        continue
-                        
-                    elif attr_fetch(record, key) and not record.ld_rho == 'NA':
-                        if key == 'intergenic' and attr_fetch(record, 'intergenic') and context_size:
-                            neither = True
-                            upstream = False
-                            downstream = False
-
-                            if check_gene_proximity(record, context_size, 'u'):
-                                neither = False
-                                upstream = True
-                            if check_gene_proximity(record, context_size, 'd'):
-                                neither = False
-                                downstream = True
-
-                            if upstream and downstream:
-                                rho['both'] += record.ld_rho
-                                count['both'] += 1
-                                total_counter += 1
-                                continue # don't class as intergenic
-                            elif upstream and not downstream:
-                                rho['upstream'] += record.ld_rho
-                                count['upstream'] += 1
-                                total_counter += 1
-                                continue
-                            elif downstream and not upstream:
-                                rho['downstream'] += record.ld_rho
-                                count['downstream'] += 1
-                                total_counter += 1
-                                continue
-                            elif neither: # continue to code below
-                                pass
-
-                        rho[key] += record.ld_rho
-                        count[key] += 1
-                        total_counter += 1
-                    else:
-                        continue
-
-            rhovals = list(rho.values())
-            countvals = list(count.values())
-
-            totals = ' '.join([str(v) for v in rhovals])
-            counts = ' '.join([str(v) for v in countvals])
-            
-        if gc: # gc content option selected
-            gc_rho = 0.0
-            gc_counter = 0
-            
-            for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
-                gc_rho += record.ld_rho
-                gc_counter += 1
-            
-            gc_window = gc_calc(current_chrom, window, table)
-            gc_rho_perbp = gc_rho / gc_counter
-            
-            if correlates:
-                print(current_chrom, window[0], window[1], totals, counts, gc_window, total_counter)
-            elif not correlates:
-                print(current_chrom, window[0], window[1], gc_window, gc_rho_perbp, gc_rho, gc_counter)
+def main(table, windowsize, correlates, gc_content, gene_context):
+    # print column headers
+    if correlates:
+        if context_size: # ie upstream/downstream of genes
+            correlates.extend(['upstream', 'downstream', 'both'])
+        title1 = ' '.join([item + '_total' for item in correlates])
+        title2 = ' '.join([item + '_count' for item in correlates])
+        if gc:
+            print('chromosome', 'start', 'end', title1, title2, 'GC', 'count')
         elif not gc:
-            print(current_chrom, window[0], window[1], totals, counts, total_counter)
+            print('chromosome', 'start', 'end', title1, title2, 'count')    
+    elif gc and not correlates:
+        print('chromosome', 'start', 'end', 'GC', 'rho', 'rho_total', 'count')
+
+    # iterate through chromosomes
+    for chrom in range(1, 18):
+        current_chrom = 'chromosome_{}'.format(str(chrom))
+        windows = list(range(0, lengths[current_chrom], windowsize)) + [lengths[current_chrom]]
+
+        p = antr.Reader(table)
+
+        for i in range(len(windows) - 1):
+            window = (windows[i], windows[i + 1])
+
+            if correlates:
+                rho = OrderedDict.fromkeys(correlates, 0.0)
+                count = OrderedDict.fromkeys(correlates, 0)
+                total_counter = 0
+
+                # iterate through records in window
+                for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
+                    for key in rho.keys():
+                        if key in ['upstream', 'downstream', 'both']:
+                            continue
+
+                        elif attr_fetch(record, key) and not record.ld_rho == 'NA':
+                            if key == 'intergenic' and attr_fetch(record, 'intergenic') and context_size:
+                                neither = True
+                                upstream = False
+                                downstream = False
+
+                                if check_gene_proximity(record, context_size, 'u'):
+                                    neither = False
+                                    upstream = True
+                                if check_gene_proximity(record, context_size, 'd'):
+                                    neither = False
+                                    downstream = True
+
+                                if upstream and downstream:
+                                    rho['both'] += record.ld_rho
+                                    count['both'] += 1
+                                    total_counter += 1
+                                    continue # don't class as intergenic
+                                elif upstream and not downstream:
+                                    rho['upstream'] += record.ld_rho
+                                    count['upstream'] += 1
+                                    total_counter += 1
+                                    continue
+                                elif downstream and not upstream:
+                                    rho['downstream'] += record.ld_rho
+                                    count['downstream'] += 1
+                                    total_counter += 1
+                                    continue
+                                elif neither: # continue to code below
+                                    pass
+
+                            rho[key] += record.ld_rho
+                            count[key] += 1
+                            total_counter += 1
+                        else:
+                            continue
+
+                rhovals = list(rho.values())
+                countvals = list(count.values())
+
+                totals = ' '.join([str(v) for v in rhovals])
+                counts = ' '.join([str(v) for v in countvals])
+
+            if gc: # gc content option selected
+                gc_rho = 0.0
+                gc_counter = 0
+
+                for record in tqdm(p.fetch(current_chrom, window[0], window[1])):
+                    gc_rho += record.ld_rho
+                    gc_counter += 1
+
+                gc_window = gc_calc(current_chrom, window, table)
+                gc_rho_perbp = gc_rho / gc_counter
+
+                if correlates:
+                    print(current_chrom, window[0], window[1], totals, counts, gc_window, total_counter)
+                elif not correlates:
+                    print(current_chrom, window[0], window[1], gc_window, gc_rho_perbp, gc_rho, gc_counter)
+            elif not gc:
+                print(current_chrom, window[0], window[1], totals, counts, total_counter)
+
+if __name__ == 'main':
+    arguments = args()
+    main(*arguments)
