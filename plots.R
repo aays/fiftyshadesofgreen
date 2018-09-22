@@ -135,9 +135,18 @@ fig_2 <- ggplot(filter(correlates, correlate != 'exonic', correlate != 'is_genic
 ggsave(fig_2, file = 'fig_2.pdf', width = par('din')[1], height = par('din')[1])
 
 ### 
-# figure 3 - rho ~ diversity plot
+# figure 3 - 
+# A - rho ~ diversity plot
+# B - rho ~ CO_density
+# C - CO_density ~ diversity
 
 rho_div <- read_delim('rho_diversity_genedensity_100k.txt', delim = ' ')
+rho_density <- read_csv('rho_to_CO_density.txt') %>% 
+  mutate(bins = str_replace(bins, '\\(', '')) %>%
+  mutate(bins = str_replace(bins, '\\)', '')) %>% 
+  separate(bins, into = c('bin_left', 'bin_right'), sep = ', ') %>% 
+  mutate(bin_left = as.numeric(bin_left), bin_right = as.numeric(bin_right))
+pi_density <- read_csv('pi_by_CO_density.txt')
 
 div_theme <- function(font_size = 12) {
   out <- theme(plot.title = element_text(family = "Helvetica", hjust = 0.5),
@@ -149,10 +158,13 @@ div_theme <- function(font_size = 12) {
                axis.line = element_line(colour = 'black', linetype = 'solid', size = 1.2),
                plot.tag = element_text(family = "Helvetica", size = font_size, color = 'black', face = 'bold'),
                panel.background = element_blank(),
-               axis.ticks = element_line(size = 0.9))
+               axis.ticks = element_line(size = 0.9),
+               axis.line.x = element_line(size = 0.9),
+               axis.line.y = element_line(size = 0.9))
   return(out)
 }
 
+# 3A
 rho_div_plot <- ggplot(rho_div, aes(x = log10(rho), y = diversity)) +
   geom_point(size = 1.5) +
   div_theme(font_size = 20) +
@@ -160,11 +172,43 @@ rho_div_plot <- ggplot(rho_div, aes(x = log10(rho), y = diversity)) +
   ylab(expression(paste('Nucleotide diversity (', theta[pi], ')'))) +
   coord_cartesian(x = c(-4.5, -1)) +
   scale_x_continuous(breaks = c(-4:-1), labels = c('0.0001', 10^-3, 10^-2, 10^-1)) +
-  theme(axis.line.x = element_line(size = 0.9),
-        axis.line.y = element_line(size = 0.9))
+  labs(tag = 'A')
 
-ggsave(rho_div_plot, file = 'fig_3.pdf',
-       width = par('din')[1], height = par('din')[1])
+# 3B
+rho_density_plot <- rho_density %>% 
+  filter(COs != 0) %>% 
+  ggplot(aes(x = rho_midpoints, y = log10(CO_density))) +
+  geom_point(size = 1.5) +
+  div_theme(font_size = 20) +
+  geom_smooth(method = 'lm', se = FALSE) +
+  xlab(expression(paste(rho, 'LD'))) +
+  ylab('CO density') +
+  scale_y_continuous(breaks = c(seq(-5, -3.5, by = 0.5)),
+    labels = c(expression(10^-5), expression(10^-4.5), # manual solution...
+                                expression(10^-4), expression(10^-3.5))) +
+  labs(tag = 'B')
+
+# 3C
+pi_density_plot <- pi_density %>% 
+  filter(COs != 0) %>% 
+  ggplot(aes(x = log10(CO_density), y = Diversity)) +
+  geom_point(size = 1.5) +
+  div_theme(font_size = 20) +
+  geom_smooth(method = 'lm', se = FALSE) +
+  scale_x_continuous(breaks = c(seq(-5, -4, by = 0.5)),
+    labels = c(expression(10^-5), expression(10^-4.5),
+                                expression(10^-4))) +
+  xlab('CO density') +
+  ylab(expression(paste('Nucleotide diversity (', theta[pi], ')'))) +
+  labs(tag = 'C')
+  
+# putting it together with patchwork
+fig_3 <- rho_div_plot + {
+  rho_density_plot + pi_density_plot + plot_layout(ncol = 1)
+}
+
+ggsave(fig_3, file = 'fig_3.pdf', 
+       width = par('din')[1] * 1.5, height = par('din')[1] * 0.8)
 
 ###
 # fig S1 - landscape plot in 50 kb windows
