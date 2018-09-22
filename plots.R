@@ -2,7 +2,7 @@
 
 # these require ggplot2 3.0 - install w/ devtools
 
-# setwd('Desktop/Research/papers/2018-LD-recombination/plots/')
+# setwd('Desktop/Research/papers/2019-LD-recombination/plots/')
 
 library(readr)
 library(dplyr)
@@ -167,9 +167,9 @@ div_theme <- function(font_size = 12) {
 # 3A
 rho_div_plot <- ggplot(rho_div, aes(x = log10(rho), y = diversity)) +
   geom_point(size = 1.5) +
-  div_theme(font_size = 20) +
-  xlab(expression(paste('log(', rho, 'LD)'))) +
-  ylab(expression(paste('Nucleotide diversity (', theta[pi], ')'))) +
+  div_theme(font_size = 18) +
+  xlab(expression(paste(rho, 'LD'))) +
+  ylab(expression(paste('Diversity (', theta[pi], ')'))) +
   coord_cartesian(x = c(-4.5, -1)) +
   scale_x_continuous(breaks = c(-4:-1), labels = c('0.0001', 10^-3, 10^-2, 10^-1)) +
   labs(tag = 'A')
@@ -179,7 +179,7 @@ rho_density_plot <- rho_density %>%
   filter(COs != 0) %>% 
   ggplot(aes(x = rho_midpoints, y = log10(CO_density))) +
   geom_point(size = 1.5) +
-  div_theme(font_size = 20) +
+  div_theme(font_size = 18) +
   geom_smooth(method = 'lm', se = FALSE) +
   xlab(expression(paste(rho, 'LD'))) +
   ylab('CO density') +
@@ -193,22 +193,28 @@ pi_density_plot <- pi_density %>%
   filter(COs != 0) %>% 
   ggplot(aes(x = log10(CO_density), y = Diversity)) +
   geom_point(size = 1.5) +
-  div_theme(font_size = 20) +
+  div_theme(font_size = 18) +
   geom_smooth(method = 'lm', se = FALSE) +
   scale_x_continuous(breaks = c(seq(-5, -4, by = 0.5)),
     labels = c(expression(10^-5), expression(10^-4.5),
                                 expression(10^-4))) +
   xlab('CO density') +
-  ylab(expression(paste('Nucleotide diversity (', theta[pi], ')'))) +
+  ylab(expression(paste('Diversity (', theta[pi], ')'))) +
   labs(tag = 'C')
+
+# blank plot - to stick on either side of final plot
+# this is so that B and C aren't in a super 'wide' format
+blank_plot <- ggplot(pi_density) +
+  geom_blank()
   
 # putting it together with patchwork
-fig_3 <- rho_div_plot + {
+fig_3 <- blank_plot + rho_div_plot + {
   rho_density_plot + pi_density_plot + plot_layout(ncol = 1)
-}
+} + blank_plot + 
+  plot_layout(ncol = 4, nrow = 1, width = c(0.1, 1, 0.6, 0.3))
 
 ggsave(fig_3, file = 'fig_3.pdf', 
-       width = par('din')[1] * 1.5, height = par('din')[1] * 0.8)
+       width = par('din')[1] * 1.8, height = par('din')[1] * 0.9)
 
 ###
 # fig S1 - landscape plot in 50 kb windows
