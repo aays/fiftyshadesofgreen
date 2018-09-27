@@ -1,8 +1,8 @@
 # plots for LD paper
 
-# these require ggplot2 3.0 - install w/ devtools
+# these require ggplot2 3.0
 
-# setwd('Desktop/Research/papers/2019-LD-recombination/plots/')
+# setwd('Desktop/Research/papers/2018-LD-recombination/plots/')
 
 library(readr)
 library(dplyr)
@@ -190,7 +190,8 @@ rho_density_plot <- rho_density %>%
 
 # 3C
 pi_density_plot <- pi_density %>% 
-  filter(COs != 0) %>% 
+  mutate(silent_sites = fold4 + intronic + intergenic) %>% 
+  filter(sites >= 100000, silent_sites >= 500) %>% 
   ggplot(aes(x = log10(CO_density), y = Diversity)) +
   geom_point(size = 1.5) +
   div_theme(font_size = 18) +
@@ -198,8 +199,10 @@ pi_density_plot <- pi_density %>%
   scale_x_continuous(breaks = c(seq(-5, -4, by = 0.5)),
     labels = c(expression(10^-5), expression(10^-4.5),
                                 expression(10^-4))) +
+  scale_y_continuous(breaks = c(seq(0, 0.06, 0.02))) +
   xlab('CO density') +
   ylab(expression(paste('Diversity (', theta[pi], ')'))) +
+  coord_cartesian(x = c(-5.4, -3.8), y = c(0, 0.06)) +
   labs(tag = 'C')
 
 # blank plot - to stick on either side of final plot
